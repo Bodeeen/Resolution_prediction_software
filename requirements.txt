@@ -1,0 +1,6 @@
+dataclasses; python_version < "3.7"
+dataclasses-json
+GDAL
+PyQt5
+pyqtgraph
+PySignal
