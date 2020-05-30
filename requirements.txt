@@ -1,5 +1,5 @@
 dataclasses; python_version < "3.7"
-dataclasses-json
+dataclasses-json >= 0.4.4
 GDAL
 PyQt5
 pyqtgraph

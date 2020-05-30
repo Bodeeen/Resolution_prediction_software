@@ -1,57 +1,37 @@
 from dataclasses import dataclass, field
+from dataclasses_json import config, Exclude
 import numpy as np
 from osgeo import gdal_array
 from PySignal import Signal
 
+from frcpredict.util import observable_field
+
 
 @dataclass
 class ImagingSystemSettings:
-    optical_psf: np.ndarray
-    pinhole_function: np.ndarray
-    scanning_step_size: float
+    optical_psf: np.ndarray = observable_field(
+        "_optical_psf", default=None,
+        signal_name="optical_psf_changed", emit_arg_name="optical_psf"
+    )
 
-    # Internal fields
-    _scanning_step_size: float = field(init=False, repr=False, default=0.0)
-    _initialized: bool = field(init=False, repr=False, default=False)  # TODO: Fix this ugly stuff
+    pinhole_function: np.ndarray = observable_field(
+        "_pinhole_function", default=None,
+        signal_name="pinhole_function_changed", emit_arg_name="pinhole_function")
 
-    # Properties
-    @property
-    def optical_psf(self) -> np.ndarray:
-        return self._optical_psf
+    scanning_step_size: float = observable_field(
+        "_scanning_step_size", default=0.0,
+        signal_name="basic_field_changed"
+    )
 
-    @optical_psf.setter
-    def optical_psf(self, optical_psf: np.ndarray) -> None:
-        self._optical_psf = optical_psf
-        if self._initialized:
-            self.optical_psf_changed.emit(optical_psf)
-
-    @property
-    def pinhole_function(self) -> np.ndarray:
-        return self._pinhole_function
-
-    @pinhole_function.setter
-    def pinhole_function(self, pinhole_function: np.ndarray) -> None:
-        self._pinhole_function = pinhole_function
-        if self._initialized:
-            self.pinhole_function_changed.emit(pinhole_function)
-
-    @property
-    def scanning_step_size(self) -> float:
-        return self._scanning_step_size
-
-    @scanning_step_size.setter
-    def scanning_step_size(self, scanning_step_size: float) -> None:
-        self._scanning_step_size = scanning_step_size
-        if self._initialized:
-            self.basic_field_changed.emit(self)
+    # Signals
+    optical_psf_changed: Signal = field(
+        init=False, repr=False, default_factory=Signal, metadata=config(exclude=Exclude.ALWAYS))
+    pinhole_function_changed: Signal = field(
+        init=False, repr=False, default_factory=Signal, metadata=config(exclude=Exclude.ALWAYS))
+    basic_field_changed: Signal = field(
+        init=False, repr=False, default_factory=Signal, metadata=config(exclude=Exclude.ALWAYS))
 
     # Functions
-    def __post_init__(self):  # TODO: Fix this ugly stuff
-        self.optical_psf_changed = Signal()
-        self.pinhole_function_changed = Signal()
-        self.basic_field_changed = Signal()
-        self._initialized = True
-
     def load_optical_psf_npy(self, path: str) -> None:
         """ Loads an optical PSF from an .npy file. """
         self.optical_psf = np.load(path)

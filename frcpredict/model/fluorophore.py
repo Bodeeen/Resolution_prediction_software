@@ -1,58 +1,30 @@
 from dataclasses import dataclass, field
+from dataclasses_json import config, Exclude
 from PySignal import Signal
 from typing import Any, List, Dict
+
+from frcpredict.util import observable_field
 
 
 @dataclass
 class IlluminationResponse:
     wavelength_start: int
     wavelength_end: int
-    cross_section_off_to_on: float
-    cross_section_on_to_off: float
-    cross_section_emission: float
 
-    # Internal fields
-    _cross_section_off_to_on: float = field(init=False, repr=False, default=0.0)
-    _cross_section_on_to_off: float = field(init=False, repr=False, default=0.0)
-    _cross_section_emission: float = field(init=False, repr=False, default=0.0)
-    _initialized: bool = field(init=False, repr=False, default=False)  # TODO: Fix this ugly stuff
+    cross_section_off_to_on: float = observable_field("_cross_section_off_to_on", default=0.0,
+                                                      signal_name="basic_field_changed")
 
-    # Properties
-    @property
-    def cross_section_off_to_on(self) -> float:
-        return self._cross_section_off_to_on
+    cross_section_on_to_off: float = observable_field("_cross_section_on_to_off", default=0.0,
+                                                      signal_name="basic_field_changed")
 
-    @cross_section_off_to_on.setter
-    def cross_section_off_to_on(self, cross_section_off_to_on: float) -> None:
-        self._cross_section_off_to_on = cross_section_off_to_on
-        if self._initialized:
-            self.basic_field_changed.emit(self)
+    cross_section_emission: float = observable_field("_cross_section_emission", default=0.0,
+                                                     signal_name="basic_field_changed")
 
-    @property
-    def cross_section_on_to_off(self) -> float:
-        return self._cross_section_on_to_off
-
-    @cross_section_on_to_off.setter
-    def cross_section_on_to_off(self, cross_section_on_to_off: float) -> None:
-        self._cross_section_on_to_off = cross_section_on_to_off
-        if self._initialized:
-            self.basic_field_changed.emit(self)
-
-    @property
-    def cross_section_emission(self) -> float:
-        return self._cross_section_emission
-
-    @cross_section_emission.setter
-    def cross_section_emission(self, cross_section_emission: float) -> None:
-        self._cross_section_emission = cross_section_emission
-        if self._initialized:
-            self.basic_field_changed.emit(self)
+    # Signals
+    basic_field_changed: Signal = field(
+        init=False, repr=False, default_factory=Signal, metadata=config(exclude=Exclude.ALWAYS))
 
     # Functions
-    def __post_init__(self):  # TODO: Fix this ugly stuff
-        self.basic_field_changed = Signal()
-        self._initialized = True
-
     def __str__(self) -> str:
         if self.wavelength_start == self.wavelength_end:
             return f"{self.wavelength_start} nm"
@@ -66,8 +38,13 @@ class FluorophoreSettings:
 
     # Internal fields
     _responses: Dict[int, IlluminationResponse] = field(
-        init=False, repr=False, default_factory=dict)
-    _initialized: bool = field(init=False, repr=False, default=False)  # TODO: Fix this ugly stuff
+        init=False, repr=False, default_factory=dict, metadata=config(exclude=Exclude.ALWAYS))
+
+    # Signals
+    response_added: Signal = field(
+        init=False, repr=False, default_factory=Signal, metadata=config(exclude=Exclude.ALWAYS))
+    response_removed: Signal = field(
+        init=False, repr=False, default_factory=Signal, metadata=config(exclude=Exclude.ALWAYS))
 
     # Properties
     @property
@@ -83,11 +60,6 @@ class FluorophoreSettings:
             self.add_response(response)
 
     # Functions
-    def __post_init__(self):  # TODO: Fix this ugly stuff
-        self.response_added = Signal()
-        self.response_removed = Signal()
-        self._initialized = True
-
     def add_response(self, response: IlluminationResponse) -> bool:
         """
         Adds a response. Returns true if successful, or false if there was a wavelength collision.
@@ -99,16 +71,14 @@ class FluorophoreSettings:
                 return False
 
         self._responses[response.wavelength_start] = response
-        if self._initialized:
-            self.response_added.emit(response)
+        self.response_added.emit(response)
 
         return True
 
     def remove_response(self, wavelength_start) -> None:
         """ Removes the response with the specified wavelength attributes. """
         removed_response = self._responses.pop(wavelength_start)
-        if self._initialized:
-            self.response_removed.emit(removed_response)
+        self.response_removed.emit(removed_response)
 
     def clear_responses(self) -> None:
         """ Removes all responses. """
