@@ -55,8 +55,10 @@ class ImagingSystemSettings:
         raster_array = gdal_array.LoadFile(path)  # Load image as numpy array
 
         if np.issubdtype(raster_array.dtype, np.integer):
-            raster_array = raster_array / 256.0  # Image has int values, normalise
+            raster_array = raster_array / 256.0  # Image has int values; normalise
 
-        raster_array = np.mean(raster_array, axis=0)  # Average values over channels
+        if raster_array.ndim > 2:
+            # Image has multiple channels; average the values over the channels
+            raster_array = np.mean(raster_array, axis=0)
 
         return raster_array
