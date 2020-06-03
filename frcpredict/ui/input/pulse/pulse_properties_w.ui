@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>344</width>
+    <height>123</height>
+   </rect>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>16777215</width>
+    <height>16777215</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <property name="spacing">
+    <number>12</number>
+   </property>
+   <item>
+    <layout class="QFormLayout" name="formLayout_5">
+     <property name="horizontalSpacing">
+      <number>9</number>
+     </property>
+     <property name="verticalSpacing">
+      <number>6</number>
+     </property>
+     <item row="0" column="0">
+      <widget class="QLabel" name="lblWavelength">
+       <property name="text">
+        <string>Wavelength:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QSpinBox" name="editWavelength">
+       <property name="suffix">
+        <string> nm</string>
+       </property>
+       <property name="minimum">
+        <number>0</number>
+       </property>
+       <property name="maximum">
+        <number>10000</number>
+       </property>
+       <property name="value">
+        <number>0</number>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="lblDuration">
+       <property name="text">
+        <string>Duration:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QDoubleSpinBox" name="editDuration">
+       <property name="prefix">
+        <string/>
+       </property>
+       <property name="suffix">
+        <string> ms</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="lblMaxIntensity">
+       <property name="text">
+        <string>Max intensity:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QDoubleSpinBox" name="editMaxIntensity">
+       <property name="suffix">
+        <string> kW/cm²</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="lblOrder">
+       <property name="text">
+        <string>Order:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0,1">
+       <item>
+        <widget class="QPushButton" name="btnMoveLeft">
+         <property name="maximumSize">
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>&lt;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="widget" native="true"/>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnMoveRight">
+         <property name="maximumSize">
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>&gt;</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="spacing">
+      <number>6</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="lblIlluminationPattern">
+       <property name="text">
+        <string>Illumination pattern:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QListWidget" name="listPatterns">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>64</height>
+          </size>
+         </property>
+         <property name="baseSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="imgIlluminationPattern">
+         <property name="minimumSize">
+          <size>
+           <width>48</width>
+           <height>48</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>48</width>
+           <height>48</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="scaledContents">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>editWavelength</tabstop>
+  <tabstop>editDuration</tabstop>
+  <tabstop>editMaxIntensity</tabstop>
+  <tabstop>listPatterns</tabstop>
+  <tabstop>btnMoveLeft</tabstop>
+  <tabstop>btnMoveRight</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

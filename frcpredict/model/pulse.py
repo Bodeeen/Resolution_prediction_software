@@ -1,14 +1,123 @@
-from dataclasses import dataclass
-from typing import List
+from dataclasses import dataclass, field
+from dataclasses_json import config as json_config, Exclude
+from collections import OrderedDict
+from PySignal import Signal
+import numpy as np
+from typing import List, Dict
+import uuid
+
+from frcpredict.util import observable_property
 
 
 @dataclass
 class Pulse:
-    wavelength: float
-    duration: float
-    intensity_pattern: str
+    wavelength: int = observable_property(
+        "_wavelength", default=0.0,
+        signal_name="basic_field_changed"
+    )
+
+    duration: float = observable_property(
+        "_duration", default=0.0,
+        signal_name="basic_field_changed"
+    )
+
+    max_intensity: float = observable_property(
+        "_max_intensity", default=0.0,
+        signal_name="basic_field_changed"
+    )
+
+    illumination_pattern: np.ndarray = observable_property(
+        "_illumination_pattern", default=np.zeros((80, 80)),
+        signal_name="illumination_pattern_changed", emit_arg_name="illumination_pattern")
+
+    # Signals
+    basic_field_changed: Signal = field(
+        init=False, repr=False, default_factory=Signal, metadata=json_config(exclude=Exclude.ALWAYS))
+    illumination_pattern_changed: Signal = field(
+        init=False, repr=False, default_factory=Signal, metadata=json_config(exclude=Exclude.ALWAYS))
 
 
 @dataclass
 class PulseScheme:
     pulses: List[Pulse]
+
+    # Internal fields
+    _pulses: OrderedDict = field(
+        init=False, repr=False, default_factory=OrderedDict, metadata=json_config(exclude=Exclude.ALWAYS))
+
+    # Signals
+    pulse_added: Signal = field(
+        init=False, repr=False, default_factory=Signal, metadata=json_config(exclude=Exclude.ALWAYS))
+    pulse_moved: Signal = field(
+        init=False, repr=False, default_factory=Signal, metadata=json_config(exclude=Exclude.ALWAYS))
+    pulse_removed: Signal = field(
+        init=False, repr=False, default_factory=Signal, metadata=json_config(exclude=Exclude.ALWAYS))
+
+    # Properties
+    @property
+    def pulses(self) -> List[Pulse]:
+        return self._pulses.values()
+
+    @pulses.setter
+    def pulses(self, pulses: List[Pulse]) -> None:
+        self._pulses = {}
+
+        self.clear_pulses()
+        for pulse in pulses:
+            self.add_pulse(pulse)
+    
+    # Methods
+    def add_pulse(self, pulse: Pulse) -> None:
+        """ Adds a pulse. """
+        key = str(uuid.uuid4())  # Random key
+        self._pulses[key] = pulse
+        self.pulse_added.emit(key, pulse)
+
+    def remove_pulse(self, key: str) -> None:
+        """ Removes the pulse with the specified key. """
+        removed_pulse = self._pulses.pop(key)
+        self.pulse_removed.emit(key, removed_pulse)
+
+    def clear_pulses(self) -> None:
+        """ Removes all pulses. """
+        for key in self._pulses.keys():
+            self.remove_pulse(key)
+
+    def move_pulse_left(self, key: str) -> None:
+        """ Moves the pulse with the specified key one step to the left in the order. """
+        existing_keys = list(self._pulses.keys()).copy()
+        
+        i = len(existing_keys) - 1
+        while i >= 0:
+            has_moved_requested = False
+            if key == existing_keys[i] and len(existing_keys) > i - 1:
+                self._pulses.move_to_end(existing_keys[i - 1], last=False)
+                has_moved_requested = True
+            
+            self._pulses.move_to_end(existing_keys[i], last=False)
+            if has_moved_requested:
+                i -= 2
+            else:
+                i -= 1
+
+        self.pulse_moved.emit(key, self._pulses[key])
+
+    def move_pulse_right(self, key: str) -> None:
+        """ Moves the pulse with the specified key one step to the right in the order. """
+        existing_keys = list(self._pulses.keys()).copy()
+        
+        i = 0
+        while i < len(existing_keys):
+            has_moved_requested = False
+            if key == existing_keys[i] and len(existing_keys) > i + 1:
+                self._pulses.move_to_end(existing_keys[i + 1], last=True)
+                has_moved_requested = True
+            
+            self._pulses.move_to_end(existing_keys[i], last=True)
+            if has_moved_requested:
+                i += 2
+            else:
+                i += 1
+
+        self.pulse_moved.emit(key, self._pulses[key])
+

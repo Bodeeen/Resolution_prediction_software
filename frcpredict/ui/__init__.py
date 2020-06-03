@@ -13,7 +13,8 @@ from .input.fluorophore.response_properties_w import ResponsePropertiesWidget
 
 from .input.imaging.imaging_settings_w import ImagingSystemSettingsWidget
 
-from .input.pulse.pulse_scheme import PulseSchemeWidget
+from .input.pulse.pulse_scheme_w import PulseSchemeWidget
+from .input.pulse.pulse_properties_w import PulsePropertiesWidget
 
 from .input.sample.sample_properties import SamplePropertiesWidget
 

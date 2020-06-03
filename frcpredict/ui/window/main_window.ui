@@ -7,8 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>1120</width>
-    <height>600</height>
+    <height>680</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>1120</width>
+    <height>680</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>frcpredict</string>
@@ -64,7 +70,7 @@
          <number>16</number>
         </property>
         <item>
-         <layout class="QVBoxLayout" name="verticalLayout_6" stretch="2,3">
+         <layout class="QVBoxLayout" name="verticalLayout_6" stretch="3,5">
           <property name="spacing">
            <number>12</number>
           </property>
@@ -203,20 +209,6 @@
             </layout>
            </widget>
           </item>
-          <item>
-           <widget class="QPushButton" name="pushButton">
-            <property name="font">
-             <font>
-              <pointsize>10</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>RUN SIMULATION</string>
-            </property>
-           </widget>
-          </item>
          </layout>
         </item>
        </layout>
@@ -271,6 +263,20 @@
              <weight>50</weight>
              <bold>false</bold>
             </font>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QPushButton" name="pushButton">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>SIMULATE</string>
            </property>
           </widget>
          </item>
