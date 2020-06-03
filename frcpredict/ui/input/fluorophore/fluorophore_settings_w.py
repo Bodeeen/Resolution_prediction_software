@@ -1,9 +1,9 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QListWidgetItem
 
 from frcpredict.model import FluorophoreSettings, IlluminationResponse
 from frcpredict.ui import BaseWidget
 from .fluorophore_settings_p import FluorophoreSettingsPresenter
+from .response_list_item import ResponseListItem
 
 
 class FluorophoreSettingsWidget(BaseWidget):
@@ -11,17 +11,18 @@ class FluorophoreSettingsWidget(BaseWidget):
     A widget where the user may add or remove fluorophore responses.
     """
 
-    # Functions
+    # Methods
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(__file__, *args, **kwargs)
         self._presenter = FluorophoreSettingsPresenter(self)
+        self.editProperties.setWavelengthVisible(False)
 
     def setModel(self, model: FluorophoreSettings) -> None:
         self._presenter.model = model
 
     def addResponseToList(self, response: IlluminationResponse) -> None:
         """ Adds the specified response to the response list and selects it. """
-        item = ResponseItem(response)
+        item = ResponseListItem(response)
         self.listResponses.addItem(item)
         self.listResponses.setCurrentItem(item)
 
@@ -43,39 +44,18 @@ class FluorophoreSettingsWidget(BaseWidget):
         """ Updates controls and response properties widget based on the current selection. """
 
         if response is not None:
-            self.groupProperties.setTitle(f"Properties: {response}")
+            self.groupProperties.setTitle(f"Selected Response: {response}")
             self.editProperties.setModel(response)
             self.editProperties.setEnabled(True)
             self.btnRemoveResponse.setEnabled(True)
         else:
-            self.groupProperties.setTitle("Properties")
+            # Clear properties
+            self.groupProperties.setTitle("Selected Response")
+            self.editProperties.setModel(  # Clear properties
+                IlluminationResponse(
+                    wavelength_start=0.0, wavelength_end=0.0,
+                    cross_section_off_to_on=0.0, cross_section_on_to_off=0.0, cross_section_emission=0.0
+                )
+            )
             self.editProperties.setEnabled(False)
             self.btnRemoveResponse.setEnabled(False)
-
-
-class ResponseItem(QListWidgetItem):
-    """
-    Custom QListWidgetItem that can be initialized/updated with and sorted by wavelength.
-    """
-
-    _wavelengthStart: int
-    _wavelengthEnd: int
-
-    # Functions
-    def __init__(self, response: IlluminationResponse, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self._wavelengthStart = response.wavelength_start
-        self._wavelengthEnd = response.wavelength_end
-        self.setText(str(response))
-
-    def __lt__(self, other: QListWidgetItem) -> bool:
-        if self._wavelengthStart != other._wavelengthStart:
-            return self._wavelengthStart < other._wavelengthStart
-        else:
-            return self._wavelengthEnd < other._wavelengthEnd
-
-    def __gt__(self, other: QListWidgetItem) -> bool:
-        if self._wavelengthStart != other._wavelengthStart:
-            return self._wavelengthStart > other._wavelengthStart
-        else:
-            return self._wavelengthEnd > other._wavelengthEnd

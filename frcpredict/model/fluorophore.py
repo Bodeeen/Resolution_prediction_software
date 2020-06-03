@@ -1,9 +1,9 @@
 from dataclasses import dataclass, field
-from dataclasses_json import config, Exclude
+from dataclasses_json import config as json_config, Exclude
 from PySignal import Signal
 from typing import Any, List, Dict
 
-from frcpredict.util import observable_field
+from frcpredict.util import observable_property
 
 
 @dataclass
@@ -11,20 +11,20 @@ class IlluminationResponse:
     wavelength_start: int
     wavelength_end: int
 
-    cross_section_off_to_on: float = observable_field("_cross_section_off_to_on", default=0.0,
+    cross_section_off_to_on: float = observable_property("_cross_section_off_to_on", default=0.0,
                                                       signal_name="basic_field_changed")
 
-    cross_section_on_to_off: float = observable_field("_cross_section_on_to_off", default=0.0,
+    cross_section_on_to_off: float = observable_property("_cross_section_on_to_off", default=0.0,
                                                       signal_name="basic_field_changed")
 
-    cross_section_emission: float = observable_field("_cross_section_emission", default=0.0,
+    cross_section_emission: float = observable_property("_cross_section_emission", default=0.0,
                                                      signal_name="basic_field_changed")
 
     # Signals
     basic_field_changed: Signal = field(
-        init=False, repr=False, default_factory=Signal, metadata=config(exclude=Exclude.ALWAYS))
+        init=False, repr=False, default_factory=Signal, metadata=json_config(exclude=Exclude.ALWAYS))
 
-    # Functions
+    # Methods
     def __str__(self) -> str:
         if self.wavelength_start == self.wavelength_end:
             return f"{self.wavelength_start} nm"
@@ -38,13 +38,13 @@ class FluorophoreSettings:
 
     # Internal fields
     _responses: Dict[int, IlluminationResponse] = field(
-        init=False, repr=False, default_factory=dict, metadata=config(exclude=Exclude.ALWAYS))
+        init=False, repr=False, default_factory=dict, metadata=json_config(exclude=Exclude.ALWAYS))
 
     # Signals
     response_added: Signal = field(
-        init=False, repr=False, default_factory=Signal, metadata=config(exclude=Exclude.ALWAYS))
+        init=False, repr=False, default_factory=Signal, metadata=json_config(exclude=Exclude.ALWAYS))
     response_removed: Signal = field(
-        init=False, repr=False, default_factory=Signal, metadata=config(exclude=Exclude.ALWAYS))
+        init=False, repr=False, default_factory=Signal, metadata=json_config(exclude=Exclude.ALWAYS))
 
     # Properties
     @property
@@ -59,7 +59,7 @@ class FluorophoreSettings:
         for response in responses:
             self.add_response(response)
 
-    # Functions
+    # Methods
     def add_response(self, response: IlluminationResponse) -> bool:
         """
         Adds a response. Returns true if successful, or false if there was a wavelength collision.
@@ -72,10 +72,9 @@ class FluorophoreSettings:
 
         self._responses[response.wavelength_start] = response
         self.response_added.emit(response)
-
         return True
 
-    def remove_response(self, wavelength_start) -> None:
+    def remove_response(self, wavelength_start: int) -> None:
         """ Removes the response with the specified wavelength attributes. """
         removed_response = self._responses.pop(wavelength_start)
         self.response_removed.emit(removed_response)

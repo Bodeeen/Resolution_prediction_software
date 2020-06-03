@@ -1,5 +1,6 @@
 # Base
 from .base_widget import BaseWidget
+from .base_dialog import BaseDialog
 
 
 # Windows

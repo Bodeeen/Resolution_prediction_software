@@ -1,11 +1,11 @@
 import numpy as np
 
 from PyQt5.QtCore import pyqtSlot, QObject
-from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QFileDialog
 
-from frcpredict.model import ImagingSystemSettings, JsonContainer
+from frcpredict.model import ImagingSystemSettings
 from frcpredict.ui import BaseWidget
+from frcpredict.ui.util import getArrayPixmap
 
 
 class ImagingSystemSettingsPresenter(QObject):
@@ -32,7 +32,7 @@ class ImagingSystemSettingsPresenter(QObject):
         model.pinhole_function_changed.connect(self._onPinholeFunctionChange)
         model.basic_field_changed.connect(self._onBasicFieldChange)
 
-    # Functions
+    # Methods
     def __init__(self, widget, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self._widget = widget
@@ -48,26 +48,14 @@ class ImagingSystemSettingsPresenter(QObject):
             scanning_step_size=1.0
         )
 
-    # Internal functions
-    def _getArrayPixmap(self, arr: np.ndarray) -> QPixmap:
-        """ Converts a numpy array to a QPixmap. """
-
-        uint8_arr = (arr * 256).astype("uint8")  # Convert from [0, 1] floats to [0, 255] ints
-        width = len(arr[0])
-        height = len(arr)
-
-        return QPixmap(
-            QImage(uint8_arr, width, height, width, QImage.Format_Grayscale8)
-        )
-
     # Model event handling
-    def _onOpticalPsfChange(self, optical_psf: np.ndarray) -> None:
+    def _onOpticalPsfChange(self, opticalPsf: np.ndarray) -> None:
         """ Loads the optical PSF into a visualization in the interface. """
-        self._widget.setOpticalPsfPixmap(self._getArrayPixmap(optical_psf))
+        self._widget.setOpticalPsfPixmap(getArrayPixmap(opticalPsf))
 
-    def _onPinholeFunctionChange(self, pinhole_function: np.ndarray) -> None:
+    def _onPinholeFunctionChange(self, pinholeFunction: np.ndarray) -> None:
         """ Loads the pinhole function into a visualization in the interface. """
-        self._widget.setPinholeFunctionPixmap(self._getArrayPixmap(pinhole_function))
+        self._widget.setPinholeFunctionPixmap(getArrayPixmap(pinholeFunction))
 
     def _onBasicFieldChange(self, model: ImagingSystemSettings) -> None:
         """ Loads basic model fields (spinboxes etc.) into the interface fields. """

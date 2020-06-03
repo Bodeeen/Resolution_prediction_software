@@ -4,6 +4,7 @@ from PyQt5.QtCore import pyqtSlot, QObject
 from PyQt5.QtWidgets import QMessageBox, QInputDialog
 
 from frcpredict.model import FluorophoreSettings, IlluminationResponse
+from .add_response_dialog import AddResponseDialog
 
 
 class FluorophoreSettingsPresenter(QObject):
@@ -31,7 +32,7 @@ class FluorophoreSettingsPresenter(QObject):
         model.response_added.connect(self._onResponseAdded)
         model.response_removed.connect(self._onResponseRemoved)
 
-    # Functions
+    # Methods
     def __init__(self, widget, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self._widget = widget
@@ -60,8 +61,8 @@ class FluorophoreSettingsPresenter(QObject):
         if selectedIndex < 0:
             self._selectedResponse = None
         else:
-            # TODO: Move item key logic so that we can get rid of this bad and buggy way of getting
-            #       the selected item
+            # TODO: Move item key logic so that we can get rid of this bad and potentially buggy
+            #       way of getting the selected item
             self._selectedResponse = sorted(self.model.responses,
                                             key=lambda response: response.wavelength_start)[selectedIndex]
 
@@ -70,29 +71,24 @@ class FluorophoreSettingsPresenter(QObject):
     @pyqtSlot()
     def _onClickAddResponse(self) -> None:
         """
-        Adds a new response. A dialog will open for the user to enter the desired wavelength first.
+        Adds a response. A dialog will open for the user to enter the properties first.
 
         TODO: Custom dialog where you can choose to enter a range, and maybe even set all
               parameters (could just reuse response_properties with a couple of additional fields)
         """
-
-        wavelength, ok_pressed = QInputDialog.getInt(
-            self._widget, "Add Response", "Enter wavelength in nanometres:")
-
+        
+        response, ok_pressed = AddResponseDialog.getResponse(self._widget)
         if ok_pressed:
-            self.model.add_response(IlluminationResponse(
-                wavelength_start=wavelength, wavelength_end=wavelength,
-                cross_section_off_to_on=0.5, cross_section_on_to_off=0.25, cross_section_emission=0.25
-            ))
+            self.model.add_response(response)
 
     @pyqtSlot()
     def _onClickRemoveResponse(self) -> None:
         """
-        Removes the currently selected response. A popup will open for the user to confirm first.
+        Removes the currently selected response. A dialog will open for the user to confirm first.
         """
 
         confirmation_result = QMessageBox.question(
-            self._widget, "Remove Response", "Remove the selected response?")
+            self._widget, "Remove Response", f"Remove the selected response \"{self._selectedResponse}\"?")
 
         if confirmation_result == QMessageBox.Yes:
             self.model.remove_response(self._selectedResponse.wavelength_start)

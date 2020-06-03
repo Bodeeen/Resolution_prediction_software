@@ -8,6 +8,10 @@ from frcpredict.model import RunInstance
 
 
 class MainWindow(QMainWindow):
+    """
+    The main window of the program.
+    """
+
     def __init__(self):
         super(MainWindow, self).__init__()
         self._loadUi()

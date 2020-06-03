@@ -1,1 +1,1 @@
-from .dataclass_signals import observable_field
+from .dataclass_signals import observable_property

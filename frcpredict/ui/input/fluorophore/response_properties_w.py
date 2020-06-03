@@ -5,16 +5,20 @@ from .response_properties_p import ResponsePropertiesPresenter
 
 class ResponsePropertiesWidget(BaseWidget):
     """
-    A widget where the user may set imaging system settings.
+    A widget where the user may set propreties of a specific fluorophore response.
     """
 
-    # Functions
+    # Methods
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(__file__, *args, **kwargs)
         self._presenter = ResponsePropertiesPresenter(self)
 
     def setModel(self, model: IlluminationResponse) -> None:
         self._presenter.model = model
+
+    def setWavelengthVisible(self, value: bool) -> None:
+        self.lblWavelength.setVisible(value)
+        self.editWavelength.setVisible(value)
 
     def updateBasicFields(self, model: IlluminationResponse) -> None:
         self.editOffToOn.setValue(model.cross_section_off_to_on)

@@ -23,7 +23,7 @@ class ResponsePropertiesPresenter(QObject):
         # Prepare model events
         model.basic_field_changed.connect(self._onBasicFieldChange)
 
-    # Functions
+    # Methods
     def __init__(self, widget, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self._widget = widget
