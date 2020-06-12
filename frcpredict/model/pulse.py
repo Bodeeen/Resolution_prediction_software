@@ -84,7 +84,7 @@ class PulseScheme:
         i = len(existing_keys) - 1
         while i >= 0:
             has_moved_requested = False
-            if key == existing_keys[i] and len(existing_keys) > i - 1:
+            if key == existing_keys[i] and 0 < i:
                 self._pulses.move_to_end(existing_keys[i - 1], last=False)
                 has_moved_requested = True
             
