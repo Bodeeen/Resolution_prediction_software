@@ -21,6 +21,7 @@ from .input.sample.sample_properties_w import SamplePropertiesWidget
 
 from .input.camera.camera_properties_w import CameraPropertiesWidget
 
+from .input.free_float_box import FreeFloatBox
 from .input.preset_picker import PresetPickerWidget
 
 

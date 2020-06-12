@@ -11,18 +11,18 @@ class ResponsePropertiesWidget(BaseWidget):
     """
 
     # Signals
-    offToOnEdited = pyqtSignal(float)
-    onToOffEdited = pyqtSignal(float)
-    emissionEdited = pyqtSignal(float)
+    offToOnChanged = pyqtSignal(float)
+    onToOffChanged = pyqtSignal(float)
+    emissionChanged = pyqtSignal(float)
 
     # Methods
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(__file__, *args, **kwargs)
 
         # Connect forwarded signals
-        self.editOffToOn.valueEdited.connect(self.offToOnEdited)
-        self.editOnToOff.valueEdited.connect(self.onToOffEdited)
-        self.editEmission.valueEdited.connect(self.emissionEdited)
+        self.editOffToOn.valueChanged.connect(self.offToOnChanged)
+        self.editOnToOff.valueChanged.connect(self.onToOffChanged)
+        self.editEmission.valueChanged.connect(self.emissionChanged)
 
         # Initialize presenter
         self._presenter = ResponsePropertiesPresenter(self)

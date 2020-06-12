@@ -57,7 +57,8 @@ class AddPulseDialog(BaseDialog):
         """ Enables or disables the "OK" button depending on whether the entered data is valid. """
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(
             self.editProperties.editWavelength.value() > 0 and
+            self.editProperties.editDuration.isValid() and
             self.editProperties.editDuration.value() > 0 and
-            self.editProperties.editMaxIntensity.value() > 0 and
-                self.editProperties.listPatterns.currentRow() > -1
+            self.editProperties.editMaxIntensity.isValid() and
+            self.editProperties.listPatterns.currentRow() > -1
         )

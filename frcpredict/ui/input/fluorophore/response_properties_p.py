@@ -31,9 +31,9 @@ class ResponsePropertiesPresenter(BasePresenter[IlluminationResponse]):
         super().__init__(model, widget)
         
         # Prepare UI events
-        widget.offToOnEdited.connect(self._uiOffToOnEdit)
-        widget.onToOffEdited.connect(self._uiOnToOffEdit)
-        widget.emissionEdited.connect(self._uiEmissionEdit)
+        widget.offToOnChanged.connect(self._uiOffToOnChange)
+        widget.onToOffChanged.connect(self._uiOnToOffChange)
+        widget.emissionChanged.connect(self._uiEmissionChange)
 
     # Model event handling
     def _onBasicFieldChange(self, model: IlluminationResponse) -> None:
@@ -42,13 +42,13 @@ class ResponsePropertiesPresenter(BasePresenter[IlluminationResponse]):
 
     # UI event handling
     @pyqtSlot(float)
-    def _uiOffToOnEdit(self, value: float) -> None:
+    def _uiOffToOnChange(self, value: float) -> None:
         self.model.cross_section_off_to_on = value
 
     @pyqtSlot(float)
-    def _uiOnToOffEdit(self, value: float) -> None:
+    def _uiOnToOffChange(self, value: float) -> None:
         self.model.cross_section_on_to_off = value
 
     @pyqtSlot(float)
-    def _uiEmissionEdit(self, value: float) -> None:
+    def _uiEmissionChange(self, value: float) -> None:
         self.model.cross_section_emission = value

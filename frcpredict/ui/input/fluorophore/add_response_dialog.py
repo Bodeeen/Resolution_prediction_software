@@ -15,7 +15,14 @@ class AddResponseDialog(BaseDialog):
     # Methods
     def __init__(self, parent=None, *args, **kwargs) -> None:
         super().__init__(__file__, parent, *args, **kwargs)
+        self._updateOKButton()
         self.editProperties.editWavelength.selectAll()
+
+        # Connect signals
+        self.editProperties.editWavelength.valueChanged.connect(self._updateOKButton)
+        self.editProperties.editOffToOn.valueChanged.connect(self._updateOKButton)
+        self.editProperties.editOnToOff.valueChanged.connect(self._updateOKButton)
+        self.editProperties.editEmission.valueChanged.connect(self._updateOKButton)
 
     @staticmethod
     def getResponse(parent=None) -> Tuple[Optional[IlluminationResponse], bool]:
@@ -41,3 +48,13 @@ class AddResponseDialog(BaseDialog):
 
         dialog.deleteLater()  # Prevent memory leak
         return response, result == QDialog.Accepted
+
+    # Internal methods
+    def _updateOKButton(self) -> None:
+        """ Enables or disables the "OK" button depending on whether the entered data is valid. """
+        self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(
+            self.editProperties.editWavelength.value() > 0 and
+            self.editProperties.editOffToOn.isValid() and
+            self.editProperties.editOnToOff.isValid() and
+            self.editProperties.editEmission.isValid()
+        )

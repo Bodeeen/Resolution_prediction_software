@@ -30,8 +30,7 @@
    <item>
     <layout class="QFormLayout" name="formLayout">
      <item row="0" column="1">
-      <widget class="QDoubleSpinBox" name="editReadoutNoise">
-      </widget>
+      <widget class="FreeFloatBox" name="editReadoutNoise"/>
      </item>
      <item row="0" column="0">
       <widget class="QLabel" name="lblReadoutNoise">
@@ -48,11 +47,7 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QDoubleSpinBox" name="editQuantumEfficiency">
-       <property name="maximum">
-        <double>100.000000000000000</double>
-       </property>
-      </widget>
+      <widget class="FreeFloatBox" name="editQuantumEfficiency"/>
      </item>
     </layout>
    </item>
@@ -64,6 +59,11 @@
    <extends>QWidget</extends>
    <header>frcpredict.ui</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>FreeFloatBox</class>
+   <extends>QLineEdit</extends>
+   <header>frcpredict.ui</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -62,8 +62,7 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QDoubleSpinBox" name="editDuration">
-      </widget>
+      <widget class="FreeFloatBox" name="editDuration"/>
      </item>
      <item row="2" column="0">
       <widget class="QLabel" name="lblMaxIntensity">
@@ -73,8 +72,7 @@
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QDoubleSpinBox" name="editMaxIntensity">
-      </widget>
+      <widget class="FreeFloatBox" name="editMaxIntensity"/>
      </item>
      <item row="3" column="0">
       <widget class="QLabel" name="lblOrder">
@@ -189,6 +187,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>FreeFloatBox</class>
+   <extends>QLineEdit</extends>
+   <header>frcpredict.ui</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>editWavelength</tabstop>
   <tabstop>editDuration</tabstop>
