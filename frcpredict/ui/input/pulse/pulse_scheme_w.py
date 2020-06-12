@@ -1,3 +1,4 @@
+import functools
 import numpy as np
 
 from PyQt5.QtCore import pyqtSignal
@@ -78,9 +79,18 @@ class PulseSchemeWidget(BaseWidget):
         """ Redraws the pulse scheme plot based on the passed model. """
         self.plot.clear()
 
+        plotEndTime = functools.reduce(
+            lambda current, pulse: 1 + current + pulse.duration,
+            model._pulses.values(), 0
+        )
+        
         nextStartTime = 1
         for (key, pulse) in model._pulses.items():
-            curve = PulseCurveItem(key, pulse.wavelength, nextStartTime, pulse.duration)
+            curve = PulseCurveItem(
+                key, wavelength=pulse.wavelength,
+                startTime=nextStartTime, duration=pulse.duration, plotEndTime=plotEndTime
+            )
+
             curve.sigClicked.connect(self._onCurveClicked)
             self.plot.addItem(curve)
             nextStartTime += curve.duration + 1
