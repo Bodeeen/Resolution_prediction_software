@@ -6,7 +6,7 @@ import numpy as np
 from typing import List, Dict
 import uuid
 
-from frcpredict.util import observable_property
+from frcpredict.util import observable_property, hidden_field
 
 
 @dataclass
@@ -31,10 +31,8 @@ class Pulse:
         signal_name="illumination_pattern_changed", emit_arg_name="illumination_pattern")
 
     # Signals
-    basic_field_changed: Signal = field(
-        init=False, repr=False, default_factory=Signal, metadata=json_config(exclude=Exclude.ALWAYS))
-    illumination_pattern_changed: Signal = field(
-        init=False, repr=False, default_factory=Signal, metadata=json_config(exclude=Exclude.ALWAYS))
+    basic_field_changed: Signal = hidden_field(Signal)
+    illumination_pattern_changed: Signal = hidden_field(Signal)
 
 
 @dataclass
@@ -42,16 +40,12 @@ class PulseScheme:
     pulses: List[Pulse]
 
     # Internal fields
-    _pulses: OrderedDict = field(
-        init=False, repr=False, default_factory=OrderedDict, metadata=json_config(exclude=Exclude.ALWAYS))
-
+    _pulses: OrderedDict = hidden_field(OrderedDict)  # [key, value]: [str, Pulse]
+    
     # Signals
-    pulse_added: Signal = field(
-        init=False, repr=False, default_factory=Signal, metadata=json_config(exclude=Exclude.ALWAYS))
-    pulse_moved: Signal = field(
-        init=False, repr=False, default_factory=Signal, metadata=json_config(exclude=Exclude.ALWAYS))
-    pulse_removed: Signal = field(
-        init=False, repr=False, default_factory=Signal, metadata=json_config(exclude=Exclude.ALWAYS))
+    pulse_added: Signal = hidden_field(Signal)
+    pulse_moved: Signal = hidden_field(Signal)
+    pulse_removed: Signal = hidden_field(Signal)
 
     # Properties
     @property

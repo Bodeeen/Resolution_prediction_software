@@ -1,3 +1,5 @@
+from dataclasses import field
+from dataclasses_json import config as json_config, Exclude
 from PySignal import Signal
 from typing import Any, Optional, List
 
@@ -32,3 +34,12 @@ def observable_property(internal_name: str, default: Any, signal_name: str, emit
                 signal.emit(self)
 
     return property(getter, setter)
+
+
+def hidden_field(default_factory):
+    """ A field that is hidden when the dataclass is serialized to a string or JSON. """
+
+    return field(
+        init=False, repr=False, default_factory=default_factory,
+        metadata=json_config(exclude=Exclude.ALWAYS)
+    )

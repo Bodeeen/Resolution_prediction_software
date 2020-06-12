@@ -3,7 +3,7 @@ from dataclasses_json import config as json_config, Exclude
 from PySignal import Signal
 from typing import Any, List, Dict
 
-from frcpredict.util import observable_property
+from frcpredict.util import observable_property, hidden_field
 
 
 @dataclass
@@ -21,8 +21,7 @@ class IlluminationResponse:
                                                      signal_name="basic_field_changed")
 
     # Signals
-    basic_field_changed: Signal = field(
-        init=False, repr=False, default_factory=Signal, metadata=json_config(exclude=Exclude.ALWAYS))
+    basic_field_changed: Signal = hidden_field(Signal)
 
     # Methods
     def __str__(self) -> str:
@@ -37,14 +36,11 @@ class FluorophoreSettings:
     responses: List[IlluminationResponse]
 
     # Internal fields
-    _responses: Dict[int, IlluminationResponse] = field(
-        init=False, repr=False, default_factory=dict, metadata=json_config(exclude=Exclude.ALWAYS))
+    _responses: Dict[int, IlluminationResponse] = hidden_field(dict)
 
     # Signals
-    response_added: Signal = field(
-        init=False, repr=False, default_factory=Signal, metadata=json_config(exclude=Exclude.ALWAYS))
-    response_removed: Signal = field(
-        init=False, repr=False, default_factory=Signal, metadata=json_config(exclude=Exclude.ALWAYS))
+    response_added: Signal = hidden_field(Signal)
+    response_removed: Signal = hidden_field(Signal)
 
     # Properties
     @property

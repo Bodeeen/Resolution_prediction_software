@@ -4,7 +4,7 @@ import numpy as np
 from osgeo import gdal_array
 from PySignal import Signal
 
-from frcpredict.util import observable_property
+from frcpredict.util import observable_property, hidden_field
 
 
 @dataclass
@@ -24,12 +24,9 @@ class ImagingSystemSettings:
     )
 
     # Signals
-    optical_psf_changed: Signal = field(
-        init=False, repr=False, default_factory=Signal, metadata=json_config(exclude=Exclude.ALWAYS))
-    pinhole_function_changed: Signal = field(
-        init=False, repr=False, default_factory=Signal, metadata=json_config(exclude=Exclude.ALWAYS))
-    basic_field_changed: Signal = field(
-        init=False, repr=False, default_factory=Signal, metadata=json_config(exclude=Exclude.ALWAYS))
+    optical_psf_changed: Signal = hidden_field(Signal)
+    pinhole_function_changed: Signal = hidden_field(Signal)
+    basic_field_changed: Signal = hidden_field(Signal)
 
     # Methods
     def load_optical_psf_npy(self, path: str) -> None:

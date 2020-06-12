@@ -1,3 +1,3 @@
 from .colour_utils import wavelength_to_rgb
-from .dataclass_signals import observable_property
+from .dataclass_extra import observable_property, hidden_field
 from .patterns import patterns
