@@ -14,8 +14,9 @@ class FreeFloatBox(QLineEdit):
     # Methods
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self._value = 0
-        self._valid = False
+        self._value = 0.0
+        self._valid = True
+        self._onFinishEditing()  # Update the text
 
         # Connect signals
         self.textChanged.connect(self._onChange)
