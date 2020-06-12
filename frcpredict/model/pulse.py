@@ -62,18 +62,18 @@ class PulseScheme:
     
     # Methods
     def add_pulse(self, pulse: Pulse) -> None:
-        """ Adds a pulse. """
+        """ Adds a pulse to the pulse scheme. """
         key = str(uuid.uuid4())  # Random key
         self._pulses[key] = pulse
         self.pulse_added.emit(key, pulse)
 
     def remove_pulse(self, key: str) -> None:
-        """ Removes the pulse with the specified key. """
+        """ Removes the pulse with the specified key from the pulse scheme. """
         removed_pulse = self._pulses.pop(key)
         self.pulse_removed.emit(key, removed_pulse)
 
     def clear_pulses(self) -> None:
-        """ Removes all pulses. """
+        """ Removes all pulses from the pulse scheme. """
         for key in self._pulses.keys():
             self.remove_pulse(key)
 
