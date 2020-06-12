@@ -2,9 +2,10 @@
 
 ## Requirements
  - Python 3.6 or later
- - The packages specified by [requirements.txt](requirements.txt). If you have any issues with pip
-   failing to build the packages on Windows, you may find prebuilt versions
+ - The packages specified by [requirements.txt](requirements.txt). Running the command
+   `pip install -r requirements.txt` in the root folder of the repo will install these. If you have
+   any issues with pip failing to build the packages on Windows, you may find prebuilt versions
    [here](https://www.lfd.uci.edu/~gohlke/pythonlibs).
 
 ## Running the application
-In the root folder of the repo, run the command `python3 -m frcpredict` to launch the software.
+In the root folder of the repo, run the command `python -m frcpredict` to launch the software.
