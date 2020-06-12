@@ -1,21 +1,22 @@
 import numpy as np
 from typing import Optional, Tuple
 
-from PyQt5.QtWidgets import QDialog, QDialogButtonBox
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QWidget, QDialog, QDialogButtonBox
 
 from frcpredict.model import Pulse
 from frcpredict.util import patterns
-from frcpredict.ui import BaseDialog
+from frcpredict.ui import BaseWidget
 
 
-class AddPulseDialog(BaseDialog):
+class AddPulseDialog(QDialog, BaseWidget):
     """
     A dialog for adding a pulse.
     """
 
     # Methods
-    def __init__(self, parent=None, *args, **kwargs) -> None:
-        super().__init__(__file__, parent, *args, **kwargs)
+    def __init__(self, parent: Optional[QWidget] = None) -> None:
+        super().__init__(__file__, parent, Qt.WindowSystemMenuHint | Qt.WindowTitleHint)
         self._updateOKButton()
         self.editProperties.setChangeOrderVisible(False)
         self.editProperties.editWavelength.selectAll()
@@ -27,7 +28,7 @@ class AddPulseDialog(BaseDialog):
         self.editProperties.listPatterns.currentRowChanged.connect(self._updateOKButton)
 
     @staticmethod
-    def getPulse(parent=None) -> Tuple[Optional[Pulse], bool]:
+    def getPulse(parent: Optional[QWidget] = None) -> Tuple[Optional[Pulse], bool]:
         """
         Synchronously opens a dialog for entering pulse properties. The second value in the
         returned tuple refers to whether the "OK" button was pressed when the dialog closed. If

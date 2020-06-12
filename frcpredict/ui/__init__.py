@@ -1,6 +1,5 @@
 # Base
 from .base_widget import BaseWidget
-from .base_dialog import BaseDialog
 from .base_presenter import BasePresenter
 
 

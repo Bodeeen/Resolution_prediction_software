@@ -1,20 +1,21 @@
 from typing import Optional, Tuple
 
-from PyQt5.QtWidgets import QDialog, QDialogButtonBox
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QWidget, QDialog, QDialogButtonBox
 
 from frcpredict.model import IlluminationResponse
 from frcpredict.util import patterns
-from frcpredict.ui import BaseDialog
+from frcpredict.ui import BaseWidget
 
 
-class AddResponseDialog(BaseDialog):
+class AddResponseDialog(QDialog, BaseWidget):
     """
     A dialog for adding an illumination response.
     """
 
     # Methods
-    def __init__(self, parent=None, *args, **kwargs) -> None:
-        super().__init__(__file__, parent, *args, **kwargs)
+    def __init__(self, parent: Optional[QWidget] = None) -> None:
+        super().__init__(__file__, parent, Qt.WindowSystemMenuHint | Qt.WindowTitleHint)
         self._updateOKButton()
         self.editProperties.editWavelength.selectAll()
 
@@ -25,11 +26,11 @@ class AddResponseDialog(BaseDialog):
         self.editProperties.editEmission.valueChanged.connect(self._updateOKButton)
 
     @staticmethod
-    def getResponse(parent=None) -> Tuple[Optional[IlluminationResponse], bool]:
+    def getResponse(parent: Optional[QWidget] = None) -> Tuple[Optional[IlluminationResponse], bool]:
         """
         Synchronously opens a dialog for entering illumination response properties. The second
         value in the returned tuple refers to whether the "OK" button was pressed when the dialog
-        closed.
+        closed. If it's true, the first value will contain the illumination response.
         """
 
         dialog = AddResponseDialog(parent)
