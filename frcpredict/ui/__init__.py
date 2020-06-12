@@ -17,9 +17,9 @@ from .input.imaging.imaging_settings_w import ImagingSystemSettingsWidget
 from .input.pulse.pulse_scheme_w import PulseSchemeWidget
 from .input.pulse.pulse_properties_w import PulsePropertiesWidget
 
-from .input.sample.sample_properties import SamplePropertiesWidget
+from .input.sample.sample_properties_w import SamplePropertiesWidget
 
-from .input.camera.camera_properties import CameraPropertiesWidget
+from .input.camera.camera_properties_w import CameraPropertiesWidget
 
 from .input.preset_picker import PresetPickerWidget
 
