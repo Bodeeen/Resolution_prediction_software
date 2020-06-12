@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QLineEdit
 class FreeFloatBox(QLineEdit):
     """
     A box where the user can freely type float values. The values entered are validated. E notation
-    is allowed.
+    is allowed. Both dots and commas are allowed as decimal separators.
     """
 
     # Signals
