@@ -1,3 +1,4 @@
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QPixmap
 
 from frcpredict.model import ImagingSystemSettings
@@ -10,9 +11,19 @@ class ImagingSystemSettingsWidget(BaseWidget):
     A widget where the user may set imaging system settings.
     """
 
+    # Signals
+    loadOpticalPsfClicked = pyqtSignal()
+    loadPinholeFunctionClicked = pyqtSignal()
+
     # Methods
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(__file__, *args, **kwargs)
+        
+        # Connect forwarded signals
+        self.btnLoadOpticalPsf.clicked.connect(self.loadOpticalPsfClicked)
+        self.btnLoadPinholeFunction.clicked.connect(self.loadPinholeFunctionClicked)
+
+        # Initialize presenter
         self._presenter = ImagingSystemSettingsPresenter(self)
 
     def setModel(self, model: ImagingSystemSettings) -> None:

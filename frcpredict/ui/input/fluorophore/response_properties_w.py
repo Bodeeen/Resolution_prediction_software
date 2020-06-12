@@ -1,3 +1,5 @@
+from PyQt5.QtCore import pyqtSignal
+
 from frcpredict.model import IlluminationResponse
 from frcpredict.ui import BaseWidget
 from .response_properties_p import ResponsePropertiesPresenter
@@ -8,9 +10,21 @@ class ResponsePropertiesWidget(BaseWidget):
     A widget where the user may set propreties of a specific fluorophore response.
     """
 
+    # Signals
+    offToOnEdited = pyqtSignal(float)
+    onToOffEdited = pyqtSignal(float)
+    emissionEdited = pyqtSignal(float)
+
     # Methods
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(__file__, *args, **kwargs)
+
+        # Connect forwarded signals
+        self.editOffToOn.valueEdited.connect(self.offToOnEdited)
+        self.editOnToOff.valueEdited.connect(self.onToOffEdited)
+        self.editEmission.valueEdited.connect(self.emissionEdited)
+
+        # Initialize presenter
         self._presenter = ResponsePropertiesPresenter(self)
 
     def setModel(self, model: IlluminationResponse) -> None:

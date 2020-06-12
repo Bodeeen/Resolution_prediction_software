@@ -1,3 +1,4 @@
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QPixmap
 
 from frcpredict.model import Pulse
@@ -11,13 +12,31 @@ class PulsePropertiesWidget(BaseWidget):
     A widget where the user may set propreties of a specific pulse.
     """
 
+    # Signals
+    wavelengthChanged = pyqtSignal(int)
+    durationChanged = pyqtSignal(float)
+    maxIntensityChanged = pyqtSignal(float)
+    patternSelectionChanged = pyqtSignal(int)
+    moveLeftClicked = pyqtSignal()
+    moveRightClicked = pyqtSignal()
+
     # Methods
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(__file__, *args, **kwargs)
-        self._presenter = PulsePropertiesPresenter(self)
 
         for pattern in patterns.keys():
             self.listPatterns.addItem(pattern)
+        
+        # Connect forwarded signals
+        self.editWavelength.valueChanged.connect(self.wavelengthChanged)
+        self.editDuration.valueChanged.connect(self.durationChanged)
+        self.editMaxIntensity.valueChanged.connect(self.maxIntensityChanged)
+        self.listPatterns.currentRowChanged.connect(self.patternSelectionChanged)
+        self.btnMoveLeft.clicked.connect(self.moveLeftClicked)
+        self.btnMoveRight.clicked.connect(self.moveRightClicked)
+
+        # Initialize presenter
+        self._presenter = PulsePropertiesPresenter(self)
 
     def setModel(self, model: Pulse) -> None:
         self._presenter.model = model

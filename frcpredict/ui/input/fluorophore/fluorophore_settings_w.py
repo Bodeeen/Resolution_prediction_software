@@ -1,4 +1,4 @@
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import pyqtSignal, Qt
 
 from frcpredict.model import FluorophoreSettings, IlluminationResponse
 from frcpredict.ui import BaseWidget
@@ -11,11 +11,23 @@ class FluorophoreSettingsWidget(BaseWidget):
     A widget where the user may add or remove fluorophore responses.
     """
 
+    # Signals
+    responseSelectionChanged = pyqtSignal(int)
+    addResponseClicked = pyqtSignal()
+    removeResponseClicked = pyqtSignal()
+
     # Methods
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(__file__, *args, **kwargs)
-        self._presenter = FluorophoreSettingsPresenter(self)
         self.editProperties.setWavelengthVisible(False)
+        
+        # Connect forwarded signals
+        self.listResponses.currentRowChanged.connect(self.responseSelectionChanged)
+        self.btnAddResponse.clicked.connect(self.addResponseClicked)
+        self.btnRemoveResponse.clicked.connect(self.removeResponseClicked)
+
+        # Initialize presenter
+        self._presenter = FluorophoreSettingsPresenter(self)
 
     def setModel(self, model: FluorophoreSettings) -> None:
         self._presenter.model = model

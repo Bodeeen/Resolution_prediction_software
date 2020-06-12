@@ -1,5 +1,7 @@
-from PyQt5.QtCore import pyqtSignal
 import numpy as np
+
+from PyQt5.QtCore import pyqtSignal
+import pyqtgraph as pg
 
 from frcpredict.model import PulseScheme, Pulse
 from frcpredict.ui import BaseWidget
@@ -13,16 +15,35 @@ class PulseSchemeWidget(BaseWidget):
     """
 
     # Signals
-    pulseClicked: pyqtSignal = pyqtSignal(PulseCurveItem)
+    pulseClicked = pyqtSignal(PulseCurveItem)
+    plotClicked = pyqtSignal(object)
+    addPulseClicked = pyqtSignal()
+    removePulseClicked = pyqtSignal()
+    pulseDurationChanged = pyqtSignal()
+    pulseMoveLeftClicked = pyqtSignal()
+    pulseMoveRightClicked = pyqtSignal()
 
     # Methods
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(__file__, *args, **kwargs)
-        self._presenter = PulseSchemePresenter(self)
 
         self.plot.setMouseEnabled(x=False, y=False)
         self.plot.setMenuEnabled(False)
         self.plot.getAxis("left").setTicks([[(0, "OFF"), (1, "ON")]])
+
+        # Connect forwarded signals
+        self.plot.scene().sigMouseClicked.connect(self.plotClicked)
+        self.btnAddPulse.clicked.connect(self.addPulseClicked)
+        self.btnRemovePulse.clicked.connect(self.removePulseClicked)
+        self.editProperties.durationChanged.connect(self.pulseDurationChanged)
+        self.editProperties.moveLeftClicked.connect(self.pulseMoveLeftClicked)
+        self.editProperties.moveRightClicked.connect(self.pulseMoveRightClicked)
+
+        # Initialize presenter
+        self._presenter = PulseSchemePresenter(self)
+
+    def setModel(self, model: PulseScheme) -> None:
+        self._presenter.model = model
 
     def setSelectedPulse(self, pulse: Pulse) -> None:
         """ Updates controls and pulse properties widget based on the current selection. """

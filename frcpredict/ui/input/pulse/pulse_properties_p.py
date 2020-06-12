@@ -3,25 +3,22 @@ import numpy as np
 from PyQt5.QtCore import pyqtSlot, QObject
 
 from frcpredict.model import Pulse
+from frcpredict.ui import BasePresenter
 from frcpredict.ui.util import getArrayPixmap
 from frcpredict.util import patterns
 
 
-class PulsePropertiesPresenter(QObject):
+class PulsePropertiesPresenter(BasePresenter[Pulse]):
     """
     Presenter for the pulse properties widget.
     """
 
     # Properties
-    @property
-    def model(self) -> Pulse:
-        return self._model
-
-    @model.setter
+    @BasePresenter.model.setter
     def model(self, model: Pulse) -> None:
         self._model = model
 
-        # Update data in widget
+        # Trigger model change event handlers
         self._onIlluminationPatternChange(model.illumination_pattern)
         self._onBasicFieldChange(model)
 
@@ -30,47 +27,46 @@ class PulsePropertiesPresenter(QObject):
         model.basic_field_changed.connect(self._onBasicFieldChange)
 
     # Methods
-    def __init__(self, widget, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self._widget = widget
-
-        # Prepare UI events
-        self._widget.editWavelength.valueChanged.connect(self._onWavelengthChange)
-        self._widget.editDuration.valueChanged.connect(self._onDurationChange)
-        self._widget.editMaxIntensity.valueChanged.connect(self._onMaxIntensityChange)
-        self._widget.listPatterns.currentRowChanged.connect(self._onIlluminationPatternSelectionChange)
-
+    def __init__(self, widget) -> None:
         # Initialize model
-        self.model = Pulse(
+        model = Pulse(
             wavelength=0.0,
             duration=0.0,
             max_intensity=0.0,
             illumination_pattern=np.zeros((80, 80))
         )
 
+        super().__init__(model, widget)
+
+        # Prepare UI events
+        widget.wavelengthChanged.connect(self._uiWavelengthChange)
+        widget.durationChanged.connect(self._uiDurationChange)
+        widget.maxIntensityChanged.connect(self._uiMaxIntensityChange)
+        widget.patternSelectionChanged.connect(self._uiIlluminationPatternSelectionChange)
+
     # Model event handling
     def _onIlluminationPatternChange(self, illuminationPattern: np.ndarray) -> None:
         """ Loads the illumination pattern into a visualization in the interface. """
-        self._widget.setIlluminationPatternPixmap(getArrayPixmap(illuminationPattern))
+        self.widget.setIlluminationPatternPixmap(getArrayPixmap(illuminationPattern))
 
     def _onBasicFieldChange(self, model: Pulse) -> None:
         """ Loads basic model fields (spinboxes etc.) into the interface fields. """
-        self._widget.updateBasicFields(model)
+        self.widget.updateBasicFields(model)
 
     # UI event handling
     @pyqtSlot(int)
-    def _onWavelengthChange(self, value: int) -> None:
+    def _uiWavelengthChange(self, value: int) -> None:
         self.model.wavelength = value
 
     @pyqtSlot(float)
-    def _onDurationChange(self, value: float) -> None:
+    def _uiDurationChange(self, value: float) -> None:
         self.model.duration = value
 
     @pyqtSlot(float)
-    def _onMaxIntensityChange(self, value: float) -> None:
+    def _uiMaxIntensityChange(self, value: float) -> None:
         self.model.max_intensity = value
 
     @pyqtSlot(int)
-    def _onIlluminationPatternSelectionChange(self, selectedIndex: int) -> None:
-        selectedPattern = self._widget.listPatterns.item(selectedIndex).text()
+    def _uiIlluminationPatternSelectionChange(self, selectedIndex: int) -> None:
+        selectedPattern = self.widget.listPatterns.item(selectedIndex).text()
         self.model.illumination_pattern = patterns[selectedPattern]
