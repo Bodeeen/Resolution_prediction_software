@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>344</width>
+    <width>365</width>
     <height>123</height>
    </rect>
   </property>
@@ -37,15 +37,12 @@
      <item row="0" column="0">
       <widget class="QLabel" name="lblWavelength">
        <property name="text">
-        <string>Wavelength:</string>
+        <string>Wavelength [nm]:</string>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
       <widget class="QSpinBox" name="editWavelength">
-       <property name="suffix">
-        <string> nm</string>
-       </property>
        <property name="minimum">
         <number>0</number>
        </property>
@@ -60,32 +57,23 @@
      <item row="1" column="0">
       <widget class="QLabel" name="lblDuration">
        <property name="text">
-        <string>Duration:</string>
+        <string>Duration [ms]:</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
       <widget class="QDoubleSpinBox" name="editDuration">
-       <property name="prefix">
-        <string/>
-       </property>
-       <property name="suffix">
-        <string> ms</string>
-       </property>
       </widget>
      </item>
      <item row="2" column="0">
       <widget class="QLabel" name="lblMaxIntensity">
        <property name="text">
-        <string>Max intensity:</string>
+        <string>Max intensity [kW/cm²]:</string>
        </property>
       </widget>
      </item>
      <item row="2" column="1">
       <widget class="QDoubleSpinBox" name="editMaxIntensity">
-       <property name="suffix">
-        <string> kW/cm²</string>
-       </property>
       </widget>
      </item>
      <item row="3" column="0">

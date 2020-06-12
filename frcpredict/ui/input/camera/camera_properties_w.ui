@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>195</width>
+    <width>206</width>
     <height>97</height>
    </rect>
   </property>
@@ -31,33 +31,24 @@
     <layout class="QFormLayout" name="formLayout">
      <item row="0" column="1">
       <widget class="QDoubleSpinBox" name="editReadoutNoise">
-       <property name="suffix">
-        <string> e⁻</string>
-       </property>
       </widget>
      </item>
      <item row="0" column="0">
       <widget class="QLabel" name="lblReadoutNoise">
        <property name="text">
-        <string>Readout noise:</string>
+        <string>Readout noise [e⁻]:</string>
        </property>
       </widget>
      </item>
      <item row="1" column="0">
       <widget class="QLabel" name="lblQuantumEfficiency">
        <property name="text">
-        <string>Quantum efficiency:</string>
+        <string>Quantum efficiency [%]:</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
       <widget class="QDoubleSpinBox" name="editQuantumEfficiency">
-       <property name="prefix">
-        <string/>
-       </property>
-       <property name="suffix">
-        <string>%</string>
-       </property>
        <property name="maximum">
         <double>100.000000000000000</double>
        </property>
