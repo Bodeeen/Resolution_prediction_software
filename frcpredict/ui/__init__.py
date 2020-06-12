@@ -4,7 +4,7 @@ from .base_presenter import BasePresenter
 
 
 # Windows
-from .window.main_window import MainWindow
+from .window.main_window_w import MainWindow
 
 
 # Input

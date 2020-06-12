@@ -13,10 +13,10 @@ class FRCResultsWidget(BaseWidget):
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(__file__, *args, **kwargs)
-        
-        # Temp
-        x = np.arange(0, 10, 0.01)
-        y = -1 / (1 + np.exp(5 - x))
-        threshold = np.repeat(-0.8, 10 + 1)
+
+    def setCurve(self, x: np.ndarray, y: np.ndarray) -> None:
+        """ TODO. """
+        threshold = 0.143
+        self.plotFrc.clear()
         self.plotFrc.plot(x, y, clickable=True)
-        self.plotFrc.plot(threshold, pen=pg.mkPen("r", style=Qt.DashLine))
+        self.plotFrc.plot([x[0], x[-1]], [threshold, threshold], pen=pg.mkPen("r", style=Qt.DashLine))

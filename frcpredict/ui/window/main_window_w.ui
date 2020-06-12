@@ -90,7 +90,7 @@
             </property>
             <layout class="QGridLayout" name="gridLayout">
              <item row="0" column="0">
-              <widget class="FluorophoreSettingsWidget" name="widget" native="true">
+              <widget class="FluorophoreSettingsWidget" name="fluorophoreSettings" native="true">
                <property name="font">
                 <font>
                  <weight>50</weight>
@@ -115,7 +115,7 @@
             </property>
             <layout class="QGridLayout" name="gridLayout_5">
              <item row="0" column="0">
-              <widget class="PulseSchemeWidget" name="widget_6" native="true">
+              <widget class="PulseSchemeWidget" name="pulseScheme" native="true">
                <property name="font">
                 <font>
                  <weight>50</weight>
@@ -147,7 +147,7 @@
             </property>
             <layout class="QGridLayout" name="gridLayout_4">
              <item row="0" column="0">
-              <widget class="ImagingSystemSettingsWidget" name="widget_5" native="true">
+              <widget class="ImagingSystemSettingsWidget" name="imagingSystemSettings" native="true">
                <property name="font">
                 <font>
                  <weight>50</weight>
@@ -172,7 +172,7 @@
             </property>
             <layout class="QGridLayout" name="gridLayout_3">
              <item row="0" column="0">
-              <widget class="SamplePropertiesWidget" name="widget_4" native="true">
+              <widget class="SamplePropertiesWidget" name="sampleProperties" native="true">
                <property name="font">
                 <font>
                  <weight>50</weight>
@@ -197,7 +197,7 @@
             </property>
             <layout class="QGridLayout" name="gridLayout_2">
              <item row="1" column="0">
-              <widget class="CameraPropertiesWidget" name="widget_3" native="true">
+              <widget class="CameraPropertiesWidget" name="cameraProperties" native="true">
                <property name="font">
                 <font>
                  <weight>50</weight>
@@ -257,7 +257,7 @@
         </property>
         <layout class="QGridLayout" name="gridLayout_6">
          <item row="0" column="0">
-          <widget class="FRCResultsWidget" name="widget_2" native="true">
+          <widget class="FRCResultsWidget" name="frcResults" native="true">
            <property name="font">
             <font>
              <weight>50</weight>
@@ -267,7 +267,7 @@
           </widget>
          </item>
          <item row="1" column="0">
-          <widget class="QPushButton" name="pushButton">
+          <widget class="QPushButton" name="btnSimulateFrc">
            <property name="font">
             <font>
              <pointsize>10</pointsize>
