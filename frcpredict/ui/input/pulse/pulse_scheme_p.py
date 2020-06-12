@@ -32,9 +32,11 @@ class PulseSchemePresenter(BasePresenter[PulseScheme]):
         # Initialize model
         model = PulseScheme(pulses=[])
 
+        # Initialize self
+        self._selectedPulseKey = None
         super().__init__(model, widget)
 
-        self._selectedPulseKey = None
+        # Prepare UI elements
         widget.editProperties.setEditWavelengthEnabled(False)
         widget.setSelectedPulse(None)
 

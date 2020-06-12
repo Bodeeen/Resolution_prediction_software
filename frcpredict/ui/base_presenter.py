@@ -28,6 +28,6 @@ class BasePresenter(QObject, Generic[Model]):
     # Methods
     @abstractmethod
     def __init__(self, model: Model, widget) -> None:
-        self._model = model
-        self._widget = widget
         super().__init__()
+        self._widget = widget
+        self.model = model
