@@ -16,7 +16,12 @@ class FreeFloatBox(QLineEdit):
         super().__init__(*args, **kwargs)
         self._value = 0.0
         self._valid = True
-        self._onFinishEditing()  # Update the text
+
+        # Attempt to ensure that the box doesn't become smaller when we set a stylesheet
+        self.setMinimumHeight(20)
+
+        # Update the text
+        self._onFinishEditing()
 
         # Connect signals
         self.textChanged.connect(self._onChange)
@@ -33,7 +38,7 @@ class FreeFloatBox(QLineEdit):
             self.setText(str(value))
 
     def isValid(self) -> bool:
-        """ Returns whether the field contains a valid float. """
+        """ Returns whether the field contains a valid float value. """
         return self._valid
 
     # Event handling
@@ -43,13 +48,13 @@ class FreeFloatBox(QLineEdit):
             str_value = "0"  # Assume empty string == 0
 
         try:
-            self._value = float(str_value.replace(",", ".").rstrip("-.e"))
+            self._value = float(str_value.replace(",", ".").rstrip(".e+-"))
             self._valid = True
             self.valueChanged.emit(self._value)
             self.setStyleSheet("")  # Remove red border if it was there
         except ValueError:
             self._valid = False
-            self.setStyleSheet("border: 1px solid red")
+            self.setStyleSheet("border: 1px solid red")  # Red border if invalid value
 
     @pyqtSlot()
     def _onFinishEditing(self) -> None:
