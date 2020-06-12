@@ -45,7 +45,7 @@ class AddPulseDialog(QDialog, BaseWidget):
                 max_intensity=dialog.editProperties.editMaxIntensity.value(),
                 illumination_pattern=patterns[
                     dialog.editProperties.listPatterns.currentItem().text()
-                ]
+                ]()
             )
         else:
             pulse = None

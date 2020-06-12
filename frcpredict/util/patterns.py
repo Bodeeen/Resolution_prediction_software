@@ -1,16 +1,15 @@
 import numpy as np
-from astropy.modeling.functional_models import Gaussian1D, Gaussian2D
+from astropy.modeling.functional_models import AiryDisk2D, Gaussian1D, Gaussian2D
 from astropy.stats import gaussian_fwhm_to_sigma
 
 # Temp stuff!
 # TODO: Make everything better.
-# TODO: Also, don't compute patterns immediately (takes longer to load the program).
 
 px_size_nm = 20
 radius_nm = np.sqrt(2) * 2000
 radius_px = np.int(radius_nm / px_size_nm)
-width_px = radius_px * 2
-height_px = radius_px * 2
+width_px = radius_px * 2 - 1
+height_px = radius_px * 2 - 1
 
 
 def radial_to_2d(size: int):
@@ -20,7 +19,7 @@ def radial_to_2d(size: int):
 
 def gaussian_test1(fwhm: float) -> np.ndarray:
     stddev = fwhm * gaussian_fwhm_to_sigma
-    model = Gaussian2D(x_mean=width_px / 2, y_mean=height_px / 2, x_stddev=stddev, y_stddev=stddev)
+    model = Gaussian2D(x_mean=(width_px - 1) / 2, y_mean=(height_px - 1) / 2, x_stddev=stddev, y_stddev=stddev)
 
     result = np.zeros((width_px, height_px))
     x = np.arange(width_px)
@@ -35,7 +34,21 @@ def gaussian_test2(fwhm: float) -> np.ndarray:
     return model(radial_to_2d(radius_px*2 - 1))
 
 
+def airy_test(fwhm: float) -> np.ndarray:
+    model = AiryDisk2D(x_0=width_px / 2, y_0=height_px / 2, radius=fwhm)
+    result = np.zeros((width_px, height_px))
+    x = np.arange(width_px)
+    for y in range(0, height_px):
+        result[y] = model(x, y)
+
+    return result
+
+
 patterns = {
-    "Gaussian": gaussian_test1(480*4 / px_size_nm),
-    "Doughnut": gaussian_test2(480 / px_size_nm)
+    "Gau240": lambda: gaussian_test1(240 / px_size_nm),
+    "Gau480": lambda: gaussian_test1(480 / px_size_nm),
+    "Dn240": lambda: gaussian_test2(240 / px_size_nm),
+    "Dn480": lambda: gaussian_test2(480 / px_size_nm),
+    "Airy200": lambda: airy_test(200 / px_size_nm),
+    "Airy230": lambda: airy_test(230 / px_size_nm)
 }

@@ -69,4 +69,4 @@ class PulsePropertiesPresenter(BasePresenter[Pulse]):
     @pyqtSlot(int)
     def _uiIlluminationPatternSelectionChange(self, selectedIndex: int) -> None:
         selectedPattern = self.widget.listPatterns.item(selectedIndex).text()
-        self.model.illumination_pattern = patterns[selectedPattern]
+        self.model.illumination_pattern = patterns[selectedPattern]()

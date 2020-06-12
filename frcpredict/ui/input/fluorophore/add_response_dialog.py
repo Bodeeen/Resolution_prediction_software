@@ -4,7 +4,6 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QDialog, QDialogButtonBox
 
 from frcpredict.model import IlluminationResponse
-from frcpredict.util import patterns
 from frcpredict.ui import BaseWidget
 
 
