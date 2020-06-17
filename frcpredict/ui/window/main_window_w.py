@@ -26,23 +26,23 @@ class MainWindow(QMainWindow, BaseWidget):
         # Initialize presenter
         self._presenter = MainWindowPresenter(self)
 
-    def setModel(self, model: RunInstance) -> None:
-        self._presenter.model = model
-
     def setFrcResults(self, x: np.ndarray, y: np.ndarray) -> None:
         self.frcResults.setCurve(x, y)
 
+    def setValue(self, model: RunInstance) -> None:
+        self._presenter.model = model
+
     def updateFluorophoreSettings(self, fluorophore_settings: FluorophoreSettings) -> None:
-        self.fluorophoreSettings.setModel(fluorophore_settings)
+        self.fluorophoreSettings.setValue(fluorophore_settings)
 
     def updateImagingSystemSettings(self, imaging_system_settings: ImagingSystemSettings) -> None:
-        self.imagingSystemSettings.setModel(imaging_system_settings)
+        self.imagingSystemSettings.setValue(imaging_system_settings)
 
     def updatePulseScheme(self, pulse_scheme: PulseScheme) -> None:
-        self.pulseScheme.setModel(pulse_scheme)
+        self.pulseScheme.setValue(pulse_scheme)
 
     def updateSampleProperties(self, sample_properties: SampleProperties) -> None:
-        self.sampleProperties.setModel(sample_properties)
+        self.sampleProperties.setValue(sample_properties)
 
     def updateCameraProperties(self, camera_properties: CameraProperties) -> None:
-        self.cameraProperties.setModel(camera_properties)
+        self.cameraProperties.setValue(camera_properties)

@@ -1,11 +1,19 @@
 from copy import deepcopy
 import numpy as np
 
-from PyQt5.QtCore import pyqtSignal, pyqtSlot, QObject, QThreadPool, QRunnable
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, QObject, QThreadPool, QRunnable, QMutex
 
-from frcpredict.model import FluorophoreSettings, IlluminationResponse, Pulse, ImagingSystemSettings, PulseScheme, SampleProperties, CameraProperties, RunInstance
+from frcpredict.model import (
+    FluorophoreSettings, IlluminationResponse,
+    Pattern, Array2DPatternData, GaussianPatternData, DoughnutPatternData, AiryPatternData, DigitalPinholePatternData,
+    ImagingSystemSettings,
+    PulseScheme, Pulse, PulseType,
+    SampleProperties,
+    CameraProperties,
+    RunInstance,
+    JsonContainer
+)
 from frcpredict.ui import BasePresenter
-from frcpredict.util import patterns
 
 
 class MainWindowPresenter(BasePresenter[RunInstance]):
@@ -37,9 +45,9 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
         model = RunInstance(
             fluorophore_settings=FluorophoreSettings(responses=[]),
             imaging_system_settings=ImagingSystemSettings(
-                optical_psf=np.zeros((80, 80)),
-                pinhole_function=np.zeros((80, 80)),
-                scanning_step_size=1.0
+                optical_psf=Pattern(pattern_data=Array2DPatternData()),
+                pinhole_function=Pattern(pattern_data=Array2DPatternData()),
+                scanning_step_size=20.0
             ),
             pulse_scheme=PulseScheme(pulses=[]),
             sample_properties=SampleProperties(spectral_power=1.0, labelling_density=1.0),
@@ -47,6 +55,8 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
         )
 
         super().__init__(model, widget)
+        self._threadPool = QThreadPool()
+        self._actionLock = QMutex()
 
         # Connect UI events
         self.widget.simulateFrcClicked.connect(self._uiOnClickSimulateFrc)

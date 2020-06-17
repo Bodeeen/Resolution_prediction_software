@@ -25,7 +25,7 @@ class SamplePropertiesWidget(BaseWidget):
         # Initialize presenter
         self._presenter = SamplePropertiesPresenter(self)
 
-    def setModel(self, model: SampleProperties) -> None:
+    def setValue(self, model: SampleProperties) -> None:
         self._presenter.model = model
 
     def updateBasicFields(self, model: SampleProperties) -> None:

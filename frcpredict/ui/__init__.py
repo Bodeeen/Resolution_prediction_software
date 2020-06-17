@@ -8,6 +8,10 @@ from .window.main_window_w import MainWindow
 
 
 # Input
+from .input.common.free_float_box import FreeFloatBox
+from .input.common.pattern_field_w import PatternFieldWidget
+from .input.common.preset_picker import PresetPickerWidget
+
 from .input.fluorophore.fluorophore_settings_w import FluorophoreSettingsWidget
 from .input.fluorophore.response_properties_w import ResponsePropertiesWidget
 
@@ -19,9 +23,6 @@ from .input.pulse.pulse_properties_w import PulsePropertiesWidget
 from .input.sample.sample_properties_w import SamplePropertiesWidget
 
 from .input.camera.camera_properties_w import CameraPropertiesWidget
-
-from .input.free_float_box import FreeFloatBox
-from .input.preset_picker import PresetPickerWidget
 
 
 # Output

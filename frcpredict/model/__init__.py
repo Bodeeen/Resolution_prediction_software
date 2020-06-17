@@ -1,6 +1,16 @@
+from .pattern import (
+    Pattern,
+    PatternType,
+    Array2DPatternData,
+    GaussianPatternData,
+    DoughnutPatternData,
+    AiryPatternData,
+    DigitalPinholePatternData
+)
+
 from .fluorophore import FluorophoreSettings, IlluminationResponse
 from .imaging import ImagingSystemSettings
-from .pulse import Pulse, PulseScheme
+from .pulse import Pulse, PulseType, PulseScheme
 from .sample import SampleProperties
 from .camera import CameraProperties
 

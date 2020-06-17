@@ -25,7 +25,7 @@ class CameraPropertiesWidget(BaseWidget):
         # Initialize presenter
         self._presenter = CameraPropertiesPresenter(self)
 
-    def setModel(self, model: CameraProperties) -> None:
+    def setValue(self, model: CameraProperties) -> None:
         self._presenter.model = model
 
     def updateBasicFields(self, model: CameraProperties) -> None:

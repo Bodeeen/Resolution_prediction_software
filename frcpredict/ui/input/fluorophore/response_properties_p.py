@@ -37,7 +37,7 @@ class ResponsePropertiesPresenter(BasePresenter[IlluminationResponse]):
 
     # Model event handling
     def _onBasicFieldChange(self, model: IlluminationResponse) -> None:
-        """ Loads basic model fields (spinboxes etc.) into the widget. """
+        """ Loads basic model fields (e.g. ints) into the widget. """
         self.widget.updateBasicFields(model)
 
     # UI event handling

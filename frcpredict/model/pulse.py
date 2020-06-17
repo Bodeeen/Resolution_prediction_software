@@ -1,6 +1,7 @@
+from collections import OrderedDict
 from dataclasses import dataclass, field
 from dataclasses_json import config as json_config, Exclude
-from collections import OrderedDict
+from enum import Enum
 from PySignal import Signal
 import numpy as np
 from typing import List, Dict
@@ -9,8 +10,19 @@ import uuid
 from frcpredict.util import observable_property, hidden_field
 
 
+class PulseType(Enum):
+    on = "on"
+    off = "off"
+    readout = "readout"
+
+
 @dataclass
 class Pulse:
+    pulse_type: PulseType = observable_property(
+        "_pulse_type", default=PulseType.on,
+        signal_name="basic_field_changed"
+    )
+
     wavelength: int = observable_property(
         "_wavelength", default=0.0,
         signal_name="basic_field_changed"
@@ -27,7 +39,7 @@ class Pulse:
     )
 
     illumination_pattern: np.ndarray = observable_property(
-        "_illumination_pattern", default=np.zeros((80, 80)),
+        "_illumination_pattern", default=np.zeros((81, 81)),
         signal_name="illumination_pattern_changed", emit_arg_name="illumination_pattern")
 
     # Signals
@@ -50,7 +62,7 @@ class PulseScheme:
     # Properties
     @property
     def pulses(self) -> List[Pulse]:
-        return self._pulses.values()
+        return [*self._pulses.values()]
 
     @pulses.setter
     def pulses(self, pulses: List[Pulse]) -> None:

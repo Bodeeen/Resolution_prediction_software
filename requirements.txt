@@ -8,3 +8,4 @@ packaging
 PyQt5
 pyqtgraph
 PySignal
+scikit-image

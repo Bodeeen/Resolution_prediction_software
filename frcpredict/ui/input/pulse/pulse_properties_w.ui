@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>365</width>
-    <height>123</height>
+    <height>167</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -27,157 +27,184 @@
     <number>12</number>
    </property>
    <item>
-    <layout class="QFormLayout" name="formLayout_5">
-     <property name="horizontalSpacing">
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <property name="spacing">
       <number>9</number>
      </property>
-     <property name="verticalSpacing">
-      <number>6</number>
+     <property name="rightMargin">
+      <number>0</number>
      </property>
-     <item row="0" column="0">
-      <widget class="QLabel" name="lblWavelength">
-       <property name="text">
-        <string>Wavelength [nm]:</string>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <property name="spacing">
+        <number>12</number>
        </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QSpinBox" name="editWavelength">
-       <property name="minimum">
+       <property name="rightMargin">
         <number>0</number>
        </property>
-       <property name="maximum">
-        <number>10000</number>
-       </property>
-       <property name="value">
-        <number>0</number>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="lblDuration">
-       <property name="text">
-        <string>Duration [ms]:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="FreeFloatBox" name="editDuration"/>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="lblMaxIntensity">
-       <property name="text">
-        <string>Max intensity [kW/cm²]:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="FreeFloatBox" name="editMaxIntensity"/>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="lblOrder">
-       <property name="text">
-        <string>Order:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0,1">
        <item>
-        <widget class="QPushButton" name="btnMoveLeft">
-         <property name="maximumSize">
-          <size>
-           <width>24</width>
-           <height>24</height>
-          </size>
+        <layout class="QFormLayout" name="formLayout_5">
+         <property name="horizontalSpacing">
+          <number>9</number>
          </property>
-         <property name="text">
-          <string>&lt;</string>
+         <property name="verticalSpacing">
+          <number>6</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="lblWavelength">
+           <property name="text">
+            <string>Wavelength [nm]:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QSpinBox" name="editWavelength">
+           <property name="minimum">
+            <number>0</number>
+           </property>
+           <property name="maximum">
+            <number>10000</number>
+           </property>
+           <property name="value">
+            <number>0</number>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="lblDuration">
+           <property name="text">
+            <string>Duration [ms]:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="FreeFloatBox" name="editDuration"/>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="lblMaxIntensity">
+           <property name="text">
+            <string>Max intensity [kW/cm²]:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="FreeFloatBox" name="editMaxIntensity"/>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="lblOrder">
+           <property name="text">
+            <string>Order:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0,1">
+           <item>
+            <widget class="QPushButton" name="btnMoveLeft">
+             <property name="maximumSize">
+              <size>
+               <width>24</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>&lt;</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QWidget" name="widget" native="true"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnMoveRight">
+             <property name="maximumSize">
+              <size>
+               <width>24</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>&gt;</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="Line" name="line">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QWidget" name="widget" native="true"/>
-       </item>
-       <item>
-        <widget class="QPushButton" name="btnMoveRight">
-         <property name="maximumSize">
-          <size>
-           <width>24</width>
-           <height>24</height>
-          </size>
+        <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0">
+         <property name="spacing">
+          <number>12</number>
          </property>
-         <property name="text">
-          <string>&gt;</string>
-         </property>
-        </widget>
+         <item>
+          <widget class="QLabel" name="lblIlluminationPattern">
+           <property name="text">
+            <string>Illumination pattern:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="PatternFieldWidget" name="editIlluminationPattern" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QWidget" name="widget_2" native="true"/>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>
-    </layout>
-   </item>
-   <item>
-    <widget class="Line" name="line">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <property name="spacing">
-      <number>6</number>
-     </property>
      <item>
-      <widget class="QLabel" name="lblIlluminationPattern">
-       <property name="text">
-        <string>Illumination pattern:</string>
+      <widget class="Line" name="line_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
        </property>
       </widget>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout">
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
        <item>
-        <widget class="QListWidget" name="listPatterns">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>64</height>
-          </size>
-         </property>
-         <property name="baseSize">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
+        <widget class="QLabel" name="lblType">
+         <property name="text">
+          <string>Pulse type:</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="imgIlluminationPattern">
-         <property name="minimumSize">
-          <size>
-           <width>48</width>
-           <height>48</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>48</width>
-           <height>48</height>
-          </size>
-         </property>
+        <widget class="QRadioButton" name="radioTypeOn">
          <property name="text">
-          <string/>
+          <string>On</string>
          </property>
-         <property name="scaledContents">
-          <bool>true</bool>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="radioTypeOff">
+         <property name="text">
+          <string>Off</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="radioTypeReadout">
+         <property name="text">
+          <string>Readout</string>
          </property>
         </widget>
        </item>
@@ -193,12 +220,17 @@
    <extends>QLineEdit</extends>
    <header>frcpredict.ui</header>
   </customwidget>
+  <customwidget>
+   <class>PatternFieldWidget</class>
+   <extends>QWidget</extends>
+   <header>frcpredict.ui</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>editWavelength</tabstop>
   <tabstop>editDuration</tabstop>
   <tabstop>editMaxIntensity</tabstop>
-  <tabstop>listPatterns</tabstop>
   <tabstop>btnMoveLeft</tabstop>
   <tabstop>btnMoveRight</tabstop>
  </tabstops>

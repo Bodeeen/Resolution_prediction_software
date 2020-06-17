@@ -4,7 +4,7 @@ import numpy as np
 from PyQt5.QtCore import pyqtSignal
 import pyqtgraph as pg
 
-from frcpredict.model import PulseScheme, Pulse
+from frcpredict.model import PulseScheme, Pulse, PulseType, Pattern, Array2DPatternData
 from frcpredict.ui import BaseWidget
 from .pulse_scheme_p import PulseSchemePresenter
 from .pulse_curve_item import PulseCurveItem
@@ -20,7 +20,7 @@ class PulseSchemeWidget(BaseWidget):
     plotClicked = pyqtSignal(object)
     addPulseClicked = pyqtSignal()
     removePulseClicked = pyqtSignal()
-    pulseDurationChanged = pyqtSignal()
+    pulseDurationChangedByUser = pyqtSignal()
     pulseMoveLeftClicked = pyqtSignal()
     pulseMoveRightClicked = pyqtSignal()
 
@@ -36,28 +36,33 @@ class PulseSchemeWidget(BaseWidget):
         self.plot.scene().sigMouseClicked.connect(self.plotClicked)
         self.btnAddPulse.clicked.connect(self.addPulseClicked)
         self.btnRemovePulse.clicked.connect(self.removePulseClicked)
-        self.editProperties.durationChanged.connect(self.pulseDurationChanged)
+        self.editProperties.durationChangedByUser.connect(self.pulseDurationChangedByUser)
         self.editProperties.moveLeftClicked.connect(self.pulseMoveLeftClicked)
         self.editProperties.moveRightClicked.connect(self.pulseMoveRightClicked)
 
         # Initialize presenter
         self._presenter = PulseSchemePresenter(self)
 
-    def setModel(self, model: PulseScheme) -> None:
+    def setValue(self, model: PulseScheme) -> None:
         self._presenter.model = model
 
     def setSelectedPulse(self, pulse: Pulse) -> None:
         """ Updates controls and pulse properties widget based on the current selection. """
 
         if pulse is not None:
-            self.editProperties.setModel(pulse)
+            self.editProperties.setValue(pulse)
             self.editProperties.setEnabled(True)
             self.btnRemovePulse.setEnabled(True)
         else:
             # Clear properties
-            self.editProperties.setModel(
-                Pulse(wavelength=0.0, duration=0.0,
-                      max_intensity=0.0, illumination_pattern=np.zeros((80, 80)))
+            self.editProperties.setValue(
+                Pulse(
+                    pulse_type=PulseType.on,
+                    wavelength=0.0,
+                    duration=0.0,
+                    max_intensity=0.0,
+                    illumination_pattern=Pattern(pattern_data=Array2DPatternData())
+                )
             )
             self.editProperties.setEnabled(False)
             self.btnRemovePulse.setEnabled(False)

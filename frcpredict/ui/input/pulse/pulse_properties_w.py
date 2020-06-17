@@ -1,9 +1,8 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QPixmap
 
-from frcpredict.model import Pulse
+from frcpredict.model import Pulse, PulseType, Pattern, PatternType
 from frcpredict.ui import BaseWidget
-from frcpredict.util import patterns
 from .pulse_properties_p import PulsePropertiesPresenter
 
 
@@ -13,10 +12,15 @@ class PulsePropertiesWidget(BaseWidget):
     """
 
     # Signals
+    onTypeSelected = pyqtSignal()
+    offTypeSelected = pyqtSignal()
+    readoutTypeSelected = pyqtSignal()
+
     wavelengthChanged = pyqtSignal(int)
     durationChanged = pyqtSignal(float)
+    durationChangedByUser = pyqtSignal(float)
     maxIntensityChanged = pyqtSignal(float)
-    patternSelectionChanged = pyqtSignal(int)
+
     moveLeftClicked = pyqtSignal()
     moveRightClicked = pyqtSignal()
 
@@ -24,35 +28,54 @@ class PulsePropertiesWidget(BaseWidget):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(__file__, *args, **kwargs)
 
-        for pattern in patterns.keys():
-            self.listPatterns.addItem(pattern)
+        self.editIlluminationPattern.setFieldName("Illumination Pattern")
+        self.editIlluminationPattern.setAllowEditGenerationAmplitude(False)
+        self.editIlluminationPattern.setAvailableGenerationTypes(
+            [PatternType.gaussian, PatternType.doughnut, PatternType.airy]
+        )
         
         # Connect forwarded signals
+        self.radioTypeOn.clicked.connect(self.onTypeSelected)
+        self.radioTypeOff.clicked.connect(self.offTypeSelected)
+        self.radioTypeReadout.clicked.connect(self.readoutTypeSelected)
+
         self.editWavelength.valueChanged.connect(self.wavelengthChanged)
         self.editDuration.valueChanged.connect(self.durationChanged)
+        self.editDuration.valueChangedByUser.connect(self.durationChangedByUser)
         self.editMaxIntensity.valueChanged.connect(self.maxIntensityChanged)
-        self.listPatterns.currentRowChanged.connect(self.patternSelectionChanged)
+
         self.btnMoveLeft.clicked.connect(self.moveLeftClicked)
         self.btnMoveRight.clicked.connect(self.moveRightClicked)
 
         # Initialize presenter
         self._presenter = PulsePropertiesPresenter(self)
 
-    def setModel(self, model: Pulse) -> None:
+    def setEditWavelengthEnabled(self, enabled: bool) -> None:
+        self.editWavelength.setEnabled(enabled)
+    
+    def setChangeOrderVisible(self, visible: bool) -> None:
+        # TODO: Fix these still taking up space when hidden
+        self.lblOrder.setVisible(visible)
+        self.btnMoveLeft.setVisible(visible)
+        self.btnMoveRight.setVisible(visible)
+
+    def value(self) -> Pulse:
+        return self._presenter.model
+
+    def setValue(self, model: Pulse) -> None:
         self._presenter.model = model
 
-    def setEditWavelengthEnabled(self, value: bool) -> None:
-        self.editWavelength.setEnabled(value)
-    
-    def setChangeOrderVisible(self, value: bool) -> None:
-        self.lblOrder.setVisible(value)
-        self.btnMoveLeft.setVisible(value)
-        self.btnMoveRight.setVisible(value)
-
-    def setIlluminationPatternPixmap(self, pixmap: QPixmap) -> None:
-        self.imgIlluminationPattern.setPixmap(pixmap)
+    def updateIlluminationPattern(self, pattern: Pattern) -> None:
+        self.editIlluminationPattern.setValue(pattern)
 
     def updateBasicFields(self, model: Pulse) -> None:
+        if model.pulse_type == PulseType.on:
+            self.radioTypeOn.setChecked(True)
+        elif model.pulse_type == PulseType.off:
+            self.radioTypeOff.setChecked(True)
+        elif model.pulse_type == PulseType.readout:
+            self.radioTypeReadout.setChecked(True)
+
         self.editWavelength.setValue(model.wavelength)
         self.editDuration.setValue(model.duration)
         self.editMaxIntensity.setValue(model.max_intensity)

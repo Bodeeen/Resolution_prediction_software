@@ -27,12 +27,15 @@ class ResponsePropertiesWidget(BaseWidget):
         # Initialize presenter
         self._presenter = ResponsePropertiesPresenter(self)
 
-    def setModel(self, model: IlluminationResponse) -> None:
+    def value(self) -> IlluminationResponse:
+        return self._presenter.model
+
+    def setValue(self, model: IlluminationResponse) -> None:
         self._presenter.model = model
 
-    def setWavelengthVisible(self, value: bool) -> None:
-        self.lblWavelength.setVisible(value)
-        self.editWavelength.setVisible(value)
+    def setWavelengthVisible(self, visible: bool) -> None:
+        self.lblWavelength.setVisible(visible)
+        self.editWavelength.setVisible(visible)
 
     def updateBasicFields(self, model: IlluminationResponse) -> None:
         self.editOffToOn.setValue(model.cross_section_off_to_on)

@@ -29,9 +29,6 @@ class FluorophoreSettingsWidget(BaseWidget):
         # Initialize presenter
         self._presenter = FluorophoreSettingsPresenter(self)
 
-    def setModel(self, model: FluorophoreSettings) -> None:
-        self._presenter.model = model
-
     def addResponseToList(self, response: IlluminationResponse) -> None:
         """ Adds the specified response to the response list and selects it. """
         item = ResponseListItem(response)
@@ -57,13 +54,13 @@ class FluorophoreSettingsWidget(BaseWidget):
 
         if response is not None:
             self.groupProperties.setTitle(f"Selected Response: {response}")
-            self.editProperties.setModel(response)
+            self.editProperties.setValue(response)
             self.editProperties.setEnabled(True)
             self.btnRemoveResponse.setEnabled(True)
         else:
             # Clear properties
             self.groupProperties.setTitle("Selected Response")
-            self.editProperties.setModel(  # Clear properties
+            self.editProperties.setValue(  # Clear properties
                 IlluminationResponse(
                     wavelength_start=0.0, wavelength_end=0.0,
                     cross_section_off_to_on=0.0, cross_section_on_to_off=0.0, cross_section_emission=0.0
@@ -71,3 +68,6 @@ class FluorophoreSettingsWidget(BaseWidget):
             )
             self.editProperties.setEnabled(False)
             self.btnRemoveResponse.setEnabled(False)
+
+    def setValue(self, model: FluorophoreSettings) -> None:
+        self._presenter.model = model

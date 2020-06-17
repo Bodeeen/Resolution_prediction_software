@@ -65,6 +65,9 @@
         <property name="leftMargin">
          <number>0</number>
         </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
         <property name="rightMargin">
          <number>0</number>
         </property>
@@ -104,6 +107,12 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>PulsePropertiesWidget</class>
+   <extends>QWidget</extends>
+   <header>frcpredict.ui</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>PresetPickerWidget</class>
    <extends>QWidget</extends>
    <header>frcpredict.ui</header>
@@ -113,12 +122,6 @@
    <class>PlotWidget</class>
    <extends>QWidget</extends>
    <header>pyqtgraph</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>PulsePropertiesWidget</class>
-   <extends>QWidget</extends>
-   <header>frcpredict.ui</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -9,6 +9,10 @@ from frcpredict.util import wavelength_to_rgb
 class PulseCurveItem(PlotCurveItem):
     # Properties
     @property
+    def pulseKey(self):
+        return self._pulseKey
+
+    @property
     def startTime(self):
         return self._startTime
 
@@ -18,7 +22,7 @@ class PulseCurveItem(PlotCurveItem):
 
     # Methods
     def __init__(self, pulseKey: str, wavelength: int, startTime: float, duration: float, plotEndTime: float = 0, *args, **kwargs) -> None:
-        self.pulseKey = pulseKey
+        self._pulseKey = pulseKey
         self._startTime = startTime
         self._duration = duration
         self._plotEndTime = plotEndTime

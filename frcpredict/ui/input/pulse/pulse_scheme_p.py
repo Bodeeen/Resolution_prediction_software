@@ -45,7 +45,7 @@ class PulseSchemePresenter(BasePresenter[PulseScheme]):
         widget.plotClicked.connect(self._uiPlotClicked)
         widget.addPulseClicked.connect(self._uiClickAddPulse)
         widget.removePulseClicked.connect(self._uiClickRemovePulse)
-        widget.pulseDurationChanged.connect(self._uiChangeDuration)
+        widget.pulseDurationChangedByUser.connect(self._uiChangeDurationByUser)
         widget.pulseMoveLeftClicked.connect(self._uiMovePulseLeft)
         widget.pulseMoveRightClicked.connect(self._uiMovePulseRight)
 
@@ -102,12 +102,9 @@ class PulseSchemePresenter(BasePresenter[PulseScheme]):
             self.model.remove_pulse(self._selectedPulseKey)
 
     @pyqtSlot()
-    def _uiChangeDuration(self) -> None:
-        pass
-        # TODO: This causes issues due to updatePlot doing things that lead to this function being
-        #       called again.
-        #self.widget.updatePlot(self.model)
-        #self.widget.highlightPulse(self._selectedPulseKey)  # Re-highlight currently selected pulse
+    def _uiChangeDurationByUser(self) -> None:
+        self.widget.updatePlot(self.model)
+        self.widget.highlightPulse(self._selectedPulseKey)  # Re-highlight currently selected pulse
 
     @pyqtSlot()
     def _uiMovePulseLeft(self) -> None:

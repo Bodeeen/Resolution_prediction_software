@@ -1,5 +1,7 @@
-from dataclasses import field
+from base64 import b64encode, b64decode
+from dataclasses import field, fields
 from dataclasses_json import config as json_config, Exclude
+import numpy as np
 from PySignal import Signal
 from typing import Any, Optional, List
 
@@ -43,3 +45,13 @@ def hidden_field(default_factory):
         init=False, repr=False, default_factory=default_factory,
         metadata=json_config(exclude=Exclude.ALWAYS)
     )
+
+
+def with_cleared_signals(dataclass_instance):
+    """ Clears all signals in the given dataclass instance and returns it. """
+
+    for dataclass_field in fields(dataclass_instance):
+        if issubclass(dataclass_field.type, Signal):
+            getattr(dataclass_instance, dataclass_field.name).clear()
+
+    return dataclass_instance
