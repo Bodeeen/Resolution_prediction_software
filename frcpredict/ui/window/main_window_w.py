@@ -29,6 +29,13 @@ class MainWindow(QMainWindow, BaseWidget):
     def setFrcResults(self, x: np.ndarray, y: np.ndarray) -> None:
         self.frcResults.setCurve(x, y)
 
+    def setSimulating(self, simulating: bool) -> None:
+        self.btnSimulateFrc.setEnabled(not simulating)
+        if simulating:
+            self.btnSimulateFrc.setText("SIMULATING…")
+        else:
+            self.btnSimulateFrc.setText("SIMULATE")
+
     def setValue(self, model: RunInstance) -> None:
         self._presenter.model = model
 

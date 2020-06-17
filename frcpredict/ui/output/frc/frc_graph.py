@@ -16,7 +16,11 @@ class FRCResultsWidget(BaseWidget):
 
     def setCurve(self, x: np.ndarray, y: np.ndarray) -> None:
         """ TODO. """
-        threshold = 0.143
+        threshold = 0.15
         self.plotFrc.clear()
         self.plotFrc.plot(x, y, clickable=True)
         self.plotFrc.plot([x[0], x[-1]], [threshold, threshold], pen=pg.mkPen("r", style=Qt.DashLine))
+
+        self.plotFrc.getAxis("bottom").setTicks(
+            [[(1/value, str(value)) for value in [300, 100, 60, 40, 30]]]
+        )

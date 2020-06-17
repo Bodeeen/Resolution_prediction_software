@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from dataclasses_json import config as json_config, Exclude
 from PySignal import Signal
-from typing import Any, List, Dict
+from typing import Any, Optional, List, Dict
 
 from frcpredict.util import observable_property, hidden_field
 
@@ -45,7 +45,7 @@ class FluorophoreSettings:
     # Properties
     @property
     def responses(self) -> List[IlluminationResponse]:
-        return self._responses.values()
+        return [*self._responses.values()]
 
     @responses.setter
     def responses(self, responses: List[IlluminationResponse]) -> None:
@@ -79,3 +79,12 @@ class FluorophoreSettings:
         """ Removes all responses. """
         for wavelength_start in self._responses.keys():
             self.remove_response(wavelength_start)
+
+    def get_response(self, wavelength: int) -> Optional[IlluminationResponse]:
+        """ Returns the response with the specified wavelength, or None if it doesn't exist. """
+        for response in self._responses.values():
+            if (wavelength >= response.wavelength_start and
+                    wavelength <= response.wavelength_end):
+                return response
+
+        return None

@@ -11,6 +11,8 @@ from .pulse import PulseScheme
 from .sample import SampleProperties
 from .camera import CameraProperties
 
+from Old_scripts.spectral_analysis_new_temp import simulate  # TODO: Temp!
+
 
 @dataclass
 class RunInstance:
@@ -41,8 +43,11 @@ class RunInstance:
     pulse_scheme_loaded: Signal = hidden_field(Signal)
     sample_properties_loaded: Signal = hidden_field(Signal)
     camera_properties_loaded: Signal = hidden_field(Signal)
-    
+
     # Methods
     def frc(self) -> Tuple[np.ndarray, np.ndarray]:
         """ TODO. Returns x and y. """
-        pass
+        frc_spectra, df = simulate(self)
+        x = (np.arange(0, len(frc_spectra)) * df)
+        
+        return x, frc_spectra
