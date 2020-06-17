@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QWidget, QDialog, QDialogButtonBox
 
 from frcpredict.model import IlluminationResponse
 from frcpredict.ui import BaseWidget
+from frcpredict.util import with_cleared_signals
 
 
 class AddResponseDialog(QDialog, BaseWidget):
@@ -36,13 +37,7 @@ class AddResponseDialog(QDialog, BaseWidget):
         result = dialog.exec_()
 
         if result == QDialog.Accepted:
-            response = IlluminationResponse(
-                wavelength_start=dialog.editProperties.editWavelength.value(),
-                wavelength_end=dialog.editProperties.editWavelength.value(),
-                cross_section_off_to_on=dialog.editProperties.editOffToOn.value(),
-                cross_section_on_to_off=dialog.editProperties.editOnToOff.value(),
-                cross_section_emission=dialog.editProperties.editEmission.value()
-            )
+            response = with_cleared_signals(dialog.editProperties.value())
         else:
             response = None
 

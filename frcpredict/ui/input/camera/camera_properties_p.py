@@ -36,7 +36,7 @@ class CameraPropertiesPresenter(BasePresenter[CameraProperties]):
 
     # Model event handling
     def _onBasicFieldChange(self, model: CameraProperties) -> None:
-        """ Loads basic model fields (spinboxes etc.) into the interface fields. """
+        """ Loads basic model fields (e.g. ints) into the widget. """
         self._widget.updateBasicFields(model)
 
     # UI event handling

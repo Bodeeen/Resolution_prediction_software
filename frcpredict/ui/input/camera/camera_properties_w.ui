@@ -55,17 +55,21 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>FreeFloatBox</class>
+   <extends>QLineEdit</extends>
+   <header>frcpredict.ui</header>
+  </customwidget>
+  <customwidget>
    <class>PresetPickerWidget</class>
    <extends>QWidget</extends>
    <header>frcpredict.ui</header>
    <container>1</container>
   </customwidget>
-  <customwidget>
-   <class>FreeFloatBox</class>
-   <extends>QLineEdit</extends>
-   <header>frcpredict.ui</header>
-  </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>editReadoutNoise</tabstop>
+  <tabstop>editQuantumEfficiency</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

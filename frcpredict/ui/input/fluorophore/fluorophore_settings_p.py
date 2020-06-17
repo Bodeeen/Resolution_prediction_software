@@ -68,9 +68,6 @@ class FluorophoreSettingsPresenter(BasePresenter[FluorophoreSettings]):
     def _uiClickAddResponse(self) -> None:
         """
         Adds a response. A dialog will open for the user to enter the properties first.
-
-        TODO: Custom dialog where you can choose to enter a range, and maybe even set all
-              parameters (could just reuse response_properties with a couple of additional fields)
         """
         
         response, ok_pressed = AddResponseDialog.getResponse(self.widget)
