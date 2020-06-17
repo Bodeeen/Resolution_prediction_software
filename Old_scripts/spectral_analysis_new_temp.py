@@ -6,7 +6,6 @@ Created on Tue Jun 11 13:38:07 2019
 """
 
 import Old_scripts.telegraph as telegraph
-import matplotlib.pyplot as plt
 import numpy as np
 from scipy.interpolate import interp1d
 from scipy.ndimage.filters import convolve
@@ -18,7 +17,6 @@ import os
 # if not os.environ['PY_UTILS_PATH'] in sys.path:
 #    sys.path.append(os.environ['PY_UTILS_PATH'])
 #import DataIO_tools
-from mpl_toolkits.mplot3d import Axes3D
 from skimage import measure
 
 from frcpredict.model import PulseType
@@ -227,7 +225,7 @@ def simulate(run_instance):
     labelling_factor = run_instance.sample_properties.labelling_density
     sample_power = run_instance.sample_properties.spectral_power
     input_power = labelling_factor**2*sample_power
-    K_0_0 = 3.19
+    K_0_0 = run_instance.sample_properties.K_origin
     D_0_0 = labelling_factor*K_0_0
 
     """ Calculate ON-state probabilities after ON-switching illumination"""

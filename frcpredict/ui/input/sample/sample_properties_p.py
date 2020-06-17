@@ -25,7 +25,8 @@ class SamplePropertiesPresenter(BasePresenter[SampleProperties]):
         # Initialize model
         model = SampleProperties(
             spectral_power=0.0,
-            labelling_density=0.0
+            labelling_density=0.0,
+            K_origin=1.0
         )
 
         super().__init__(model, widget)
@@ -33,6 +34,7 @@ class SamplePropertiesPresenter(BasePresenter[SampleProperties]):
         # Prepare UI events
         widget.spectralPowerChanged.connect(self._uiSpectralPowerChange)
         widget.labellingDensityChanged.connect(self._uiLabellingDensityChange)
+        widget.KOriginChanged.connect(self._uiKOriginChange)
 
     # Model event handling
     def _onBasicFieldChange(self, model: SampleProperties) -> None:
@@ -47,3 +49,7 @@ class SamplePropertiesPresenter(BasePresenter[SampleProperties]):
     @pyqtSlot(float)
     def _uiLabellingDensityChange(self, value: float) -> None:
         self.model.labelling_density = value
+
+    @pyqtSlot(float)
+    def _uiKOriginChange(self, value: float) -> None:
+        self.model.K_origin = value

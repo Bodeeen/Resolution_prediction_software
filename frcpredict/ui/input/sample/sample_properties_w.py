@@ -13,6 +13,7 @@ class SamplePropertiesWidget(BaseWidget):
     # Signals
     spectralPowerChanged = pyqtSignal(float)
     labellingDensityChanged = pyqtSignal(float)
+    KOriginChanged = pyqtSignal(float)
 
     # Methods
     def __init__(self, *args, **kwargs) -> None:
@@ -21,6 +22,7 @@ class SamplePropertiesWidget(BaseWidget):
         # Connect forwarded signals
         self.editSpectralPower.valueChanged.connect(self.spectralPowerChanged)
         self.editLabellingDensity.valueChanged.connect(self.labellingDensityChanged)
+        self.editKOrigin.valueChanged.connect(self.KOriginChanged)
 
         # Initialize presenter
         self._presenter = SamplePropertiesPresenter(self)
@@ -31,3 +33,4 @@ class SamplePropertiesWidget(BaseWidget):
     def updateBasicFields(self, model: SampleProperties) -> None:
         self.editSpectralPower.setValue(model.spectral_power)
         self.editLabellingDensity.setValue(model.labelling_density)
+        self.editKOrigin.setValue(model.K_origin)

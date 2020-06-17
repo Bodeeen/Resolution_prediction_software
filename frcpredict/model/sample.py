@@ -12,5 +12,8 @@ class SampleProperties:
     labelling_density: float = observable_property("_labelling_density", default=0.0,
                                                    signal_name="basic_field_changed")
 
+    K_origin: float = observable_property("_K_origin", default=0.0,
+                                          signal_name="basic_field_changed")
+
     # Signals
     basic_field_changed: Signal = hidden_field(Signal)

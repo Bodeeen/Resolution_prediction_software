@@ -50,8 +50,15 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
                 scanning_step_size=20.0
             ),
             pulse_scheme=PulseScheme(pulses=[]),
-            sample_properties=SampleProperties(spectral_power=1.0, labelling_density=1.0),
-            camera_properties=CameraProperties(readout_noise=0.0, quantum_efficiency=0.75)
+            sample_properties=SampleProperties(
+                spectral_power=1.0,
+                labelling_density=1.0,
+                K_origin=1.0
+            ),
+            camera_properties=CameraProperties(
+                readout_noise=0.0,
+                quantum_efficiency=0.75
+            )
         )
 
         super().__init__(model, widget)
@@ -69,7 +76,7 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
         model.pulse_scheme.add_pulse(Pulse(pulse_type=PulseType.on, wavelength=405, duration=0.1, max_intensity=10.0, illumination_pattern=Pattern(pattern_data=AiryPatternData(fwhm=200))))
         model.pulse_scheme.add_pulse(Pulse(pulse_type=PulseType.off, wavelength=488, duration=4.0, max_intensity=5.1, illumination_pattern=Pattern(pattern_data=DoughnutPatternData(periodicity=510))))
         model.pulse_scheme.add_pulse(Pulse(pulse_type=PulseType.readout, wavelength=488, duration=0.4, max_intensity=13.0, illumination_pattern=Pattern(pattern_data=AiryPatternData(fwhm=230))))
-        model.sample_properties=SampleProperties(spectral_power=6.1, labelling_density=5.0)
+        model.sample_properties=SampleProperties(spectral_power=6.1, labelling_density=5.0, K_origin=3.19)
         model.camera_properties=CameraProperties(readout_noise=0.0, quantum_efficiency=0.82)
         self.model = model
         self.widget.fluorophoreSettings.listResponses.setCurrentRow(0)

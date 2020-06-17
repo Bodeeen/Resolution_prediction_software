@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>272</width>
-    <height>99</height>
+    <height>125</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -36,16 +36,6 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="lblLabellingDensity">
-       <property name="text">
-        <string>Labelling density [fluoroph./mm²]:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="FreeFloatBox" name="editLabellingDensity"/>
-     </item>
      <item row="0" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
        <property name="spacing">
@@ -71,6 +61,26 @@
         </widget>
        </item>
       </layout>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="lblLabellingDensity">
+       <property name="text">
+        <string>Labelling density [fluoroph./mm²]:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="FreeFloatBox" name="editLabellingDensity"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="lblKOrigin">
+       <property name="text">
+        <string>K(0, 0):</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="FreeFloatBox" name="editKOrigin"/>
      </item>
     </layout>
    </item>
