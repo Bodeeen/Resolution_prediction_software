@@ -3,6 +3,7 @@ colour-science
 dataclasses; python_version < "3.7"
 dataclasses-json >= 0.4.4
 GDAL
+numba
 numpy
 packaging
 PyQt5
