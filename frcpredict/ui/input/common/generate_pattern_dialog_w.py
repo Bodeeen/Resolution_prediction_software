@@ -66,14 +66,14 @@ class GeneratePatternDialog(QDialog, BaseWidget):
         self.lblPeriodicity.setVisible(periodicity)
         self.editPeriodicity.setVisible(periodicity)
 
-    def setPreview(self, pixmap: QPixmap) -> None:
-        self.imgPreview.setPixmap(pixmap)
-
     def value(self) -> Pattern:
         return self._presenter.model
 
     def setValue(self, model: Pattern) -> None:
         self._presenter.model = model
+
+    def updatePreview(self, pixmap: QPixmap) -> None:
+        self.imgPreview.setPixmap(pixmap)
 
     def updatePropertyFields(self, amplitude: Optional[float] = None, fwhm: Optional[float] = None, periodicity: Optional[float] = None) -> None:
         """ Updates the values of the fields in the widget. """

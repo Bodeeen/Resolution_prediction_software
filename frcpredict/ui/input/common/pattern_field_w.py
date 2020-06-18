@@ -86,6 +86,6 @@ class PatternFieldWidget(BaseWidget):
     def setValue(self, model: Pattern) -> None:
         self._presenter.model = model
 
-    def setVisualisation(self, pixmap: QPixmap, description: str) -> None:
+    def updateVisualisation(self, pixmap: QPixmap, description: str) -> None:
         self.imgVisualisation.setPixmap(pixmap)
         self.imgVisualisation.setToolTip(description)

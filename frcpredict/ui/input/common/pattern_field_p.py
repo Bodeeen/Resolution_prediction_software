@@ -42,7 +42,7 @@ class PatternFieldPresenter(BasePresenter[Pattern]):
     def _onPatternDataChange(self, model: Pattern):
         """ Updates the visualization based on the pattern type and data. """
 
-        self.widget.setVisualisation(
+        self.widget.updateVisualisation(
             pixmap=getArrayPixmap(
                 model.get_numpy_array(pixels_per_nm=64),
                 normalise=self._normaliseVisualisation

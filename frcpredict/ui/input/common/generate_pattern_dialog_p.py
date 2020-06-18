@@ -47,7 +47,7 @@ class GeneratePatternPresenter(BasePresenter[Pattern]):
         based on the pattern type, and updates the values of the property fields.
         """
 
-        self.widget.setPreview(
+        self.widget.updatePreview(
             getArrayPixmap(
                 model.get_numpy_array(pixels_per_nm=32),
                 normalise=self._normalisePreview
