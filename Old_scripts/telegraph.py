@@ -56,8 +56,8 @@ def make_random_telegraph_data(num_trials=10000, t_on = 1.0, t_off=1.0, t_bleach
             on_time += state*(min(time_until_switch, t_exp - t_elapsed))
             state = (state + 1) % 2
             t_elapsed += time_until_switch
-        output_array.append(on_time)
-        N_switch_array.append(N_switches)
+        N_switch_array.append(N_switches)  # For some reason this line apparently has to run before
+        output_array.append(on_time)       # this line in some configurations?
     lifetimes = np.random.exponential(t_bleach, size=(num_trials))
     return np.minimum(np.array(output_array), lifetimes), np.array(N_switch_array)
 
