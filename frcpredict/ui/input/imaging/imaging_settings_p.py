@@ -37,6 +37,9 @@ class ImagingSystemSettingsPresenter(BasePresenter[ImagingSystemSettings]):
 
         super().__init__(model, widget)
 
+        # Prepare UI events
+        self.widget.scanningStepSizeChanged.connect(self._uiScanningStepSizeChange)
+
     # Model event handling
     def _onBasicFieldChange(self, model: ImagingSystemSettings) -> None:
         """ Loads basic model fields (e.g. ints) into the widget. """
@@ -45,4 +48,4 @@ class ImagingSystemSettingsPresenter(BasePresenter[ImagingSystemSettings]):
     # UI event handling
     @pyqtSlot(float)
     def _uiScanningStepSizeChange(self, value: float) -> None:
-        self.model.scanningStepSizeChanged = value
+        self.model.scanning_step_size = value
