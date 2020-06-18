@@ -34,6 +34,7 @@ class ResponsePropertiesWidget(BaseWidget):
         self._presenter.model = model
 
     def setWavelengthVisible(self, visible: bool) -> None:
+        """ Sets whether the field for editing the wavelength is visible. """
         self.lblWavelength.setVisible(visible)
         self.editWavelength.setVisible(visible)
 

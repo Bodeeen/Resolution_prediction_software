@@ -51,9 +51,13 @@ class PulsePropertiesWidget(BaseWidget):
         self._presenter = PulsePropertiesPresenter(self)
 
     def setEditWavelengthEnabled(self, enabled: bool) -> None:
+        """ Sets whether the field for editing the wavelength is enabled. """
         self.editWavelength.setEnabled(enabled)
     
     def setChangeOrderVisible(self, visible: bool) -> None:
+        """
+        Sets whether the buttons for changing the pulse's position in the scheme are visible.
+        """
         # TODO: Fix these still taking up space when hidden
         self.lblOrder.setVisible(visible)
         self.btnMoveLeft.setVisible(visible)

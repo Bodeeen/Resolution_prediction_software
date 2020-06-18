@@ -26,6 +26,7 @@ class PatternType(Enum):
 class PatternData:
     @abstractmethod
     def get_numpy_array(self, pixels_per_nm: float) -> np.ndarray:
+        """ Returns a numpy array representation of the pattern data. """
         pass
 
     @abstractmethod
@@ -149,6 +150,11 @@ class Pattern:
             self.load_type(pattern_type)
 
     def load_type(self, pattern_type: PatternType) -> None:
+        """
+        Loads the given pattern type into pattern_type and a default pattern of that type into
+        pattern_data.
+        """
+
         if pattern_type == PatternType.array2d:
             self.pattern_data = Array2DPatternData()
         elif pattern_type == PatternType.gaussian:
@@ -166,6 +172,10 @@ class Pattern:
         self.data_loaded.emit(self)
 
     def load_data(self, pattern_data: PatternData) -> None:
+        """
+        Loads the given pattern data into pattern_data and the type of that data into pattern_type.
+        """
+
         if type(pattern_data) == Array2DPatternData:
             self.pattern_type = PatternType.array2d
         elif type(pattern_data) == GaussianPatternData:

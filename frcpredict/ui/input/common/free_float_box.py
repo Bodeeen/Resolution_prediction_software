@@ -40,7 +40,7 @@ class FreeFloatBox(QLineEdit):
         the user of the issue.
         """
         self._shouldHighlightIfInvalid = shouldHighlightIfInvalid
-        self._onChange(self.text())  # Trigger change event to validate
+        self._onChange(self.text(), changedByUser=True)  # Trigger change event to validate
 
     def value(self) -> float:
         """ Returns the value of the field. """
@@ -52,10 +52,10 @@ class FreeFloatBox(QLineEdit):
             self._value = value
             strValue = str(value)
 
-            self.blockSignals(True)
+            self.blockSignals(True)  # Ensure that change event isn't triggered automatically
             self.setText(str(value))
             self.blockSignals(False)
-            self._onChange(strValue, False)
+            self._onChange(strValue, changedByUser=False)
 
     # Event handling
     @pyqtSlot(str)

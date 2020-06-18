@@ -10,7 +10,10 @@ from .pattern_field_p import PatternFieldPresenter
 
 class PatternFieldWidget(BaseWidget):
     """
-    A widget for a pattern (2D array) input field.
+    A widget for a pattern (2D array) input field. Here, the user may load a file that contains
+    pattern data, or open a dialog to generate a pattern and load it. It also displays a preview of
+    the loaded pattern. Hovering the mouse over the preview will show information about the
+    loaded pattern.
     """
 
     # Properties
@@ -44,15 +47,29 @@ class PatternFieldWidget(BaseWidget):
         self._presenter = PatternFieldPresenter(self)
 
     def allowEditGenerationAmplitude(self) -> bool:
+        """
+        Returns whether the user may edit the pattern amplitude when generating a pattern, assuming
+        the option is available.
+        """
         return self._allowEditGenerationAmplitude
 
     def setAllowEditGenerationAmplitude(self, allowEditAmplitude: bool) -> None:
+        """
+        Sets whether the user may edit the pattern amplitude when generating a pattern, assuming
+        the option is available.
+        """
         self._allowEditGenerationAmplitude = allowEditAmplitude
 
     def availableGenerationTypes(self) -> bool:
+        """
+        Returns which pattern types are available for the user to pick when generating a pattern.
+        """
         return self._availableGenerationTypes
 
     def setAvailableGenerationTypes(self, patternTypes: List[PatternType]) -> None:
+        """
+        Sets which pattern types are available for the user to pick when generating a pattern.
+        """
         self._availableGenerationTypes = patternTypes
 
     def fieldName(self) -> str:

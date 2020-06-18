@@ -12,7 +12,9 @@ from .pulse_curve_item import PulseCurveItem
 
 class PulseSchemeWidget(BaseWidget):
     """
-    A widget where the user may set the pulse scheme.
+    A widget where the user may set the pulse scheme by adding, removing, and editing individual
+    pulses. It contains a dynamically updated graph that shows these pulses and allows the user to
+    select existing pulses.
     """
 
     # Signals
