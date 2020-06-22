@@ -11,6 +11,7 @@ class ResponsePropertiesWidget(BaseWidget):
     """
 
     # Signals
+    wavelengthChanged = pyqtSignal(int)
     offToOnChanged = pyqtSignal(float)
     onToOffChanged = pyqtSignal(float)
     emissionChanged = pyqtSignal(float)
@@ -20,6 +21,7 @@ class ResponsePropertiesWidget(BaseWidget):
         super().__init__(__file__, *args, **kwargs)
 
         # Connect forwarded signals
+        self.editWavelength.valueChanged.connect(self.wavelengthChanged)
         self.editOffToOn.valueChanged.connect(self.offToOnChanged)
         self.editOnToOff.valueChanged.connect(self.onToOffChanged)
         self.editEmission.valueChanged.connect(self.emissionChanged)
@@ -39,6 +41,7 @@ class ResponsePropertiesWidget(BaseWidget):
         self.editWavelength.setVisible(visible)
 
     def updateBasicFields(self, model: IlluminationResponse) -> None:
+        self.editWavelength.setValue(model.wavelength_start)
         self.editOffToOn.setValue(model.cross_section_off_to_on)
         self.editOnToOff.setValue(model.cross_section_on_to_off)
         self.editEmission.setValue(model.cross_section_emission)

@@ -8,8 +8,11 @@ from frcpredict.util import observable_property, hidden_field
 
 @dataclass
 class IlluminationResponse:
-    wavelength_start: int
-    wavelength_end: int
+    wavelength_start: int = observable_property("_wavelength_start", default=0,
+                                                signal_name="basic_field_changed")
+
+    wavelength_end: int = observable_property("_wavelength_end", default=0,
+                                              signal_name="basic_field_changed")
 
     cross_section_off_to_on: float = observable_property("_cross_section_off_to_on", default=0.0,
                                                       signal_name="basic_field_changed")

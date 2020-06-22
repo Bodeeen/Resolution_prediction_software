@@ -31,6 +31,7 @@ class ResponsePropertiesPresenter(BasePresenter[IlluminationResponse]):
         super().__init__(model, widget)
         
         # Prepare UI events
+        widget.wavelengthChanged.connect(self._uiWavelengthChange)
         widget.offToOnChanged.connect(self._uiOffToOnChange)
         widget.onToOffChanged.connect(self._uiOnToOffChange)
         widget.emissionChanged.connect(self._uiEmissionChange)
@@ -41,6 +42,11 @@ class ResponsePropertiesPresenter(BasePresenter[IlluminationResponse]):
         self.widget.updateBasicFields(model)
 
     # UI event handling
+    @pyqtSlot(int)
+    def _uiWavelengthChange(self, value: int) -> None:
+        self.model.wavelength_start = value
+        self.model.wavelength_end = value
+
     @pyqtSlot(float)
     def _uiOffToOnChange(self, value: float) -> None:
         self.model.cross_section_off_to_on = value
