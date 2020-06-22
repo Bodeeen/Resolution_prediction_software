@@ -1,7 +1,7 @@
 # Resolution Prediction Software
 
 ## Requirements
- - Python 3.6 or later
+ - Python 3.7 or later
  - The packages specified by [requirements.txt](requirements.txt). Running the command
    `pip install -r requirements.txt` in the root folder of the repo will install these. If you have
    any issues with pip failing to build the packages on Windows, you may find prebuilt versions
