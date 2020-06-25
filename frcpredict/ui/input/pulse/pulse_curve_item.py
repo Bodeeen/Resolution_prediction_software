@@ -57,7 +57,7 @@ class PulseCurveItem(PlotCurveItem):
 
     # Internal methods
     def _getValues(self, startTime: int, duration: int) -> Tuple[np.ndarray, np.ndarray]:
-        x = np.arange(0, max(20, self._plotEndTime + 1), 0.001)
+        x = np.arange(0, self._plotEndTime + 1, 0.001)
         y = np.zeros(len(x))
         for i in range(0, len(y)):
             if x[i] >= startTime and x[i] < startTime + duration:
