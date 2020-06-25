@@ -7,19 +7,19 @@
     <x>0</x>
     <y>0</y>
     <width>1160</width>
-    <height>710</height>
+    <height>720</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>1160</width>
-    <height>710</height>
+    <height>720</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>16777215</width>
-    <height>710</height>
+    <height>16777215</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -51,24 +51,71 @@
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_8" stretch="0,1">
       <property name="spacing">
-       <number>12</number>
+       <number>15</number>
       </property>
       <item>
-       <widget class="QLabel" name="label">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
+       <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="2,3">
+        <property name="leftMargin">
+         <number>0</number>
         </property>
-        <property name="text">
-         <string>INPUT</string>
+        <property name="rightMargin">
+         <number>0</number>
         </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>12</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+            <underline>true</underline>
+           </font>
+          </property>
+          <property name="text">
+           <string>INPUT</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
+          <property name="indent">
+           <number>9</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QFrame" name="frame">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_7">
+           <property name="leftMargin">
+            <number>9</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>9</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="PresetPickerWidget" name="presetPicker" native="true"/>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="7,5">
@@ -229,17 +276,24 @@
      </widget>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,2,3">
+     <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,3,4">
       <property name="spacing">
-       <number>12</number>
+       <number>15</number>
       </property>
       <item>
        <widget class="QLabel" name="label_2">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>32</height>
+         </size>
+        </property>
         <property name="font">
          <font>
           <pointsize>12</pointsize>
           <weight>75</weight>
           <bold>true</bold>
+          <underline>true</underline>
          </font>
         </property>
         <property name="text">
@@ -247,6 +301,9 @@
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
+        </property>
+        <property name="indent">
+         <number>0</number>
         </property>
        </widget>
       </item>
@@ -262,17 +319,7 @@
          <string>FRC</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_6">
-         <item row="0" column="0">
-          <widget class="FRCResultsWidget" name="frcResults" native="true">
-           <property name="font">
-            <font>
-             <weight>50</weight>
-             <bold>false</bold>
-            </font>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
+         <item row="2" column="0">
           <widget class="QPushButton" name="btnSimulateFrc">
            <property name="font">
             <font>
@@ -283,6 +330,16 @@
            </property>
            <property name="text">
             <string>SIMULATE</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="FRCResultsWidget" name="frcResults" native="true">
+           <property name="font">
+            <font>
+             <weight>50</weight>
+             <bold>false</bold>
+            </font>
            </property>
           </widget>
          </item>
@@ -298,6 +355,12 @@
   </widget>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>PresetPickerWidget</class>
+   <extends>QWidget</extends>
+   <header>frcpredict.ui</header>
+   <container>1</container>
+  </customwidget>
   <customwidget>
    <class>FluorophoreSettingsWidget</class>
    <extends>QWidget</extends>

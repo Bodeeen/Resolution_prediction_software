@@ -1,7 +1,9 @@
-from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt
+from PyQt5.QtWidgets import QListWidgetItem
 
 from frcpredict.model import FluorophoreSettings, IlluminationResponse
 from frcpredict.ui import BaseWidget
+from frcpredict.ui.util import UserFileDirs
 from .fluorophore_settings_p import FluorophoreSettingsPresenter
 from .response_list_item import ResponseListItem
 
@@ -12,19 +14,30 @@ class FluorophoreSettingsWidget(BaseWidget):
     """
 
     # Signals
-    responseSelectionChanged = pyqtSignal(int)
+    valueChanged = pyqtSignal(FluorophoreSettings)
+    responseSelectionChanged = pyqtSignal(QListWidgetItem, QListWidgetItem)
     addResponseClicked = pyqtSignal()
     removeResponseClicked = pyqtSignal()
 
     # Methods
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(__file__, *args, **kwargs)
+
+        # Prepare UI elements
+        self.presetPicker.setModelType(FluorophoreSettings)
+        self.presetPicker.setStartDirectory(UserFileDirs.FluorophoreSettings)
+        self.presetPicker.setValueGetter(self.value)
+        self.presetPicker.setValueSetter(self.setValue)
+
         self.editProperties.setWavelengthVisible(False)
         
         # Connect forwarded signals
-        self.listResponses.currentRowChanged.connect(self.responseSelectionChanged)
+        self.listResponses.currentItemChanged.connect(self.responseSelectionChanged)
         self.btnAddResponse.clicked.connect(self.addResponseClicked)
         self.btnRemoveResponse.clicked.connect(self.removeResponseClicked)
+
+        # Connect own signals
+        self.presetPicker.dataLoaded.connect(self._onLoadPreset)
 
         # Initialize presenter
         self._presenter = FluorophoreSettingsPresenter(self)
@@ -37,11 +50,10 @@ class FluorophoreSettingsWidget(BaseWidget):
 
     def removeResponseFromList(self, response: IlluminationResponse) -> None:
         """ Removes the specified response from the response list and deselects it. """
-        self.listResponses.takeItem(
-            self.listResponses.row(
-                self.listResponses.findItems(str(response), Qt.MatchExactly)[0]
-            )
-        )
+        matchingRows = self.listResponses.findItems(str(response), Qt.MatchExactly)
+
+        for matchingRow in matchingRows:
+            self.listResponses.takeItem(self.listResponses.row(matchingRow))
 
         self.listResponses.setCurrentRow(-1)
 
@@ -69,5 +81,22 @@ class FluorophoreSettingsWidget(BaseWidget):
             self.editProperties.setEnabled(False)
             self.btnRemoveResponse.setEnabled(False)
 
-    def setValue(self, model: FluorophoreSettings) -> None:
+    def unselectSelectedRow(self) -> None:
+        """ Unselects the currently selected row in the response list, if any row is selected. """
+        self.listResponses.setCurrentRow(-1)
+
+    def value(self) -> FluorophoreSettings:
+        return self._presenter.model
+
+    def setValue(self, model: FluorophoreSettings, emitSignal: bool = True) -> None:
+        self.presetPicker.setLoadedPath(None)
         self._presenter.model = model
+        self.unselectSelectedRow()
+
+        if emitSignal:
+            self.valueChanged.emit(model)
+    
+    # Event handling
+    @pyqtSlot()
+    def _onLoadPreset(self) -> None:
+        self.unselectSelectedRow()

@@ -1,7 +1,13 @@
 import sys
+
 from PyQt5.QtWidgets import QApplication
+
 import frcpredict
 from frcpredict.ui import MainWindow
+from frcpredict.ui.util import initUserFilesIfNeeded
+
+
+initUserFilesIfNeeded()
 
 app = QApplication([])
 main_window = MainWindow()

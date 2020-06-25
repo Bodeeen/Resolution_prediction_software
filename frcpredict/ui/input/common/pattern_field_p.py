@@ -17,6 +17,13 @@ class PatternFieldPresenter(BasePresenter[Pattern]):
     # Properties
     @BasePresenter.model.setter
     def model(self, model: Pattern) -> None:
+        # Disconnect old model event handling
+        try:
+            self._model.data_loaded.disconnect(self._onPatternDataChange)
+        except AttributeError:
+            pass
+
+        # Set model
         self._model = model
         
         # Trigger model change event handlers
@@ -59,15 +66,15 @@ class PatternFieldPresenter(BasePresenter[Pattern]):
 
         path, _ = QFileDialog.getOpenFileName(
             self.widget,
-            caption="Open file",
+            caption=f"Open {self.widget.fieldName()} file",
             filter="Supported files (*.npy *.tif *.tiff *.png)"
         )
 
-        if path:
+        if path:  # Check whether a file was picked
             if path.endswith(".npy"):
-                self.model.load_data(Array2DPatternData.from_npy_file(path))
+                self.model.load_from_data(Array2DPatternData.from_npy_file(path))
             else:
-                self.model.load_data(Array2DPatternData.from_image_file(path))
+                self.model.load_from_data(Array2DPatternData.from_image_file(path))
     
     @pyqtSlot()
     def _uiClickGenerate(self) -> None:
@@ -85,4 +92,4 @@ class PatternFieldPresenter(BasePresenter[Pattern]):
         )
         
         if ok_pressed:
-            self.model.load_data(pattern_data)
+            self.model.load_from_data(pattern_data)

@@ -20,6 +20,7 @@ class PulsePropertiesWidget(BaseWidget):
     durationChanged = pyqtSignal(float)
     durationChangedByUser = pyqtSignal(float)
     maxIntensityChanged = pyqtSignal(float)
+    illuminationPatternChanged = pyqtSignal(Pattern)
 
     moveLeftClicked = pyqtSignal()
     moveRightClicked = pyqtSignal()
@@ -43,6 +44,7 @@ class PulsePropertiesWidget(BaseWidget):
         self.editDuration.valueChanged.connect(self.durationChanged)
         self.editDuration.valueChangedByUser.connect(self.durationChangedByUser)
         self.editMaxIntensity.valueChanged.connect(self.maxIntensityChanged)
+        self.editIlluminationPattern.valueChanged.connect(self.illuminationPatternChanged)
 
         self.btnMoveLeft.clicked.connect(self.moveLeftClicked)
         self.btnMoveRight.clicked.connect(self.moveRightClicked)
@@ -70,7 +72,7 @@ class PulsePropertiesWidget(BaseWidget):
         self._presenter.model = model
 
     def updateIlluminationPattern(self, pattern: Pattern) -> None:
-        self.editIlluminationPattern.setValue(pattern)
+        self.editIlluminationPattern.setValue(pattern, emitSignal=False)
 
     def updateBasicFields(self, model: Pulse) -> None:
         if model.pulse_type == PulseType.on:

@@ -1,4 +1,5 @@
 from PyQt5.QtCore import pyqtSignal
+from sip import isdeleted
 
 from frcpredict.model import IlluminationResponse
 from frcpredict.ui import BaseWidget

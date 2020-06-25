@@ -6,7 +6,31 @@ from PySignal import Signal
 from typing import Any, Optional, List
 
 
-def observable_property(internal_name: str, default: Any, signal_name: str, emit_arg_name: Optional[str] = None):
+def dataclass_internal_attrs(cls=None, super_cls: type = object, **internal_attr_factories):
+    """
+    Decorator for adding internal attributes into the dataclass. This is useful for declaring
+    attributes that you want to be hidden when the dataclass is serialized to a string or JSON.
+    """
+
+    def wrap(cls):
+        def newfunc(new_cls, *new_args, **new_kwargs):
+            instance = super_cls().__new__(new_cls)
+            for key, value in internal_attr_factories.items():
+                setattr(instance, key, value())
+
+            return instance
+
+        cls.__new__ = newfunc
+        return cls
+
+    if cls is None:
+        return wrap
+
+    return wrap(cls)
+
+
+def observable_property(internal_name: str, default: Any,
+                        signal_name: str, emit_arg_name: Optional[str] = None):
     """
     A property that emits a specific PySignal signal that is also a member of its owner class.
 
@@ -36,15 +60,6 @@ def observable_property(internal_name: str, default: Any, signal_name: str, emit
                 signal.emit(self)
 
     return property(getter, setter)
-
-
-def hidden_field(default_factory):
-    """ A field that is hidden when the dataclass is serialized to a string or JSON. """
-
-    return field(
-        init=False, repr=False, default_factory=default_factory,
-        metadata=json_config(exclude=Exclude.ALWAYS)
-    )
 
 
 def with_cleared_signals(dataclass_instance):

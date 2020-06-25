@@ -16,6 +16,13 @@ class ImagingSystemSettingsPresenter(BasePresenter[ImagingSystemSettings]):
     # Properties
     @BasePresenter.model.setter
     def model(self, model: ImagingSystemSettings) -> None:
+        # Disconnect old model event handling
+        try:
+            self._model.basic_field_changed.disconnect(self._onBasicFieldChange)
+        except AttributeError:
+            pass
+
+        # Set model
         self._model = model
 
         # Trigger model change event handlers
@@ -38,7 +45,9 @@ class ImagingSystemSettingsPresenter(BasePresenter[ImagingSystemSettings]):
         super().__init__(model, widget)
 
         # Prepare UI events
-        self.widget.scanningStepSizeChanged.connect(self._uiScanningStepSizeChange)
+        widget.opticalPsfChanged.connect(self._uiSetOpticalPsfModel)
+        widget.pinholeFunctionChanged.connect(self._uiSetPinholeFunctionModel)
+        widget.scanningStepSizeChanged.connect(self._uiScanningStepSizeChange)
 
     # Model event handling
     def _onBasicFieldChange(self, model: ImagingSystemSettings) -> None:
@@ -46,6 +55,14 @@ class ImagingSystemSettingsPresenter(BasePresenter[ImagingSystemSettings]):
         self.widget.updateBasicFields(model)
 
     # UI event handling
+    @pyqtSlot(Pattern)
+    def _uiSetOpticalPsfModel(self, value: Pattern) -> None:
+        self.model.optical_psf = value
+
+    @pyqtSlot(Pattern)
+    def _uiSetPinholeFunctionModel(self, value: Pattern) -> None:
+        self.model.pinhole_function = value
+    
     @pyqtSlot(float)
     def _uiScanningStepSizeChange(self, value: float) -> None:
         self.model.scanning_step_size = value

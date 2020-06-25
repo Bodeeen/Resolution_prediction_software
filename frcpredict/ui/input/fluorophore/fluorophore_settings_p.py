@@ -1,11 +1,12 @@
 from typing import Optional
 
 from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QListWidgetItem, QMessageBox
 
 from frcpredict.model import FluorophoreSettings, IlluminationResponse
 from frcpredict.ui import BasePresenter
 from .add_response_dialog import AddResponseDialog
+from .response_list_item import ResponseListItem
 
 
 class FluorophoreSettingsPresenter(BasePresenter[FluorophoreSettings]):
@@ -16,6 +17,14 @@ class FluorophoreSettingsPresenter(BasePresenter[FluorophoreSettings]):
     # Properties
     @BasePresenter.model.setter
     def model(self, model: FluorophoreSettings) -> None:
+        # Disconnect old model event handling
+        try:
+            self._model.response_added.disconnect(self._onResponseAdded)
+            self._model.response_removed.disconnect(self._onResponseRemoved)
+        except AttributeError:
+            pass
+
+        # Set model
         self._model = model
 
         # Trigger model change event handlers
@@ -23,7 +32,7 @@ class FluorophoreSettingsPresenter(BasePresenter[FluorophoreSettings]):
         for response in model.responses:
             self.widget.addResponseToList(response)
 
-        self._uiResponseSelectionChange(-1)
+        self._uiResponseSelectionChange(None)
 
         # Prepare model events
         model.response_added.connect(self._onResponseAdded)
@@ -50,17 +59,14 @@ class FluorophoreSettingsPresenter(BasePresenter[FluorophoreSettings]):
         self.widget.removeResponseFromList(response)
 
     # UI event handling
-    @pyqtSlot(int)
-    def _uiResponseSelectionChange(self, selectedIndex: int) -> None:
+    @pyqtSlot(QListWidgetItem, QListWidgetItem)
+    def _uiResponseSelectionChange(self, selectedItem: Optional[ResponseListItem], _: Optional[ResponseListItem] = None) -> None:
         """ Updates state and response properties widget based on the current selection. """
 
-        if selectedIndex < 0:
+        if selectedItem is None:
             self._selectedResponse = None
         else:
-            # TODO: Move item key logic so that we can get rid of this bad and potentially buggy
-            #       way of getting the selected item
-            self._selectedResponse = sorted(self.model.responses,
-                                            key=lambda response: response.wavelength_start)[selectedIndex]
+            self._selectedResponse = self.model.get_response(selectedItem.wavelengthStart)
 
         self.widget.setSelectedResponse(self._selectedResponse)
 

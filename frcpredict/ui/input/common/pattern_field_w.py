@@ -28,6 +28,7 @@ class PatternFieldWidget(BaseWidget):
         self._presenter = PatternFieldPresenter(self, normaliseVisualisation=value)
 
     # Signals
+    valueChanged = pyqtSignal(Pattern)
     loadFileClicked = pyqtSignal()
     generateClicked = pyqtSignal()
 
@@ -73,18 +74,21 @@ class PatternFieldWidget(BaseWidget):
         self._availableGenerationTypes = patternTypes
 
     def fieldName(self) -> str:
-        """ Returns the name of the field, e.g. "Optical PSF". """
+        """ Returns the displayed name of the field, e.g. "Optical PSF". """
         return self._fieldName
 
     def setFieldName(self, fieldName: str) -> None:
-        """ Sets the name of the field, e.g. "Optical PSF". """
+        """ Sets the displayed name of the field, e.g. "Optical PSF". """
         self._fieldName = fieldName
 
     def value(self) -> Pattern:
         return self._presenter.model
 
-    def setValue(self, model: Pattern) -> None:
+    def setValue(self, model: Pattern, emitSignal: bool = True) -> None:
         self._presenter.model = model
+
+        if emitSignal:
+            self.valueChanged.emit(model)
 
     def updateVisualisation(self, pixmap: QPixmap, description: str) -> None:
         self.imgVisualisation.setPixmap(pixmap)

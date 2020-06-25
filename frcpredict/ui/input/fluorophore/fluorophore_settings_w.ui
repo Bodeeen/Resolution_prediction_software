@@ -28,9 +28,9 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1">
+    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="5,12">
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_4">
+      <layout class="QVBoxLayout" name="verticalLayout_4" stretch="1,0">
        <item>
         <widget class="QListWidget" name="listResponses">
          <property name="minimumSize">
@@ -41,7 +41,7 @@
          </property>
          <property name="maximumSize">
           <size>
-           <width>105</width>
+           <width>16777215</width>
            <height>16777215</height>
           </size>
          </property>

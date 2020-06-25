@@ -1,13 +1,14 @@
 from collections import OrderedDict
 from dataclasses import dataclass, field
-from dataclasses_json import config as json_config, Exclude
+from dataclasses_json import dataclass_json
 from enum import Enum
 from PySignal import Signal
 import numpy as np
-from typing import List, Dict
+from typing import List
 import uuid
 
-from frcpredict.util import observable_property, hidden_field
+from frcpredict.util import dataclass_internal_attrs, observable_property
+from .pattern import Pattern, Array2DPatternData
 
 
 class PulseType(Enum):
@@ -16,6 +17,8 @@ class PulseType(Enum):
     readout = "readout"
 
 
+@dataclass_json
+@dataclass_internal_attrs(basic_field_changed=Signal)
 @dataclass
 class Pulse:
     pulse_type: PulseType = observable_property(
@@ -38,26 +41,16 @@ class Pulse:
         signal_name="basic_field_changed"
     )
 
-    illumination_pattern: np.ndarray = observable_property(
-        "_illumination_pattern", default=np.zeros((81, 81)),
-        signal_name="illumination_pattern_changed", emit_arg_name="illumination_pattern")
-
-    # Signals
-    basic_field_changed: Signal = hidden_field(Signal)
-    illumination_pattern_changed: Signal = hidden_field(Signal)
+    illumination_pattern: Pattern = field(default=Pattern(pattern_data=Array2DPatternData()))
 
 
+@dataclass_json
+@dataclass_internal_attrs(
+    _pulses=OrderedDict, pulse_added=Signal, pulse_moved=Signal, pulse_removed=Signal
+)
 @dataclass
 class PulseScheme:
     pulses: List[Pulse]
-
-    # Internal fields
-    _pulses: OrderedDict = hidden_field(OrderedDict)  # [key, value]: [str, Pulse]
-    
-    # Signals
-    pulse_added: Signal = hidden_field(Signal)
-    pulse_moved: Signal = hidden_field(Signal)
-    pulse_removed: Signal = hidden_field(Signal)
 
     # Properties
     @property
@@ -66,16 +59,14 @@ class PulseScheme:
 
     @pulses.setter
     def pulses(self, pulses: List[Pulse]) -> None:
-        self._pulses = {}
-
         self.clear_pulses()
         for pulse in pulses:
             self.add_pulse(pulse)
-    
+
     # Methods
     def add_pulse(self, pulse: Pulse) -> None:
         """ Adds a pulse to the pulse scheme. """
-        key = str(uuid.uuid4())  # Random key
+        key = str(uuid.uuid4())  # Generate random key
         self._pulses[key] = pulse
         self.pulse_added.emit(key, pulse)
 
@@ -86,20 +77,21 @@ class PulseScheme:
 
     def clear_pulses(self) -> None:
         """ Removes all pulses from the pulse scheme. """
-        for key in self._pulses.keys():
+        keys = [*self._pulses.keys()]
+        for key in keys:
             self.remove_pulse(key)
 
     def move_pulse_left(self, key: str) -> None:
         """ Moves the pulse with the specified key one step to the left in the order. """
-        existing_keys = list(self._pulses.keys()).copy()
-        
+        existing_keys = [*self._pulses.keys()].copy()
+
         i = len(existing_keys) - 1
         while i >= 0:
             has_moved_requested = False
             if key == existing_keys[i] and 0 < i:
                 self._pulses.move_to_end(existing_keys[i - 1], last=False)
                 has_moved_requested = True
-            
+
             self._pulses.move_to_end(existing_keys[i], last=False)
             if has_moved_requested:
                 i -= 2
@@ -110,15 +102,15 @@ class PulseScheme:
 
     def move_pulse_right(self, key: str) -> None:
         """ Moves the pulse with the specified key one step to the right in the order. """
-        existing_keys = list(self._pulses.keys()).copy()
-        
+        existing_keys = [*self._pulses.keys()].copy()
+
         i = 0
         while i < len(existing_keys):
             has_moved_requested = False
             if key == existing_keys[i] and len(existing_keys) > i + 1:
                 self._pulses.move_to_end(existing_keys[i + 1], last=True)
                 has_moved_requested = True
-            
+
             self._pulses.move_to_end(existing_keys[i], last=True)
             if has_moved_requested:
                 i += 2
@@ -126,4 +118,3 @@ class PulseScheme:
                 i += 1
 
         self.pulse_moved.emit(key, self._pulses[key])
-

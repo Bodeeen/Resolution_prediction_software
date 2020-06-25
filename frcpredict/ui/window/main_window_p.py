@@ -1,11 +1,13 @@
 from copy import deepcopy
 import numpy as np
+from traceback import format_exc
 
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QObject, QThreadPool, QRunnable, QMutex
+from PyQt5.QtWidgets import QMessageBox
 
 from frcpredict.model import (
     FluorophoreSettings, IlluminationResponse,
-    Pattern, Array2DPatternData, GaussianPatternData, DoughnutPatternData, AiryPatternData, DigitalPinholePatternData,
+    Pattern, Array2DPatternData,
     ImagingSystemSettings,
     PulseScheme, Pulse, PulseType,
     SampleProperties,
@@ -23,6 +25,17 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
 
     @BasePresenter.model.setter
     def model(self, model: RunInstance) -> None:
+        # Disconnect old model event handling
+        try:
+            self._model.fluorophore_settings_loaded.disconnect(self._onFluorophoreSettingsLoad)
+            self._model.imaging_system_settings_loaded.disconnect(self._onImagingSystemSettingsLoad)
+            self._model.pulse_scheme_loaded.disconnect(self._onPulseSchemeLoad)
+            self._model.sample_properties_loaded.disconnect(self._onSamplePropertiesLoad)
+            self._model.camera_properties_loaded.disconnect(self._onCameraPropertiesLoad)
+        except AttributeError:
+            pass
+
+        # Set model
         self._model = model
 
         # Trigger model change event handlers
@@ -66,52 +79,74 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
         self._actionLock = QMutex()
 
         # Connect UI events
-        self.widget.simulateFrcClicked.connect(self._uiOnClickSimulateFrc)
+        self.widget.fluorophoreSettingsModelSet.connect(self._uiSetFluorophoreSettingsModel)
+        self.widget.imagingSystemSettingsModelSet.connect(self._uiSetImagingSystemSettingsModel)
+        self.widget.pulseSchemeModelSet.connect(self._uiSetPulseSchemeModel)
+        self.widget.samplePropertiesModelSet.connect(self._uiSetSamplePropertiesModel)
+        self.widget.cameraPropertiesModelSet.connect(self._uiSetCameraPropertiesModel)
         
-        # TODO: These are predefined values; remove them when we have proper preset support
-        model.fluorophore_settings.add_response(IlluminationResponse(wavelength_start=405, wavelength_end=405, cross_section_off_to_on=6.6e-07, cross_section_on_to_off=0.0, cross_section_emission=5e-08))
-        model.fluorophore_settings.add_response(IlluminationResponse(wavelength_start=488, wavelength_end=488, cross_section_off_to_on=3.3e-08, cross_section_on_to_off=7.3e-07, cross_section_emission=7e-06))
-        model.imaging_system_settings.optical_psf = Pattern(pattern_data=GaussianPatternData(fwhm=250))
-        model.imaging_system_settings.pinhole_function = Pattern(pattern_data=DigitalPinholePatternData(fwhm=220))
-        model.pulse_scheme.add_pulse(Pulse(pulse_type=PulseType.on, wavelength=405, duration=0.1, max_intensity=10.0, illumination_pattern=Pattern(pattern_data=AiryPatternData(fwhm=200))))
-        model.pulse_scheme.add_pulse(Pulse(pulse_type=PulseType.off, wavelength=488, duration=4.0, max_intensity=5.1, illumination_pattern=Pattern(pattern_data=DoughnutPatternData(periodicity=510))))
-        model.pulse_scheme.add_pulse(Pulse(pulse_type=PulseType.readout, wavelength=488, duration=0.4, max_intensity=13.0, illumination_pattern=Pattern(pattern_data=AiryPatternData(fwhm=230))))
-        model.sample_properties=SampleProperties(spectral_power=6.1, labelling_density=5.0, K_origin=3.19)
-        model.camera_properties=CameraProperties(readout_noise=0.0, quantum_efficiency=0.82)
-        self.model = model
-        self.widget.fluorophoreSettings.listResponses.setCurrentRow(0)
+        self.widget.simulateFrcClicked.connect(self._uiClickSimulateFrc)
 
     # Model event handling
-    def _onFluorophoreSettingsLoad(self, fluorophore_settings: FluorophoreSettings) -> None:
-        self._widget.updateFluorophoreSettings(fluorophore_settings)
+    def _onFluorophoreSettingsLoad(self, fluorophoreSettings: FluorophoreSettings) -> None:
+        self.widget.updateFluorophoreSettings(fluorophoreSettings)
 
-    def _onImagingSystemSettingsLoad(self, imaging_system_settings: ImagingSystemSettings) -> None:
-        self._widget.updateImagingSystemSettings(imaging_system_settings)
-        
-    def _onPulseSchemeLoad(self, pulse_scheme: PulseScheme) -> None:
-        self._widget.updatePulseScheme(pulse_scheme)
-        
-    def _onSamplePropertiesLoad(self, sample_properties: SampleProperties) -> None:
-        self._widget.updateSampleProperties(sample_properties)
-        
-    def _onCameraPropertiesLoad(self, camera_properties: CameraProperties) -> None:
-        self._widget.updateCameraProperties(camera_properties)
+    def _onImagingSystemSettingsLoad(self, imagingSystemSettings: ImagingSystemSettings) -> None:
+        self.widget.updateImagingSystemSettings(imagingSystemSettings)
+
+    def _onPulseSchemeLoad(self, pulseScheme: PulseScheme) -> None:
+        self.widget.updatePulseScheme(pulseScheme)
+
+    def _onSamplePropertiesLoad(self, sampleProperties: SampleProperties) -> None:
+        self.widget.updateSampleProperties(sampleProperties)
+
+    def _onCameraPropertiesLoad(self, cameraProperties: CameraProperties) -> None:
+        self.widget.updateCameraProperties(cameraProperties)
 
     # UI event handling
+    @pyqtSlot(FluorophoreSettings)
+    def _uiSetFluorophoreSettingsModel(self, fluorophoreSettings: FluorophoreSettings) -> None:
+        self.model.fluorophore_settings = fluorophoreSettings
+
+    @pyqtSlot(ImagingSystemSettings)
+    def _uiSetImagingSystemSettingsModel(self, imagingSystemSettings: ImagingSystemSettings) -> None:
+        self.model.imaging_system_settings = imagingSystemSettings
+
+    @pyqtSlot(PulseScheme)
+    def _uiSetPulseSchemeModel(self, pulseScheme: PulseScheme) -> None:
+        self.model.pulse_scheme = pulseScheme
+
+    @pyqtSlot(SampleProperties)
+    def _uiSetSamplePropertiesModel(self, sampleProperties: SampleProperties) -> None:
+        self.model.sample_properties = sampleProperties
+
+    @pyqtSlot(CameraProperties)
+    def _uiSetCameraPropertiesModel(self, cameraProperties: CameraProperties) -> None:
+        self.model.camera_properties = cameraProperties
+
     @pyqtSlot()
-    def _uiOnClickSimulateFrc(self) -> None:
+    def _uiClickSimulateFrc(self) -> None:
         if self._actionLock.tryLock():
             self.widget.setSimulating(True)
-            
+
             worker = self.FRCWorker(deepcopy(self.model))
             worker.signals.done.connect(self._onWorkerDone)
+            worker.signals.error.connect(self._onWorkerError)
             self._threadPool.start(worker)
 
     # Worker stuff
     @pyqtSlot(np.ndarray, np.ndarray)
     def _onWorkerDone(self, x: np.ndarray, y: np.ndarray) -> None:
         try:
-            self._widget.setFrcResults(x, y)
+            self.widget.setFrcResults(x, y)
+        finally:
+            self._actionLock.unlock()
+            self.widget.setSimulating(False)
+
+    @pyqtSlot(str)
+    def _onWorkerError(self, message: str) -> None:
+        try:
+            QMessageBox.critical(self.widget, "FRC calculation error", message)
         finally:
             self._actionLock.unlock()
             self.widget.setSimulating(False)
@@ -123,8 +158,13 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
             self.signals = self.Signals()
 
         def run(self) -> None:
-            x, y = self.run_instance.frc()
-            self.signals.done.emit(x, y)
+            try:
+                x, y = self.run_instance.frc()
+                self.signals.done.emit(x, y)
+            except Exception as e:
+                self.signals.error.emit(str(e))
+                print(format_exc())
 
         class Signals(QObject):
             done = pyqtSignal(np.ndarray, np.ndarray)
+            error = pyqtSignal(str)

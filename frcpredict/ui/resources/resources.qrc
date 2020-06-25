@@ -1,0 +1,8 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource>
+        <file alias="open.svg">breeze_icons/document-open.svg</file>
+        <file alias="save.svg">breeze_icons/document-save.svg</file>
+        <file alias="save_as.svg">breeze_icons/document-save-as.svg</file>
+    </qresource>
+</RCC>

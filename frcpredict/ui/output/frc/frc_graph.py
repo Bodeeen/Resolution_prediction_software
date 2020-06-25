@@ -20,6 +20,8 @@ class FRCResultsWidget(BaseWidget):
         self.plotFrc.getAxis("bottom").setTicks(
             [[(1/value, str(value)) for value in [300, 100, 60, 40, 30]]]
         )
+        self.plotFrc.setLabel("bottom", "Resolution [nm]")
+        self.plotFrc.getAxis("bottom").setHeight(30)
 
     def setCurve(self, x: np.ndarray, y: np.ndarray) -> None:
         """ TODO. """

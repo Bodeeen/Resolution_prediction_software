@@ -15,6 +15,13 @@ class PulsePropertiesPresenter(BasePresenter[Pulse]):
     # Properties
     @BasePresenter.model.setter
     def model(self, model: Pulse) -> None:
+        # Disconnect old model event handling
+        try:
+            self._model.basic_field_changed.disconnect(self._onBasicFieldChange)
+        except AttributeError:
+            pass
+
+        # Set model
         self._model = model
 
         # Trigger model change event handlers
@@ -44,6 +51,7 @@ class PulsePropertiesPresenter(BasePresenter[Pulse]):
         widget.wavelengthChanged.connect(self._uiWavelengthChange)
         widget.durationChanged.connect(self._uiDurationChange)
         widget.maxIntensityChanged.connect(self._uiMaxIntensityChange)
+        widget.illuminationPatternChanged.connect(self._uiSetIlluminationPatternModel)
 
     # Model event handling
     def _onBasicFieldChange(self, model: Pulse) -> None:
@@ -74,3 +82,7 @@ class PulsePropertiesPresenter(BasePresenter[Pulse]):
     @pyqtSlot(float)
     def _uiMaxIntensityChange(self, value: float) -> None:
         self.model.max_intensity = value
+
+    @pyqtSlot(Pattern)
+    def _uiSetIlluminationPatternModel(self, value: Pattern) -> None:
+        self.model.illumination_pattern = value

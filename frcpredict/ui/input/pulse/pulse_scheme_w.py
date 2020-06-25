@@ -6,6 +6,7 @@ import pyqtgraph as pg
 
 from frcpredict.model import PulseScheme, Pulse, PulseType, Pattern, Array2DPatternData
 from frcpredict.ui import BaseWidget
+from frcpredict.ui.util import UserFileDirs
 from .pulse_scheme_p import PulseSchemePresenter
 from .pulse_curve_item import PulseCurveItem
 
@@ -18,6 +19,7 @@ class PulseSchemeWidget(BaseWidget):
     """
 
     # Signals
+    valueChanged = pyqtSignal(PulseScheme)
     pulseClicked = pyqtSignal(PulseCurveItem)
     plotClicked = pyqtSignal(object)
     addPulseClicked = pyqtSignal()
@@ -29,6 +31,14 @@ class PulseSchemeWidget(BaseWidget):
     # Methods
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(__file__, *args, **kwargs)
+
+        # Prepare UI elements 
+        self.presetPicker.setModelType(PulseScheme)
+        self.presetPicker.setStartDirectory(UserFileDirs.PulseScheme)
+        self.presetPicker.setValueGetter(self.value)
+        self.presetPicker.setValueSetter(self.setValue)
+        
+        self.editProperties.setEditWavelengthEnabled(False)
 
         self.plot.setMouseEnabled(x=False, y=False)
         self.plot.setMenuEnabled(False)
@@ -45,8 +55,15 @@ class PulseSchemeWidget(BaseWidget):
         # Initialize presenter
         self._presenter = PulseSchemePresenter(self)
 
-    def setValue(self, model: PulseScheme) -> None:
+    def value(self) -> PulseScheme:
+        return self._presenter.model
+
+    def setValue(self, model: PulseScheme, emitSignal: bool = True) -> None:
+        self.presetPicker.setLoadedPath(None)
         self._presenter.model = model
+
+        if emitSignal:
+            self.valueChanged.emit(model)
 
     def setSelectedPulse(self, pulse: Pulse) -> None:
         """ Updates controls and pulse properties widget based on the current selection. """

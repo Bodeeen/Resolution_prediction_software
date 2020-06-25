@@ -12,6 +12,13 @@ class CameraPropertiesPresenter(BasePresenter[CameraProperties]):
     # Properties
     @BasePresenter.model.setter
     def model(self, model: CameraProperties) -> None:
+        # Disconnect old model event handling
+        try:
+            self._model.basic_field_changed.disconnect(self._onBasicFieldChange)
+        except AttributeError:
+            pass
+
+        # Set model
         self._model = model
 
         # Trigger model change event handlers
@@ -37,7 +44,7 @@ class CameraPropertiesPresenter(BasePresenter[CameraProperties]):
     # Model event handling
     def _onBasicFieldChange(self, model: CameraProperties) -> None:
         """ Loads basic model fields (e.g. ints) into the widget. """
-        self._widget.updateBasicFields(model)
+        self.widget.updateBasicFields(model)
 
     # UI event handling
     @pyqtSlot(float)

@@ -12,6 +12,13 @@ class SamplePropertiesPresenter(BasePresenter[SampleProperties]):
     # Properties
     @BasePresenter.model.setter
     def model(self, model: SampleProperties) -> None:
+        # Disconnect old model event handling
+        try:
+            self._model.basic_field_changed.disconnect(self._onBasicFieldChange)
+        except AttributeError:
+            pass
+
+        # Set model
         self._model = model
 
         # Trigger model change event handlers
@@ -39,7 +46,7 @@ class SamplePropertiesPresenter(BasePresenter[SampleProperties]):
     # Model event handling
     def _onBasicFieldChange(self, model: SampleProperties) -> None:
         """ Loads basic model fields (e.g. ints) into the widget. """
-        self._widget.updateBasicFields(model)
+        self.widget.updateBasicFields(model)
 
     # UI event handling
     @pyqtSlot(float)

@@ -1,6 +1,6 @@
-from .pattern import (
-    Pattern,
-    PatternType,
+from .pattern import Pattern, PatternType
+from .pattern_data import (
+    PatternData,
     Array2DPatternData,
     GaussianPatternData,
     DoughnutPatternData,

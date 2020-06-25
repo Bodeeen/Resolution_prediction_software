@@ -17,6 +17,15 @@ class PulseSchemePresenter(BasePresenter[PulseScheme]):
     # Properties
     @BasePresenter.model.setter
     def model(self, model: PulseScheme) -> None:
+        # Disconnect old model event handling
+        try:
+            self._model.pulse_added.disconnect(self._onPulseAdded)
+            self._model.pulse_moved.disconnect(self._onPulseMoved)
+            self._model.pulse_removed.disconnect(self._onPulseRemoved)
+        except AttributeError:
+            pass
+
+        # Set model
         self._model = model
 
         # Trigger model change event handlers
@@ -37,7 +46,6 @@ class PulseSchemePresenter(BasePresenter[PulseScheme]):
         super().__init__(model, widget)
 
         # Prepare UI elements
-        widget.editProperties.setEditWavelengthEnabled(False)
         widget.setSelectedPulse(None)
 
         # Prepare UI events

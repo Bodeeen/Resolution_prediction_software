@@ -3,6 +3,7 @@ from PyQt5.QtGui import QPixmap
 
 from frcpredict.model import ImagingSystemSettings, Pattern, PatternType
 from frcpredict.ui import BaseWidget
+from frcpredict.ui.util import UserFileDirs
 from .imaging_settings_p import ImagingSystemSettingsPresenter
 
 
@@ -12,11 +13,20 @@ class ImagingSystemSettingsWidget(BaseWidget):
     """
 
     # Signals
+    valueChanged = pyqtSignal(ImagingSystemSettings)
+    opticalPsfChanged = pyqtSignal(Pattern)
+    pinholeFunctionChanged = pyqtSignal(Pattern)
     scanningStepSizeChanged = pyqtSignal(float)
 
     # Methods
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(__file__, *args, **kwargs)
+
+        # Prepare UI elements
+        self.presetPicker.setModelType(ImagingSystemSettings)
+        self.presetPicker.setStartDirectory(UserFileDirs.ImagingSystemSettings)
+        self.presetPicker.setValueGetter(self.value)
+        self.presetPicker.setValueSetter(self.setValue)
 
         self.editOpticalPsf.setFieldName("Optical PSF")
         self.editOpticalPsf.setAllowEditGenerationAmplitude(True)
@@ -31,13 +41,22 @@ class ImagingSystemSettingsWidget(BaseWidget):
         )
 
         # Connect forwarded signals
+        self.editOpticalPsf.valueChanged.connect(self.opticalPsfChanged)
+        self.editPinholeFunction.valueChanged.connect(self.pinholeFunctionChanged)
         self.editScanningStepSize.valueChanged.connect(self.scanningStepSizeChanged)
 
         # Initialize presenter
         self._presenter = ImagingSystemSettingsPresenter(self)
 
-    def setValue(self, model: ImagingSystemSettings) -> None:
+    def value(self) -> ImagingSystemSettings:
+        return self._presenter.model
+
+    def setValue(self, model: ImagingSystemSettings, emitSignal: bool = True) -> None:
+        self.presetPicker.setLoadedPath(None)
         self._presenter.model = model
+
+        if emitSignal:
+            self.valueChanged.emit(model)
 
     def updateOpticalPsf(self, optical_psf: Pattern) -> None:
         self.editOpticalPsf.setValue(optical_psf)

@@ -17,6 +17,13 @@ class GeneratePatternPresenter(BasePresenter[Pattern]):
     # Properties
     @BasePresenter.model.setter
     def model(self, model: Pattern) -> None:
+        # Disconnect old model event handling
+        try:
+            self._model.data_loaded.disconnect(self._onPatternDataChange)
+        except AttributeError:
+            pass
+
+        # Set model
         self._model = model
 
         # Trigger model change event handlers
@@ -87,9 +94,9 @@ class GeneratePatternPresenter(BasePresenter[Pattern]):
         """
 
         if patternType is not None:
-            self.model.load_type(patternType)
+            self.model.load_from_type(patternType)
         else:
-            self.model.load_data(Array2DPatternData())
+            self.model.load_from_data(Array2DPatternData())
 
     @pyqtSlot(float)
     def _uiAmplitudeChange(self, value: float) -> None:

@@ -13,6 +13,7 @@ class ResponsePropertiesPresenter(BasePresenter[IlluminationResponse]):
     @BasePresenter.model.setter
     def model(self, model: IlluminationResponse) -> None:
         self._model = model
+        self._individualStartEnd = self._model.wavelength_start != self._model.wavelength_end
 
         # Trigger model change event handlers
         self._onBasicFieldChange(model)
@@ -29,7 +30,7 @@ class ResponsePropertiesPresenter(BasePresenter[IlluminationResponse]):
         )
 
         super().__init__(model, widget)
-        
+
         # Prepare UI events
         widget.wavelengthChanged.connect(self._uiWavelengthChange)
         widget.offToOnChanged.connect(self._uiOffToOnChange)
@@ -45,7 +46,8 @@ class ResponsePropertiesPresenter(BasePresenter[IlluminationResponse]):
     @pyqtSlot(int)
     def _uiWavelengthChange(self, value: int) -> None:
         self.model.wavelength_start = value
-        self.model.wavelength_end = value
+        if not self._individualStartEnd:
+            self.model.wavelength_end = value
 
     @pyqtSlot(float)
     def _uiOffToOnChange(self, value: float) -> None:
