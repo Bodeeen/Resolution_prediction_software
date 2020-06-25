@@ -18,22 +18,16 @@ def get_canvas_params(pixels_per_nm: float) -> Tuple[int, int]:
 
 
 def gaussian_test1(amplitude: float, fwhm: float, pixels_per_nm: float) -> np.ndarray:
-    canvas_inner_radius_px, canvas_side_length_px = get_canvas_params(pixels_per_nm)
-
     stddev = fwhm / pixels_per_nm * gaussian_fwhm_to_sigma
     model = Gaussian2D(amplitude=amplitude, x_stddev=stddev, y_stddev=stddev)
 
-    result = np.zeros((canvas_side_length_px, canvas_side_length_px))
-    x = range(-canvas_inner_radius_px + 1, canvas_inner_radius_px)
-    for y in range(-canvas_inner_radius_px + 1, canvas_inner_radius_px):
-        result[(y + canvas_inner_radius_px - 1) % canvas_side_length_px] = model(x, y)
+    x, y = _canvas_meshgrid(pixels_per_nm)
+    result = model(x, y)
 
     return result
 
 
 def doughnut_test1(periodicity: float, pixels_per_nm: float) -> np.ndarray:
-    canvas_inner_radius_px, _ = get_canvas_params(pixels_per_nm)
-
     def Doughnut1D(radius: float) -> np.ndarray:
         return np.where(
             radius < periodicity/ (2 * pixels_per_nm),
@@ -41,18 +35,15 @@ def doughnut_test1(periodicity: float, pixels_per_nm: float) -> np.ndarray:
             1
         )
 
-    return Doughnut1D(_radial_to_2d(canvas_inner_radius_px))
+    return Doughnut1D(_radial_to_2d(pixels_per_nm))
 
 
 def airy_test1(amplitude: float, fwhm: float, pixels_per_nm: float) -> np.ndarray:
-    canvas_inner_radius_px, canvas_side_length_px = get_canvas_params(pixels_per_nm)
-
     airy_radius = fwhm/pixels_per_nm * 0.353/(0.61/2)  # TODO: Might not be correct
     model = AiryDisk2D(amplitude=amplitude, radius=airy_radius)
-    result = np.zeros((canvas_side_length_px, canvas_side_length_px))
-    x = range(-canvas_inner_radius_px + 1, canvas_inner_radius_px)
-    for y in range(-canvas_inner_radius_px + 1, canvas_inner_radius_px):
-        result[(y + canvas_inner_radius_px - 1) % canvas_side_length_px] = model(x, y)
+    
+    x, y = _canvas_meshgrid(pixels_per_nm)
+    result = model(x, y)
 
     return result
 
@@ -71,12 +62,27 @@ def digital_pinhole_test1(fwhm: float, pixels_per_nm: float) -> np.ndarray:
     return b_inv[:, 0].reshape(g_base.shape)
 
 
-def _radial_to_2d(canvas_inner_radius_px: int) -> np.ndarray:
+def physical_pinhole_test1(radius: float, pixels_per_nm: float) -> np.ndarray:
+    def model(x: np.ndarray, y: np.ndarray) -> np.ndarray:
+        return (x**2 + y**2 < (radius/pixels_per_nm)**2).astype(float)
+
+    x, y = _canvas_meshgrid(pixels_per_nm)
+    result = model(x, y)
+    
+    return result
+
+
+def _canvas_meshgrid(pixels_per_nm: float) -> np.ndarray:
+    canvas_inner_radius_px, _ = get_canvas_params(pixels_per_nm)
+
     side = np.linspace(
         -canvas_inner_radius_px,
         canvas_inner_radius_px,
         canvas_inner_radius_px * 2 - 1
     )
-    x, y = np.meshgrid(side, side)
+    return np.meshgrid(side, side)
 
+
+def _radial_to_2d(canvas_inner_radius_px: int) -> np.ndarray:
+    x, y = _canvas_meshgrid(canvas_inner_radius_px)
     return np.sqrt(x**2 + y**2)

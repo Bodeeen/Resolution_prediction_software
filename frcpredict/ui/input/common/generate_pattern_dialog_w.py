@@ -17,15 +17,18 @@ class GeneratePatternDialog(QDialog, BaseWidget):
     """
     A dialog for generating patterns.
     """
-    
+
     # Signals
     typeChanged = pyqtSignal(object)
     amplitudeChanged = pyqtSignal(float)
+    radiusChanged = pyqtSignal(float)
     fwhmChanged = pyqtSignal(float)
     periodicityChanged = pyqtSignal(float)
 
     # Methods
-    def __init__(self, parent: Optional[QWidget] = None, title: str = "Generate Pattern", availableTypes: List[PatternType] = [], allowEditAmplitude: bool = True, normalisePreview: bool = False) -> None:
+    def __init__(self, parent: Optional[QWidget] = None, title: str = "Generate Pattern",
+                 availableTypes: List[PatternType] = [], allowEditAmplitude: bool = True,
+                 normalisePreview: bool = False) -> None:
         self._hasHandledInitialRowChange = False
         self._allowEditAmplitude = allowEditAmplitude
 
@@ -36,9 +39,10 @@ class GeneratePatternDialog(QDialog, BaseWidget):
 
         # Connect own signals
         self.listType.currentRowChanged.connect(self._onTypeListRowChange)
-        
+
         # Connect forwarded signals
         self.editAmplitude.valueChanged.connect(self.amplitudeChanged)
+        self.editRadius.valueChanged.connect(self.radiusChanged)
         self.editFwhm.valueChanged.connect(self.fwhmChanged)
         self.editPeriodicity.valueChanged.connect(self.periodicityChanged)
 
@@ -53,16 +57,20 @@ class GeneratePatternDialog(QDialog, BaseWidget):
                 ListItemWithValue(text=getPatternTypeName(patternType), value=patternType)
             )
 
-    def setAvailableProperties(self, amplitude: bool = False, fwhm: bool = False, periodicity: bool = False) -> None:
+    def setAvailableProperties(self, amplitude: bool = False, radius: bool = False,
+                               fwhm: bool = False, periodicity: bool = False) -> None:
         """ Sets which pattern properties are available for the user to modify. """
 
         # TODO: Fix hidden properties taking up space
         self.lblAmplitude.setVisible(self._allowEditAmplitude and amplitude)
         self.editAmplitude.setVisible(self._allowEditAmplitude and amplitude)
-    
+
+        self.lblRadius.setVisible(radius)
+        self.editRadius.setVisible(radius)
+
         self.lblFwhm.setVisible(fwhm)
         self.editFwhm.setVisible(fwhm)
-    
+
         self.lblPeriodicity.setVisible(periodicity)
         self.editPeriodicity.setVisible(periodicity)
 
@@ -75,27 +83,35 @@ class GeneratePatternDialog(QDialog, BaseWidget):
     def updatePreview(self, pixmap: QPixmap) -> None:
         self.imgPreview.setPixmap(pixmap)
 
-    def updatePropertyFields(self, amplitude: Optional[float] = None, fwhm: Optional[float] = None, periodicity: Optional[float] = None) -> None:
+    def updatePropertyFields(self, amplitude: Optional[float] = None,
+                             radius: Optional[float] = None, fwhm: Optional[float] = None,
+                             periodicity: Optional[float] = None) -> None:
         """ Updates the values of the fields in the widget. """
 
         if amplitude is not None:
             self.editAmplitude.setValue(amplitude)
-        
+
+        if radius is not None:
+            self.editRadius.setValue(radius)
+
         if fwhm is not None:
             self.editFwhm.setValue(fwhm)
-        
+
         if periodicity is not None:
             self.editPeriodicity.setValue(periodicity)
 
     @staticmethod
-    def getPatternData(parent: Optional[QWidget] = None, title: str = "Generate Pattern", availableTypes: List[PatternType] = [], allowEditAmplitude: bool = True, normalisePreview: bool = False) -> Tuple[Optional[Pattern], bool]:
+    def getPatternData(parent: Optional[QWidget] = None, title: str = "Generate Pattern",
+                       availableTypes: List[PatternType] = [], allowEditAmplitude: bool = True,
+                       normalisePreview: bool = False) -> Tuple[Optional[Pattern], bool]:
         """
         Synchronously opens a dialog for entering pattern properties. The second value in the
         returned tuple refers to whether the "OK" button was pressed when the dialog closed. If
         it's true, the first value will contain the pattern data.
         """
 
-        dialog = GeneratePatternDialog(parent, title, availableTypes, allowEditAmplitude, normalisePreview)
+        dialog = GeneratePatternDialog(parent, title, availableTypes,
+                                       allowEditAmplitude, normalisePreview)
         result = dialog.exec_()
 
         if result == QDialog.Accepted:

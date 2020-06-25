@@ -44,6 +44,7 @@ class GeneratePatternPresenter(BasePresenter[Pattern]):
         # Prepare UI events
         widget.typeChanged.connect(self._uiTypeChange)
         widget.amplitudeChanged.connect(self._uiAmplitudeChange)
+        widget.radiusChanged.connect(self._uiRadiusChange)
         widget.fwhmChanged.connect(self._uiFwhmChange)
         widget.periodicityChanged.connect(self._uiPeriodicityChange)
 
@@ -64,6 +65,8 @@ class GeneratePatternPresenter(BasePresenter[Pattern]):
         hasAmplitudeProperty = (model.pattern_type == PatternType.gaussian or
                                 model.pattern_type == PatternType.airy)
 
+        hasRadiusProperty = model.pattern_type == PatternType.physical_pinhole
+
         hasFwhmProperty = (model.pattern_type == PatternType.gaussian or
                            model.pattern_type == PatternType.airy or
                            model.pattern_type == PatternType.digital_pinhole)
@@ -73,6 +76,9 @@ class GeneratePatternPresenter(BasePresenter[Pattern]):
         if hasAmplitudeProperty:
             self.widget.updatePropertyFields(amplitude=model.pattern_data.amplitude)
 
+        if hasRadiusProperty:
+            self.widget.updatePropertyFields(radius=model.pattern_data.radius)
+
         if hasFwhmProperty:
             self.widget.updatePropertyFields(fwhm=model.pattern_data.fwhm)
 
@@ -81,6 +87,7 @@ class GeneratePatternPresenter(BasePresenter[Pattern]):
 
         self.widget.setAvailableProperties(
             amplitude=hasAmplitudeProperty,
+            radius=hasRadiusProperty,
             fwhm=hasFwhmProperty,
             periodicity=hasPeriodicityProperty
         )
@@ -102,6 +109,12 @@ class GeneratePatternPresenter(BasePresenter[Pattern]):
     def _uiAmplitudeChange(self, value: float) -> None:
         if hasattr(self.model.pattern_data, "amplitude") and self.model.pattern_data.amplitude != value:
             self.model.pattern_data.amplitude = value
+            self._onPatternDataChange(self.model)
+
+    @pyqtSlot(float)
+    def _uiRadiusChange(self, value: float) -> None:
+        if hasattr(self.model.pattern_data, "radius") and self.model.pattern_data.radius != value:
+            self.model.pattern_data.radius = value
             self._onPatternDataChange(self.model)
 
     @pyqtSlot(float)

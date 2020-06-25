@@ -37,7 +37,7 @@ class ImagingSystemSettingsWidget(BaseWidget):
         self.editPinholeFunction.setFieldName("Pinhole Function")
         self.editPinholeFunction.setAllowEditGenerationAmplitude(True)
         self.editPinholeFunction.setAvailableGenerationTypes(
-            [PatternType.digital_pinhole]
+            [PatternType.digital_pinhole, PatternType.physical_pinhole]
         )
 
         # Connect forwarded signals

@@ -19,6 +19,7 @@ class PatternType(Enum):
     doughnut = "doughnut"
     airy = "airy"
     digital_pinhole = "digital_pinhole"
+    physical_pinhole = "physical_pinhole"
 
 
 @dataclass_json
@@ -96,6 +97,8 @@ class Pattern:
             return AiryPatternData
         elif pattern_type == PatternType.digital_pinhole:
             return DigitalPinholePatternData
+        elif pattern_type == PatternType.physical_pinhole:
+            return PhysicalPinholePatternData
         else:
             raise ValueError(f"Invalid pattern type \"{pattern_type}\"")
 
@@ -110,5 +113,7 @@ class Pattern:
             return PatternType.airy
         elif type(pattern_data) == DigitalPinholePatternData:
             return PatternType.digital_pinhole
+        elif type(pattern_data) == PhysicalPinholePatternData:
+            return PatternType.physical_pinhole
         else:
             raise TypeError(f"Invalid pattern data type \"{type(pattern_data).__name__}\"")

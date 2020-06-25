@@ -9,5 +9,7 @@ def getPatternTypeName(patternType: PatternType):
         return "Airy"
     elif patternType == PatternType.digital_pinhole:
         return "Digital pinhole"
+    elif patternType == PatternType.physical_pinhole:
+        return "Physical pinhole"
     else:
         return patternType.name

@@ -131,3 +131,16 @@ class DigitalPinholePatternData(PatternData):
 
     def __str__(self) -> str:
         return f"Digital pinhole; FWHM = {self.fwhm} nm"
+
+
+@dataclass_json
+@dataclass
+class PhysicalPinholePatternData(PatternData):
+    radius: float = 100
+
+    # Methods
+    def get_numpy_array(self, pixels_per_nm: float) -> np.ndarray:
+        return physical_pinhole_test1(radius=self.radius, pixels_per_nm=pixels_per_nm)
+
+    def __str__(self) -> str:
+        return f"Physical pinhole; radius = {self.radius} nm"

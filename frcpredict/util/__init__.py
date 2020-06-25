@@ -6,5 +6,5 @@ from .dataclass_extras import (
 
 from .pattern_utils import (
     get_canvas_params,
-    gaussian_test1, doughnut_test1, airy_test1, digital_pinhole_test1
+    gaussian_test1, doughnut_test1, airy_test1, digital_pinhole_test1, physical_pinhole_test1
 )
