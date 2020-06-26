@@ -1,4 +1,3 @@
-import numpy as np
 from typing import Optional, Tuple, List
 
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt

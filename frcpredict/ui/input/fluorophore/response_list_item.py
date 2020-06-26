@@ -25,13 +25,13 @@ class ResponseListItem(QListWidgetItem):
         self.setText(str(response))
 
     def __lt__(self, other: QListWidgetItem) -> bool:
-        if self._wavelengthStart != other._wavelengthStart:
-            return self._wavelengthStart < other._wavelengthStart
+        if self.wavelengthStart != other.wavelengthStart:
+            return self.wavelengthStart < other.wavelengthStart
         else:
-            return self._wavelengthEnd < other._wavelengthEnd
+            return self.wavelengthEnd < other.wavelengthEnd
 
     def __gt__(self, other: QListWidgetItem) -> bool:
-        if self._wavelengthStart != other._wavelengthStart:
-            return self._wavelengthStart > other._wavelengthStart
+        if self.wavelengthStart != other.wavelengthStart:
+            return self.wavelengthStart > other.wavelengthStart
         else:
-            return self._wavelengthEnd > other._wavelengthEnd
+            return self.wavelengthEnd > other.wavelengthEnd

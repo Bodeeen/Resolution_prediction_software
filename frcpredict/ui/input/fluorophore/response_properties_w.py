@@ -1,5 +1,4 @@
 from PyQt5.QtCore import pyqtSignal
-from sip import isdeleted
 
 from frcpredict.model import IlluminationResponse
 from frcpredict.ui import BaseWidget
@@ -8,7 +7,7 @@ from .response_properties_p import ResponsePropertiesPresenter
 
 class ResponsePropertiesWidget(BaseWidget):
     """
-    A widget where the user may set propreties of a specific fluorophore response.
+    A widget where the user may set properties of a specific fluorophore response.
     """
 
     # Signals

@@ -6,14 +6,9 @@ from PyQt5.QtCore import pyqtSignal, pyqtSlot, QObject, QThreadPool, QRunnable, 
 from PyQt5.QtWidgets import QMessageBox
 
 from frcpredict.model import (
-    FluorophoreSettings, IlluminationResponse,
     Pattern, Array2DPatternData,
-    ImagingSystemSettings,
-    PulseScheme, Pulse, PulseType,
-    SampleProperties,
-    CameraProperties,
-    RunInstance,
-    JsonContainer
+    FluorophoreSettings, ImagingSystemSettings, PulseScheme, SampleProperties, CameraProperties,
+    RunInstance
 )
 from frcpredict.ui import BasePresenter
 

@@ -1,10 +1,7 @@
-import numpy as np
-
-from PyQt5.QtCore import pyqtSlot, QObject
+from PyQt5.QtCore import pyqtSlot
 
 from frcpredict.model import Pulse, PulseType, Pattern, Array2DPatternData
 from frcpredict.ui import BasePresenter
-from frcpredict.ui.util import getArrayPixmap
 
 
 class PulsePropertiesPresenter(BasePresenter[Pulse]):

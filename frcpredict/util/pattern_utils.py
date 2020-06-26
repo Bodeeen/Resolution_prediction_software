@@ -1,4 +1,4 @@
-from astropy.modeling.functional_models import AiryDisk2D, Gaussian1D, Gaussian2D
+from astropy.modeling.functional_models import AiryDisk2D, Gaussian2D
 from astropy.stats import gaussian_fwhm_to_sigma
 import numpy as np
 from typing import Tuple
@@ -30,7 +30,7 @@ def gaussian_test1(amplitude: float, fwhm: float, pixels_per_nm: float) -> np.nd
 def doughnut_test1(periodicity: float, pixels_per_nm: float) -> np.ndarray:
     def Doughnut1D(radius: float) -> np.ndarray:
         return np.where(
-            radius < periodicity/ (2 * pixels_per_nm),
+            radius < periodicity / (2 * pixels_per_nm),
             0.5 - 0.5 * np.cos(2 * np.pi * radius * pixels_per_nm / periodicity),
             1
         )

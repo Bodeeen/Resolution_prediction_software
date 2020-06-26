@@ -1,5 +1,4 @@
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtGui import QPixmap
 
 from frcpredict.model import Pulse, PulseType, Pattern, PatternType
 from frcpredict.ui import BaseWidget

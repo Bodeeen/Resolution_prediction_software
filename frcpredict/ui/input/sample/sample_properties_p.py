@@ -1,4 +1,4 @@
-from PyQt5.QtCore import pyqtSlot, QObject
+from PyQt5.QtCore import pyqtSlot
 
 from frcpredict.model import SampleProperties
 from frcpredict.ui import BasePresenter

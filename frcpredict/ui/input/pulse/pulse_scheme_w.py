@@ -1,8 +1,6 @@
 import functools
-import numpy as np
 
 from PyQt5.QtCore import pyqtSignal
-import pyqtgraph as pg
 
 from frcpredict.model import PulseScheme, Pulse, PulseType, Pattern, Array2DPatternData
 from frcpredict.ui import BaseWidget

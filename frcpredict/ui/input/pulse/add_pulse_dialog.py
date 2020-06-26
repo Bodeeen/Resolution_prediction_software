@@ -1,10 +1,9 @@
-import numpy as np
 from typing import Optional, Tuple
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QDialog, QDialogButtonBox
 
-from frcpredict.model import Pulse, PulseType
+from frcpredict.model import Pulse
 from frcpredict.ui import BaseWidget
 from frcpredict.util import with_cleared_signals
 

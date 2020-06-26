@@ -1,9 +1,7 @@
-from dataclasses import fields
 from typing import Any, Optional, Callable
 import os
 
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
-from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QMessageBox, QFileDialog
 
 from frcpredict.model import JsonContainer
@@ -55,7 +53,9 @@ class PresetPickerWidget(BaseWidget):
         """ Sets the displayed path to the currently loaded file. """
         self._loadedPath = loadedPath
         self.btnSaveFile.setEnabled(loadedPath is not None)
-        self.lblLoadedConfigName.setText(os.path.basename(loadedPath) if loadedPath else "(no file loaded)")
+        self.lblLoadedConfigName.setText(
+            os.path.basename(loadedPath) if loadedPath else "(no file loaded)"
+        )
 
     def modelType(self) -> type:
         """ Returns the type of model that is intended to be loaded/saved. """
@@ -67,10 +67,10 @@ class PresetPickerWidget(BaseWidget):
 
     # TODO: Use this function for indicating when the current configuration has unsaved changes
     #def setModifiedFlag(self, modified: bool) -> None:
-        #self.lblConfigName.setText("*(custom)" if modified else "(custom)")
-        #newFont = QFont(self.lblConfigName.font())
-        # newFont.setItalic(modified)
-        # self.lblConfigName.setFont(newFont)
+    #    self.lblConfigName.setText("*(custom)" if modified else "(custom)")
+    #    newFont = QFont(self.lblConfigName.font())
+    #    newFont.setItalic(modified)
+    #    self.lblConfigName.setFont(newFont)
 
     def startDirectory(self) -> str:
         """
@@ -138,7 +138,7 @@ class PresetPickerWidget(BaseWidget):
 
         if self._modelType is None or self._valueGetter is None:
             raise Exception("Model type or value getter not set for preset picker.")
-        
+
         with open(path, "w") as jsonFile:
             try:
                 jsonContainer = JsonContainer[self.modelType()](self._valueGetter())

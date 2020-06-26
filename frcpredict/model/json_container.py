@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from dataclasses_json import dataclass_json
 from packaging import version
-from typing import Any, Type, TypeVar, Generic, List
+from typing import TypeVar, Generic, List
 
 import frcpredict
 
@@ -24,7 +24,8 @@ class JsonContainer(Generic[DataType]):
     program_name: str
     program_version: str
 
-    def __init__(self, data: DataType, data_type: type = None, program_name: str = None, program_version: str = None) -> None:
+    def __init__(self, data: DataType, data_type: type = None,
+                 program_name: str = None, program_version: str = None) -> None:
         self.data = data
         self.data_type = type(data).__name__ if data_type is None else data_type
         self.program_name = frcpredict.__title__ if program_name is None else program_name

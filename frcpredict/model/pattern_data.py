@@ -5,7 +5,6 @@ from marshmallow import fields
 import numpy as np
 from osgeo import gdal_array
 from skimage.transform import resize
-from typing import Optional, Union, List, Dict, Type
 
 from frcpredict.util import (
     get_canvas_params,

@@ -1,8 +1,6 @@
-import numpy as np
-from typing import Optional, List
+from typing import Optional
 
 from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtWidgets import QFileDialog
 
 from frcpredict.model import Pattern, Array2DPatternData, PatternType
 from frcpredict.ui import BasePresenter

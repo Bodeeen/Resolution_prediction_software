@@ -42,7 +42,7 @@ class FluorophoreSettingsPresenter(BasePresenter[FluorophoreSettings]):
     def __init__(self, widget) -> None:
         # Initialize model
         model = FluorophoreSettings(responses=[])
-        
+
         super().__init__(model, widget)
         self._selectedResponse = None
 
@@ -60,7 +60,8 @@ class FluorophoreSettingsPresenter(BasePresenter[FluorophoreSettings]):
 
     # UI event handling
     @pyqtSlot(QListWidgetItem, QListWidgetItem)
-    def _uiResponseSelectionChange(self, selectedItem: Optional[ResponseListItem], _: Optional[ResponseListItem] = None) -> None:
+    def _uiResponseSelectionChange(self, selectedItem: Optional[ResponseListItem],
+                                   _: Optional[ResponseListItem] = None) -> None:
         """ Updates state and response properties widget based on the current selection. """
 
         if selectedItem is None:
@@ -75,7 +76,7 @@ class FluorophoreSettingsPresenter(BasePresenter[FluorophoreSettings]):
         """
         Adds a response. A dialog will open for the user to enter the properties first.
         """
-        
+
         response, ok_pressed = AddResponseDialog.getResponse(self.widget)
         if ok_pressed:
             self.model.add_response(response)
@@ -87,7 +88,9 @@ class FluorophoreSettingsPresenter(BasePresenter[FluorophoreSettings]):
         """
 
         confirmation_result = QMessageBox.question(
-            self.widget, "Remove Response", f"Remove the selected response \"{self._selectedResponse}\"?")
+            self.widget, "Remove Response",
+            f"Remove the selected response \"{self._selectedResponse}\"?"
+        )
 
         if confirmation_result == QMessageBox.Yes:
             self.model.remove_response(self._selectedResponse.wavelength_start)

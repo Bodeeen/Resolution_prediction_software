@@ -1,6 +1,7 @@
 from frcpredict.model import PatternType
 
-def getPatternTypeName(patternType: PatternType):
+
+def getPatternTypeName(patternType: PatternType) -> str:
     if patternType == PatternType.gaussian:
         return "Gaussian"
     elif patternType == PatternType.doughnut:

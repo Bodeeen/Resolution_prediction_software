@@ -1,9 +1,6 @@
-from base64 import b64encode, b64decode
-from dataclasses import field, fields
-from dataclasses_json import config as json_config, Exclude
-import numpy as np
+from dataclasses import fields
 from PySignal import Signal
-from typing import Any, Optional, List
+from typing import Any, Optional
 
 
 def dataclass_internal_attrs(cls=None, super_cls: type = object, **internal_attr_factories):
@@ -13,7 +10,7 @@ def dataclass_internal_attrs(cls=None, super_cls: type = object, **internal_attr
     """
 
     def wrap(cls):
-        def newfunc(new_cls, *new_args, **new_kwargs):
+        def newfunc(new_cls, *_new_args, **_new_kwargs):
             instance = super_cls().__new__(new_cls)
             for key, value in internal_attr_factories.items():
                 setattr(instance, key, value())

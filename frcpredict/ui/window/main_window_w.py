@@ -3,7 +3,10 @@ import numpy as np
 from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtWidgets import QMainWindow
 
-from frcpredict.model import FluorophoreSettings, ImagingSystemSettings, PulseScheme, SampleProperties, CameraProperties, RunInstance
+from frcpredict.model import (
+    FluorophoreSettings, ImagingSystemSettings, PulseScheme, SampleProperties, CameraProperties,
+    RunInstance
+)
 from frcpredict.ui import BaseWidget
 from frcpredict.ui.util import UserFileDirs
 from .main_window_p import MainWindowPresenter

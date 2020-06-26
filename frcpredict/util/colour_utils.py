@@ -1,6 +1,8 @@
 import colour
+from typing import Tuple
 
-def wavelength_to_rgb(wavelength: int, gamma: float = 2.2):
+
+def wavelength_to_rgb(wavelength: int, gamma: float = 2.2) -> Tuple[int, int, int]:
     """
     Converts a wavelength (in nanometres) to a gamma corrected RGB tuple with values [0, 255].
     Returns white if the wavelength is outside the visible spectrum or any other error occurs.
@@ -12,4 +14,4 @@ def wavelength_to_rgb(wavelength: int, gamma: float = 2.2):
         gamma_corrected_rgb = 255 * srgb ** (1 / gamma)
         return tuple(gamma_corrected_rgb)
     except ValueError:
-        return (255, 255, 255)
+        return 255, 255, 255

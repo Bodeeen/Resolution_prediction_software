@@ -2,6 +2,7 @@ import os
 
 _baseUserFilesDir = "user_files"
 
+
 def subdirOfUserFilesDir(subdir: str) -> str:
     return os.path.join(os.getcwd(), _baseUserFilesDir, subdir)
 
@@ -9,6 +10,7 @@ def subdirOfUserFilesDir(subdir: str) -> str:
 def initUserFilesIfNeeded() -> None:
     for userFileDir in UserFileDirs.list():
         os.makedirs(userFileDir, exist_ok=True)
+
 
 class UserFileDirs:
     FluorophoreSettings: str = subdirOfUserFilesDir("fluorophore_settings")

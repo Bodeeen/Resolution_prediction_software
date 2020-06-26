@@ -1,11 +1,7 @@
-import numpy as np
-
 from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtWidgets import QFileDialog
 
 from frcpredict.model import ImagingSystemSettings, Pattern, Array2DPatternData
 from frcpredict.ui import BasePresenter
-from frcpredict.ui.util import getArrayPixmap
 
 
 class ImagingSystemSettingsPresenter(BasePresenter[ImagingSystemSettings]):

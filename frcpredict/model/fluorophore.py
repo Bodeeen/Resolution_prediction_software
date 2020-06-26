@@ -1,7 +1,7 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from dataclasses_json import dataclass_json
 from PySignal import Signal
-from typing import Any, Optional, List, Dict
+from typing import Optional, List
 
 from frcpredict.util import dataclass_internal_attrs, observable_property
 
@@ -82,8 +82,7 @@ class FluorophoreSettings:
     def get_response(self, wavelength: int) -> Optional[IlluminationResponse]:
         """ Returns the response with the specified wavelength, or None if it doesn't exist. """
         for response in self._responses.values():
-            if (wavelength >= response.wavelength_start and
-                    wavelength <= response.wavelength_end):
+            if response.wavelength_start <= wavelength <= response.wavelength_end:
                 return response
 
         return None

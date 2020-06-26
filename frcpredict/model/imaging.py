@@ -1,7 +1,5 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from dataclasses_json import dataclass_json
-import numpy as np
-from osgeo import gdal_array
 from PySignal import Signal
 
 from frcpredict.util import dataclass_internal_attrs, observable_property

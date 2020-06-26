@@ -3,13 +3,12 @@ from dataclasses_json import dataclass_json
 from enum import Enum
 import numpy as np
 from PySignal import Signal
-from typing import Optional, Union, List, Dict, Type
+from typing import Optional, Union
 
 from frcpredict.util import dataclass_internal_attrs
 from .pattern_data import (
     PatternData, Array2DPatternData,
     GaussianPatternData, DoughnutPatternData, AiryPatternData,
-    DigitalPinholePatternData
     DigitalPinholePatternData, PhysicalPinholePatternData
 )
 
@@ -34,9 +33,11 @@ class Pattern:
     @property
     def pattern_data(self) -> PatternData:
         # The way we do this with allowing and converting from dicts is a bit stupid, but it seems
-        # to be neccessary in order to get dataclasses_json to encode/decode our data as wanted
+        # to be necessary in order to get dataclasses_json to encode/decode our data as wanted
         if isinstance(self._pattern_data, dict):
-            self._pattern_data = self._get_data_type_from_pattern_type(self.pattern_type).from_dict(self._pattern_data)
+            self._pattern_data = self._get_data_type_from_pattern_type(self.pattern_type).from_dict(
+                self._pattern_data
+            )
 
         return self._pattern_data
 
@@ -46,14 +47,17 @@ class Pattern:
         self.data_loaded.emit(self)
 
     # Methods
-    def __init__(self, pattern_type: Optional[PatternType] = None, pattern_data: Optional[Union[dict, PatternData]] = None):
+    def __init__(self, pattern_type: Optional[PatternType] = None,
+                 pattern_data: Optional[Union[dict, PatternData]] = None):
         if pattern_type is None and pattern_data is None:
             raise ValueError("Either pattern type or pattern data must be specified")
 
         if pattern_data is not None:
             if isinstance(pattern_data, dict):
                 if pattern_type is None:
-                    raise ValueError("Pattern type must be specified when loading pattern data from dict")
+                    raise ValueError(
+                        "Pattern type must be specified when loading pattern data from dict"
+                    )
 
                 self.pattern_type = pattern_type
                 self.pattern_data = pattern_data

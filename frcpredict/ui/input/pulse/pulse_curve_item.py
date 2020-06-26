@@ -1,7 +1,7 @@
 import numpy as np
 from typing import Tuple
 
-from pyqtgraph import mkPen, PlotCurveItem
+from pyqtgraph import PlotCurveItem
 
 from frcpredict.util import wavelength_to_rgb
 
@@ -21,7 +21,8 @@ class PulseCurveItem(PlotCurveItem):
         return self._duration
 
     # Methods
-    def __init__(self, pulseKey: str, wavelength: int, startTime: float, duration: float, plotEndTime: float = 0, *args, **kwargs) -> None:
+    def __init__(self, pulseKey: str, wavelength: int, startTime: float, duration: float,
+                 plotEndTime: float = 0, *args, **kwargs) -> None:
         self._pulseKey = pulseKey
         self._startTime = startTime
         self._duration = duration
@@ -51,7 +52,7 @@ class PulseCurveItem(PlotCurveItem):
         self.setZValue(1000000)
 
     def unhighlight(self) -> None:
-        """ Unhighlights the item. """
+        """ Un-highlights the item. """
         self.setPen(self._colour, width=2)
         self.setZValue(self.startTime)
 
@@ -60,7 +61,7 @@ class PulseCurveItem(PlotCurveItem):
         x = np.arange(0, self._plotEndTime + 1, 0.001)
         y = np.zeros(len(x))
         for i in range(0, len(y)):
-            if x[i] >= startTime and x[i] < startTime + duration:
+            if startTime <= x[i] < startTime + duration:
                 y[i] = 1
 
         return x, y
