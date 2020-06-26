@@ -76,8 +76,8 @@ def _canvas_meshgrid(pixels_per_nm: float) -> np.ndarray:
     canvas_inner_radius_px, _ = get_canvas_params(pixels_per_nm)
 
     side = np.linspace(
-        -canvas_inner_radius_px,
-        canvas_inner_radius_px,
+        -canvas_inner_radius_px + 1,
+        canvas_inner_radius_px - 1,
         canvas_inner_radius_px * 2 - 1
     )
     return np.meshgrid(side, side)
