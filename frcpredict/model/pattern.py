@@ -10,6 +10,7 @@ from .pattern_data import (
     PatternData, Array2DPatternData,
     GaussianPatternData, DoughnutPatternData, AiryPatternData,
     DigitalPinholePatternData
+    DigitalPinholePatternData, PhysicalPinholePatternData
 )
 
 

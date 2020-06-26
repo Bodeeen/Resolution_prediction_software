@@ -10,7 +10,7 @@ from typing import Optional, Union, List, Dict, Type
 from frcpredict.util import (
     get_canvas_params,
     gaussian_test1, doughnut_test1, airy_test1,
-    digital_pinhole_test1
+    digital_pinhole_test1, physical_pinhole_test1
 )
 
 
