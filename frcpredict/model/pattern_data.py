@@ -59,7 +59,7 @@ class Array2DPatternData(PatternData):
     def from_npy_file(path: str) -> PatternData:
         """
         Loads a 2D array from an .npy file. The file is expected to contain a float array that is
-        of the shape (width, height) and has values within the range [-1, 1].
+        of the shape (width, height).
         """
         return Array2DPatternData(value=np.load(path))
 
