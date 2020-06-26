@@ -83,6 +83,6 @@ def _canvas_meshgrid(pixels_per_nm: float) -> np.ndarray:
     return np.meshgrid(side, side)
 
 
-def _radial_to_2d(canvas_inner_radius_px: int) -> np.ndarray:
-    x, y = _canvas_meshgrid(canvas_inner_radius_px)
+def _radial_to_2d(pixels_per_nm: float) -> np.ndarray:
+    x, y = _canvas_meshgrid(pixels_per_nm)
     return np.sqrt(x**2 + y**2)

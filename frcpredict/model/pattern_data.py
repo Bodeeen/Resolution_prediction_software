@@ -56,7 +56,7 @@ class Array2DPatternData(PatternData):
             return "Empty pattern"
 
     @staticmethod
-    def from_npy_file(path: str) -> None:
+    def from_npy_file(path: str) -> PatternData:
         """
         Loads a 2D array from an .npy file. The file is expected to contain a float array that is
         of the shape (width, height) and has values within the range [-1, 1].
@@ -64,7 +64,7 @@ class Array2DPatternData(PatternData):
         return Array2DPatternData(value=np.load(path))
 
     @staticmethod
-    def from_image_file(path: str) -> None:
+    def from_image_file(path: str) -> PatternData:
         """ Loads a 2D array from an image file. """
         raster_array = gdal_array.LoadFile(path)  # Load image as numpy array
         

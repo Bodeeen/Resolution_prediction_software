@@ -61,7 +61,7 @@ class PatternFieldWidget(BaseWidget):
         """
         self._allowEditGenerationAmplitude = allowEditAmplitude
 
-    def availableGenerationTypes(self) -> bool:
+    def availableGenerationTypes(self) -> List[PatternType]:
         """
         Returns which pattern types are available for the user to pick when generating a pattern.
         """

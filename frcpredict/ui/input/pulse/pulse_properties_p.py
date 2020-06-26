@@ -33,7 +33,7 @@ class PulsePropertiesPresenter(BasePresenter[Pulse]):
         # Initialize model
         model = Pulse(
             pulse_type=PulseType.on,
-            wavelength=0.0,
+            wavelength=0,
             duration=0.0,
             max_intensity=0.0,
             illumination_pattern=Pattern(pattern_data=Array2DPatternData())
