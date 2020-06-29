@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from dataclasses_json import dataclass_json, config as json_config
 from marshmallow import fields
 import numpy as np
-from osgeo import gdal_array
+from skimage.io import imread
 from skimage.transform import resize
 
 from frcpredict.util import (
@@ -66,14 +66,10 @@ class Array2DPatternData(PatternData):
     @staticmethod
     def from_image_file(path: str) -> PatternData:
         """ Loads a 2D array from an image file. """
-        raster_array = gdal_array.LoadFile(path)  # Load image as numpy array
-        
+        raster_array = imread(path, as_gray=True)  # Load image as numpy array
+
         if np.issubdtype(raster_array.dtype, np.integer):
             raster_array = raster_array / 255.0  # Image has int values; normalise
-
-        if raster_array.ndim > 2:
-            # Image has multiple channels; average the values over the channels
-            raster_array = np.mean(raster_array, axis=0)
 
         return Array2DPatternData(value=raster_array)
 

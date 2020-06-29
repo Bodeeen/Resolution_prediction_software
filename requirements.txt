@@ -1,7 +1,7 @@
 astropy
 colour-science
 dataclasses-json >= 0.4.4
-GDAL
+imagecodecs
 numba
 numpy
 packaging
