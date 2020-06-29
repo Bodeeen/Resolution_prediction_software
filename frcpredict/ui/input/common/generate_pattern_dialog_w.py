@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QWidget, QDialog, QDialogButtonBox
 
 from frcpredict.model import Pattern, PatternType
 from frcpredict.ui import BaseWidget
-from frcpredict.ui.util import getPatternTypeName
+from frcpredict.ui.util import getPatternTypeName, setFormLayoutRowVisibility
 from frcpredict.util import with_cleared_signals
 from .generate_pattern_dialog_p import GeneratePatternPresenter
 from .list_item_with_value import ListItemWithValue
@@ -60,18 +60,17 @@ class GeneratePatternDialog(QDialog, BaseWidget):
                                fwhm: bool = False, periodicity: bool = False) -> None:
         """ Sets which pattern properties are available for the user to modify. """
 
-        # TODO: Fix hidden properties taking up space
-        self.lblAmplitude.setVisible(self._allowEditAmplitude and amplitude)
-        self.editAmplitude.setVisible(self._allowEditAmplitude and amplitude)
+        setFormLayoutRowVisibility(self.frmProperties, 0, self.lblAmplitude, self.editAmplitude,
+                                   visible=amplitude and self._allowEditAmplitude)
 
-        self.lblRadius.setVisible(radius)
-        self.editRadius.setVisible(radius)
+        setFormLayoutRowVisibility(self.frmProperties, 1, self.lblRadius, self.editRadius,
+                                   visible=radius)
 
-        self.lblFwhm.setVisible(fwhm)
-        self.editFwhm.setVisible(fwhm)
+        setFormLayoutRowVisibility(self.frmProperties, 2, self.lblFwhm, self.editFwhm,
+                                   visible=fwhm)
 
-        self.lblPeriodicity.setVisible(periodicity)
-        self.editPeriodicity.setVisible(periodicity)
+        setFormLayoutRowVisibility(self.frmProperties, 3, self.lblPeriodicity, self.editPeriodicity,
+                                   visible=periodicity)
 
     def value(self) -> Pattern:
         return self._presenter.model

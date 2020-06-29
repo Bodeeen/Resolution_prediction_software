@@ -105,7 +105,8 @@ class GeneratePatternPresenter(BasePresenter[Pattern]):
 
     @pyqtSlot(float)
     def _uiAmplitudeChange(self, value: float) -> None:
-        if hasattr(self.model.pattern_data, "amplitude") and self.model.pattern_data.amplitude != value:
+        if (hasattr(self.model.pattern_data, "amplitude") and
+                self.model.pattern_data.amplitude != value):
             self.model.pattern_data.amplitude = value
             self._onPatternDataChange(self.model)
 
@@ -123,6 +124,7 @@ class GeneratePatternPresenter(BasePresenter[Pattern]):
 
     @pyqtSlot(float)
     def _uiPeriodicityChange(self, value: float) -> None:
-        if hasattr(self.model.pattern_data, "periodicity") and self.model.pattern_data.periodicity != value:
+        if (hasattr(self.model.pattern_data, "periodicity") and
+                self.model.pattern_data.periodicity != value):
             self.model.pattern_data.periodicity = value
             self._onPatternDataChange(self.model)
