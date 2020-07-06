@@ -1,3 +1,4 @@
+from traceback import format_exc
 from typing import Any, Optional, Callable
 import os
 
@@ -30,6 +31,8 @@ class PresetPickerWidget(BaseWidget):
         super().__init__(__file__, *args, **kwargs)
         self.setLoadedPath(None)
         self.setFieldName("Config")
+
+        self.scrLoadedConfigName.setMaximumHeight(self.lblLoadedConfigName.height())
 
         # Connect signals
         self.btnLoadFile.clicked.connect(self._onClickLoadFile)
@@ -128,6 +131,7 @@ class PresetPickerWidget(BaseWidget):
                 self.setLoadedPath(path)
                 self.dataLoaded.emit()
             except Exception as e:
+                print(format_exc())
                 QMessageBox.critical(self, "Configuration load error", str(e))
 
     def _saveToFile(self, path: str):
@@ -157,7 +161,8 @@ class PresetPickerWidget(BaseWidget):
             self,
             caption="Open configuration file",
             filter="JSON files (*.json)",
-            directory=self.startDirectory()
+            directory=(os.path.dirname(self.loadedPath()) if self.loadedPath() is not None
+                       else self.startDirectory())
         )
 
         if path:  # Check whether a file was picked
@@ -181,7 +186,7 @@ class PresetPickerWidget(BaseWidget):
             self,
             caption="Save configuration file",
             filter="JSON files (*.json)",
-            directory=self.startDirectory()
+            directory=self.loadedPath() if self.loadedPath() is not None else self.startDirectory()
         )
 
         if path:  # Check whether a file was picked
