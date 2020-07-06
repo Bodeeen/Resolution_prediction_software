@@ -63,7 +63,7 @@ class FrcResultsWidget(BaseWidget):
 
             # Update parameter range value labels
             for i in range(0, len(self._valueLabels)):
-                self._valueLabels[i].setText("%.2f" % curve.range_values[i])
+                self._valueLabels[i].setText("%#.4g" % curve.range_values[i])
         else:
             self.lblResolutionValue.setText("")
 
@@ -133,8 +133,9 @@ class FrcResultsWidget(BaseWidget):
 
                 sliderValueChangeEvents.append(slider.valueChanged)
 
-        # Return slider value change signals
         self._valueLabels = valueLabels
+
+        # Return slider value change signals
         return sliderValueChangeEvents
 
     def updateThreshold(self, curve: Optional[FrcCurve], threshold: float) -> None:
