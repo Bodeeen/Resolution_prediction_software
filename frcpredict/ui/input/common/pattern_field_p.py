@@ -81,7 +81,7 @@ class PatternFieldPresenter(BasePresenter[Pattern]):
         of pattern to generate and with what parameters.
         """
 
-        pattern_data, ok_pressed = GeneratePatternDialog.getPatternData(
+        pattern_data, okClicked = GeneratePatternDialog.getPatternData(
             self.widget,
             title=f"Generate {self.widget.fieldName()}",
             availableTypes=self.widget.availableGenerationTypes(),
@@ -89,5 +89,5 @@ class PatternFieldPresenter(BasePresenter[Pattern]):
             normalisePreview=self._normaliseVisualisation
         )
         
-        if ok_pressed:
+        if okClicked:
             self.model.load_from_data(pattern_data)

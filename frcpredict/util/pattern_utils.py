@@ -41,7 +41,7 @@ def doughnut_test1(periodicity: float, pixels_per_nm: float) -> np.ndarray:
 def airy_test1(amplitude: float, fwhm: float, pixels_per_nm: float) -> np.ndarray:
     airy_radius = fwhm/pixels_per_nm * 0.353/(0.61/2)  # TODO: Might not be correct
     model = AiryDisk2D(amplitude=amplitude, radius=airy_radius)
-    
+
     x, y = _canvas_meshgrid(pixels_per_nm)
     result = model(x, y)
 

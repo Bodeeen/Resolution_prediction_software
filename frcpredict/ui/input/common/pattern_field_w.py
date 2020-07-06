@@ -18,13 +18,13 @@ class PatternFieldWidget(BaseWidget):
 
     # Properties
     @pyqtProperty(bool)
-    def normaliseVisualisation(self):
+    def normaliseVisualisation(self) -> bool:
         return self._normaliseVisualisation
 
     @normaliseVisualisation.setter
-    def normaliseVisualisation(self, value):
+    def normaliseVisualisation(self, value: bool) -> None:
         self._normaliseVisualisation = value
-        
+
         # This is an ugly way to listen to changes on the "normaliseVisualisation" property
         self._presenter.deleteLater()
         self._presenter = PatternFieldPresenter(self, normaliseVisualisation=value)
@@ -41,7 +41,7 @@ class PatternFieldWidget(BaseWidget):
         self._allowEditGenerationAmplitude = True
         self._availableGenerationTypes = []
         self._fieldName = "Pattern"
-        
+
         # Connect forwarded signals
         self.btnLoadFile.clicked.connect(self.loadFileClicked)
         self.btnGenerate.clicked.connect(self.generateClicked)

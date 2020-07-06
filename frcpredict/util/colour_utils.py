@@ -1,5 +1,6 @@
-import colour
 from typing import Tuple
+
+import colour
 
 
 def wavelength_to_rgb(wavelength: int, gamma: float = 2.2) -> Tuple[int, int, int]:
