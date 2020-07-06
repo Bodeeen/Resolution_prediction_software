@@ -1,7 +1,8 @@
 from PyQt5.QtCore import pyqtSignal
 
-from frcpredict.model import IlluminationResponse
+from frcpredict.model import IlluminationResponse, ValueRange
 from frcpredict.ui import BaseWidget
+from frcpredict.ui.util import connectMulti
 from .response_properties_p import ResponsePropertiesPresenter
 
 
@@ -12,9 +13,9 @@ class ResponsePropertiesWidget(BaseWidget):
 
     # Signals
     wavelengthChanged = pyqtSignal(int)
-    offToOnChanged = pyqtSignal(float)
-    onToOffChanged = pyqtSignal(float)
-    emissionChanged = pyqtSignal(float)
+    offToOnChanged = pyqtSignal([float], [ValueRange])
+    onToOffChanged = pyqtSignal([float], [ValueRange])
+    emissionChanged = pyqtSignal([float], [ValueRange])
 
     # Methods
     def __init__(self, *args, **kwargs) -> None:
@@ -22,9 +23,9 @@ class ResponsePropertiesWidget(BaseWidget):
 
         # Connect forwarded signals
         self.editWavelength.valueChanged.connect(self.wavelengthChanged)
-        self.editOffToOn.valueChanged.connect(self.offToOnChanged)
-        self.editOnToOff.valueChanged.connect(self.onToOffChanged)
-        self.editEmission.valueChanged.connect(self.emissionChanged)
+        connectMulti(self.editOffToOn.valueChanged, [float, ValueRange], self.offToOnChanged)
+        connectMulti(self.editOnToOff.valueChanged, [float, ValueRange], self.onToOffChanged)
+        connectMulti(self.editEmission.valueChanged, [float, ValueRange], self.emissionChanged)
 
         # Initialize presenter
         self._presenter = ResponsePropertiesPresenter(self)

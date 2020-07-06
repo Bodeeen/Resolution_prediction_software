@@ -1,8 +1,8 @@
 from PyQt5.QtCore import pyqtSignal
 
-from frcpredict.model import SampleProperties
+from frcpredict.model import SampleProperties, ValueRange
 from frcpredict.ui import BaseWidget
-from frcpredict.ui.util import UserFileDirs
+from frcpredict.ui.util import connectMulti, UserFileDirs
 from .sample_properties_p import SamplePropertiesPresenter
 
 
@@ -13,9 +13,9 @@ class SamplePropertiesWidget(BaseWidget):
 
     # Signals
     valueChanged = pyqtSignal(SampleProperties)
-    spectralPowerChanged = pyqtSignal(float)
-    labellingDensityChanged = pyqtSignal(float)
-    KOriginChanged = pyqtSignal(float)
+    spectralPowerChanged = pyqtSignal([float], [ValueRange])
+    labellingDensityChanged = pyqtSignal([float], [ValueRange])
+    KOriginChanged = pyqtSignal([float], [ValueRange])
 
     # Methods
     def __init__(self, *args, **kwargs) -> None:
@@ -28,9 +28,12 @@ class SamplePropertiesWidget(BaseWidget):
         self.presetPicker.setValueSetter(self.setValue)
         
         # Connect forwarded signals
-        self.editSpectralPower.valueChanged.connect(self.spectralPowerChanged)
-        self.editLabellingDensity.valueChanged.connect(self.labellingDensityChanged)
-        self.editKOrigin.valueChanged.connect(self.KOriginChanged)
+        connectMulti(self.editSpectralPower.valueChanged, [float, ValueRange],
+                     self.spectralPowerChanged)
+        connectMulti(self.editLabellingDensity.valueChanged, [float, ValueRange],
+                     self.labellingDensityChanged)
+        connectMulti(self.editKOrigin.valueChanged, [float, ValueRange],
+                     self.KOriginChanged)
 
         # Initialize presenter
         self._presenter = SamplePropertiesPresenter(self)

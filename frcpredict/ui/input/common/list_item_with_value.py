@@ -2,13 +2,12 @@ from typing import TypeVar, Generic
 
 from PyQt5.QtWidgets import QListWidgetItem
 
-
 T = TypeVar('T')
 
 
 class ListItemWithValue(QListWidgetItem, Generic[T]):
     """
-    Custom QListWidgetItem that can be initialized/updated with and sorted by wavelength.
+    Custom QListWidgetItem that holds a value.
     """
 
     # Methods

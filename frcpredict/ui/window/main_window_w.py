@@ -1,11 +1,12 @@
-import numpy as np
+from typing import Optional
 
-from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtCore import pyqtSignal, Qt, QRect
+from PyQt5.QtGui import QFontMetrics
 from PyQt5.QtWidgets import QMainWindow
 
 from frcpredict.model import (
     FluorophoreSettings, ImagingSystemSettings, PulseScheme, SampleProperties, CameraProperties,
-    RunInstance
+    RunInstance, FrcSimulationResults
 )
 from frcpredict.ui import BaseWidget
 from frcpredict.ui.util import UserFileDirs
@@ -23,13 +24,24 @@ class MainWindow(QMainWindow, BaseWidget):
     pulseSchemeModelSet = pyqtSignal(PulseScheme)
     samplePropertiesModelSet = pyqtSignal(SampleProperties)
     cameraPropertiesModelSet = pyqtSignal(CameraProperties)
-    
+
     simulateFrcClicked = pyqtSignal()
 
     # Methods
-    def __init__(self) -> None:
+    def __init__(self, screenGeometry: Optional[QRect] = None) -> None:
         super().__init__(__file__)
         self.setWindowFlag(Qt.WindowMaximizeButtonHint, on=False)
+
+        # Try to resize the window to fit everything without being too small or too large. The text
+        # size-based calculations are there to approximately account for differences in text size on
+        # different systems, as this has an effect how large the window should be.
+        textSizeInfo = QFontMetrics(self.font()).boundingRect(
+            "The quick brown fox jumps over the lazy dog"
+        )
+        self.resize(
+            min(screenGeometry.width() - 96, 1280 * (textSizeInfo.width() / 214) ** 0.5),
+            min(screenGeometry.height() - 96, 740 * (textSizeInfo.height() / 13) ** 0.5)
+        )
 
         # Prepare UI elements
         self.presetPicker.setFieldName("Global config")
@@ -44,17 +56,23 @@ class MainWindow(QMainWindow, BaseWidget):
         self.pulseScheme.valueChanged.connect(self.pulseSchemeModelSet)
         self.sampleProperties.valueChanged.connect(self.samplePropertiesModelSet)
         self.cameraProperties.valueChanged.connect(self.cameraPropertiesModelSet)
-        
+
         self.btnSimulateFrc.clicked.connect(self.simulateFrcClicked)
+
+        # TODO: Make these work and then unhide them.
+        self.btnAbort.setVisible(False)
+        self.pbProgress.setVisible(False)
 
         # Initialize presenter
         self._presenter = MainWindowPresenter(self)
 
-    def setFrcResults(self, x: np.ndarray, y: np.ndarray) -> None:
-        self.frcResults.setCurve(x, y)
+    def setFrcSimulationResults(self, frcSimulationResults: FrcSimulationResults) -> None:
+        self.frcResults.setValue(frcSimulationResults)
 
     def setSimulating(self, simulating: bool) -> None:
         self.btnSimulateFrc.setEnabled(not simulating)
+        self.btnAbort.setEnabled(simulating)
+
         if simulating:
             self.btnSimulateFrc.setText("SIMULATING…")
         else:

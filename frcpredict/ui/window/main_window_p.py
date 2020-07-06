@@ -1,14 +1,14 @@
 from copy import deepcopy
-import numpy as np
 from traceback import format_exc
 
+import numpy as np
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QObject, QThreadPool, QRunnable, QMutex
 from PyQt5.QtWidgets import QMessageBox
 
 from frcpredict.model import (
     Pattern, Array2DPatternData,
     FluorophoreSettings, ImagingSystemSettings, PulseScheme, SampleProperties, CameraProperties,
-    RunInstance
+    RunInstance, FrcSimulationResults
 )
 from frcpredict.ui import BasePresenter
 
@@ -74,13 +74,13 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
         self._actionLock = QMutex()
 
         # Connect UI events
-        self.widget.fluorophoreSettingsModelSet.connect(self._uiSetFluorophoreSettingsModel)
-        self.widget.imagingSystemSettingsModelSet.connect(self._uiSetImagingSystemSettingsModel)
-        self.widget.pulseSchemeModelSet.connect(self._uiSetPulseSchemeModel)
-        self.widget.samplePropertiesModelSet.connect(self._uiSetSamplePropertiesModel)
-        self.widget.cameraPropertiesModelSet.connect(self._uiSetCameraPropertiesModel)
-        
-        self.widget.simulateFrcClicked.connect(self._uiClickSimulateFrc)
+        widget.fluorophoreSettingsModelSet.connect(self._uiSetFluorophoreSettingsModel)
+        widget.imagingSystemSettingsModelSet.connect(self._uiSetImagingSystemSettingsModel)
+        widget.pulseSchemeModelSet.connect(self._uiSetPulseSchemeModel)
+        widget.samplePropertiesModelSet.connect(self._uiSetSamplePropertiesModel)
+        widget.cameraPropertiesModelSet.connect(self._uiSetCameraPropertiesModel)
+
+        widget.simulateFrcClicked.connect(self._uiClickSimulateFrc)
 
     # Model event handling
     def _onFluorophoreSettingsLoad(self, fluorophoreSettings: FluorophoreSettings) -> None:
@@ -104,7 +104,8 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
         self.model.fluorophore_settings = fluorophoreSettings
 
     @pyqtSlot(ImagingSystemSettings)
-    def _uiSetImagingSystemSettingsModel(self, imagingSystemSettings: ImagingSystemSettings) -> None:
+    def _uiSetImagingSystemSettingsModel(self,
+                                         imagingSystemSettings: ImagingSystemSettings) -> None:
         self.model.imaging_system_settings = imagingSystemSettings
 
     @pyqtSlot(PulseScheme)
@@ -124,16 +125,22 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
         if self._actionLock.tryLock():
             self.widget.setSimulating(True)
 
+            # Clear results
+            self.widget.setFrcSimulationResults(
+                FrcSimulationResults(run_instance=None, range_paths=[], frc_curves=np.array([]))
+            )
+
+            # Do work
             worker = self.FRCWorker(deepcopy(self.model))
             worker.signals.done.connect(self._onWorkerDone)
             worker.signals.error.connect(self._onWorkerError)
             self._threadPool.start(worker)
 
     # Worker stuff
-    @pyqtSlot(np.ndarray, np.ndarray)
-    def _onWorkerDone(self, x: np.ndarray, y: np.ndarray) -> None:
+    @pyqtSlot(FrcSimulationResults)
+    def _onWorkerDone(self, frcSimulationResults: FrcSimulationResults) -> None:
         try:
-            self.widget.setFrcResults(x, y)
+            self.widget.setFrcSimulationResults(frcSimulationResults)
         finally:
             self._actionLock.unlock()
             self.widget.setSimulating(False)
@@ -141,7 +148,7 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
     @pyqtSlot(str)
     def _onWorkerError(self, message: str) -> None:
         try:
-            QMessageBox.critical(self.widget, "FRC calculation error", message)
+            QMessageBox.critical(self.widget, "FRC simulation error", message)
         finally:
             self._actionLock.unlock()
             self.widget.setSimulating(False)
@@ -154,12 +161,12 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
 
         def run(self) -> None:
             try:
-                x, y = self.run_instance.frc()
-                self.signals.done.emit(x, y)
+                results = self.run_instance.frc()
+                self.signals.done.emit(results)
             except Exception as e:
-                self.signals.error.emit(str(e))
                 print(format_exc())
+                self.signals.error.emit(str(e))
 
         class Signals(QObject):
-            done = pyqtSignal(np.ndarray, np.ndarray)
+            done = pyqtSignal(FrcSimulationResults)
             error = pyqtSignal(str)

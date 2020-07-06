@@ -1,8 +1,8 @@
 from PyQt5.QtCore import pyqtSignal
 
-from frcpredict.model import CameraProperties
+from frcpredict.model import CameraProperties, ValueRange
 from frcpredict.ui import BaseWidget
-from frcpredict.ui.util import UserFileDirs
+from frcpredict.ui.util import connectMulti, UserFileDirs
 from .camera_properties_p import CameraPropertiesPresenter
 
 
@@ -13,8 +13,8 @@ class CameraPropertiesWidget(BaseWidget):
 
     # Signals
     valueChanged = pyqtSignal(CameraProperties)
-    readoutNoiseChanged = pyqtSignal(float)
-    quantumEfficiencyChanged = pyqtSignal(float)
+    readoutNoiseChanged = pyqtSignal([float], [ValueRange])
+    quantumEfficiencyChanged = pyqtSignal([float], [ValueRange])
 
     # Methods
     def __init__(self, *args, **kwargs) -> None:
@@ -27,8 +27,10 @@ class CameraPropertiesWidget(BaseWidget):
         self.presetPicker.setValueSetter(self.setValue)
         
         # Connect forwarded signals
-        self.editReadoutNoise.valueChanged.connect(self.readoutNoiseChanged)
-        self.editQuantumEfficiency.valueChanged.connect(self.quantumEfficiencyChanged)
+        connectMulti(self.editReadoutNoise.valueChanged, [float, ValueRange],
+                     self.readoutNoiseChanged)
+        connectMulti(self.editQuantumEfficiency.valueChanged, [float, ValueRange],
+                     self.quantumEfficiencyChanged)
 
         # Initialize presenter
         self._presenter = CameraPropertiesPresenter(self)
@@ -45,4 +47,4 @@ class CameraPropertiesWidget(BaseWidget):
 
     def updateBasicFields(self, model: CameraProperties) -> None:
         self.editReadoutNoise.setValue(model.readout_noise)
-        self.editQuantumEfficiency.setValue(model.quantum_efficiency * 100)  # Convert to percent
+        self.editQuantumEfficiency.setValue(model.quantum_efficiency)

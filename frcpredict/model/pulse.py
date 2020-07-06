@@ -1,13 +1,15 @@
+import uuid
 from collections import OrderedDict
 from dataclasses import dataclass, field
-from dataclasses_json import dataclass_json
 from enum import Enum
-from PySignal import Signal
-from typing import List
-import uuid
+from typing import Union, List
 
-from frcpredict.util import dataclass_internal_attrs, observable_property
+from PySignal import Signal
+from dataclasses_json import dataclass_json
+
+from frcpredict.util import dataclass_internal_attrs, observable_property, rangeable_field
 from .pattern import Pattern, Array2DPatternData
+from .value_range import ValueRange
 
 
 class PulseType(Enum):
@@ -20,24 +22,18 @@ class PulseType(Enum):
 @dataclass_internal_attrs(basic_field_changed=Signal)
 @dataclass
 class Pulse:
-    pulse_type: PulseType = observable_property(
-        "_pulse_type", default=PulseType.on,
-        signal_name="basic_field_changed"
+    pulse_type: PulseType = observable_property("_pulse_type", default=PulseType.on,
+                                                signal_name="basic_field_changed")
+
+    wavelength: int = observable_property("_wavelength", default=0.0,
+                                          signal_name="basic_field_changed")  # nanometres
+
+    duration: Union[float, ValueRange[float]] = rangeable_field(  # milliseconds
+        observable_property("_duration", default=0.0, signal_name="basic_field_changed")
     )
 
-    wavelength: int = observable_property(
-        "_wavelength", default=0.0,
-        signal_name="basic_field_changed"
-    )
-
-    duration: float = observable_property(
-        "_duration", default=0.0,
-        signal_name="basic_field_changed"
-    )
-
-    max_intensity: float = observable_property(
-        "_max_intensity", default=0.0,
-        signal_name="basic_field_changed"
+    max_intensity: Union[float, ValueRange[float]] = rangeable_field(  # kW/cm^2
+        observable_property("_max_intensity", default=0.0, signal_name="basic_field_changed")
     )
 
     illumination_pattern: Pattern = field(default=Pattern(pattern_data=Array2DPatternData()))

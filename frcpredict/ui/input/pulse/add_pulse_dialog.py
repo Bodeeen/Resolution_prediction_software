@@ -3,9 +3,9 @@ from typing import Optional, Tuple
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QDialog, QDialogButtonBox
 
-from frcpredict.model import Pulse
+from frcpredict.model import Pulse, ValueRange
 from frcpredict.ui import BaseWidget
-from frcpredict.util import with_cleared_signals
+from frcpredict.util import clear_signals
 
 
 class AddPulseDialog(QDialog, BaseWidget):
@@ -37,7 +37,7 @@ class AddPulseDialog(QDialog, BaseWidget):
         result = dialog.exec_()
 
         if result == QDialog.Accepted:
-            pulse = with_cleared_signals(dialog.editProperties.value())
+            pulse = clear_signals(dialog.editProperties.value())
         else:
             pulse = None
 
@@ -50,6 +50,8 @@ class AddPulseDialog(QDialog, BaseWidget):
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(
             self.editProperties.editWavelength.value() > 0 and
             self.editProperties.editDuration.isValid() and
-            self.editProperties.editDuration.value() > 0 and
+            (isinstance(self.editProperties.editDuration.value(), ValueRange) or
+             self.editProperties.editDuration.value() > 0
+             ) and
             self.editProperties.editMaxIntensity.isValid()
         )

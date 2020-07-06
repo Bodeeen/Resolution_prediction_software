@@ -1,12 +1,12 @@
-from dataclasses import fields
-from PySignal import Signal
 from typing import Any, Optional
+
+from PySignal import Signal
 
 
 def dataclass_internal_attrs(cls=None, super_cls: type = object, **internal_attr_factories):
     """
     Decorator for adding internal attributes into the dataclass. This is useful for declaring
-    attributes that you want to be hidden when the dataclass is serialized to a string or JSON.
+    attributes that should be hidden when the dataclass is serialized to a string or JSON.
     """
 
     def wrap(cls):
@@ -27,7 +27,7 @@ def dataclass_internal_attrs(cls=None, super_cls: type = object, **internal_attr
 
 
 def observable_property(internal_name: str, default: Any,
-                        signal_name: str, emit_arg_name: Optional[str] = None):
+                        signal_name: str, emit_arg_name: Optional[str] = None) -> property:
     """
     A property that emits a specific PySignal signal that is also a member of its owner class.
 
@@ -35,9 +35,9 @@ def observable_property(internal_name: str, default: Any,
     internal_name -- the observable property will use this instance variable name internally to
                      store the value of the property
     default       -- default value of the property
-    signal_name   -- the name of a property in the same class instance, that is the signal that
+    signal_name   -- the name of an attribute in the same class instance, that is the signal that
                      should be emitted
-    emit_arg_name -- the name of a property in the same class instance, the value of which will be
+    emit_arg_name -- the name of an attribute in the same class instance, the value of which will be
                      passed as an argument when the signal is emitted; if none is specified, the
                      entire class instance will be passed
     """
@@ -59,11 +59,24 @@ def observable_property(internal_name: str, default: Any,
     return property(getter, setter)
 
 
-def with_cleared_signals(dataclass_instance):
+def clear_signals(dataclass_instance):
     """ Clears all signals in the given dataclass instance and returns it. """
 
-    for dataclass_field in fields(dataclass_instance):
-        if issubclass(dataclass_field.type, Signal):
-            getattr(dataclass_instance, dataclass_field.name).clear()
+    for attr_name in dir(dataclass_instance):
+        if attr_name.startswith("__"):
+            continue
+
+        attr_value = getattr(dataclass_instance, attr_name)
+
+        if isinstance(attr_value, Signal):
+            attr_value.clear()
+        elif isinstance(attr_value, list):
+            for list_item in attr_value:
+                clear_signals(list_item)
+        elif isinstance(attr_value, dict):
+            for dict_value in attr_value.values():
+                clear_signals(dict_value)
+        elif hasattr(attr_value, "__dataclass_fields__"):
+            clear_signals(attr_value)
 
     return dataclass_instance

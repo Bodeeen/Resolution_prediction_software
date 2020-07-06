@@ -91,8 +91,8 @@ class PulseSchemePresenter(BasePresenter[PulseScheme]):
         Adds a pulse. A dialog will open for the user to enter the properties first.
         """
 
-        pulse, ok_pressed = AddPulseDialog.getPulse(self.widget)
-        if ok_pressed:
+        pulse, okClicked = AddPulseDialog.getPulse(self.widget)
+        if okClicked:
             self.model.add_pulse(pulse)
 
     @pyqtSlot()

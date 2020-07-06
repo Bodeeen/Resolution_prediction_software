@@ -1,7 +1,10 @@
+from typing import Union
+
 from PyQt5.QtCore import pyqtSlot
 
-from frcpredict.model import Pulse, PulseType, Pattern, Array2DPatternData
+from frcpredict.model import Pulse, PulseType, Pattern, Array2DPatternData, ValueRange
 from frcpredict.ui import BasePresenter
+from frcpredict.ui.util import connectMulti
 
 
 class PulsePropertiesPresenter(BasePresenter[Pulse]):
@@ -46,8 +49,8 @@ class PulsePropertiesPresenter(BasePresenter[Pulse]):
         widget.offTypeSelected.connect(self._uiOffTypeSelect)
         widget.readoutTypeSelected.connect(self._uiReadoutTypeSelect)
         widget.wavelengthChanged.connect(self._uiWavelengthChange)
-        widget.durationChanged.connect(self._uiDurationChange)
-        widget.maxIntensityChanged.connect(self._uiMaxIntensityChange)
+        connectMulti(widget.durationChanged, [float, ValueRange], self._uiDurationChange)
+        connectMulti(widget.maxIntensityChanged, [float, ValueRange], self._uiMaxIntensityChange)
         widget.illuminationPatternChanged.connect(self._uiSetIlluminationPatternModel)
 
     # Model event handling
@@ -73,11 +76,13 @@ class PulsePropertiesPresenter(BasePresenter[Pulse]):
         self.model.wavelength = value
 
     @pyqtSlot(float)
-    def _uiDurationChange(self, value: float) -> None:
+    @pyqtSlot(ValueRange)
+    def _uiDurationChange(self, value: Union[float, ValueRange[float]]) -> None:
         self.model.duration = value
 
     @pyqtSlot(float)
-    def _uiMaxIntensityChange(self, value: float) -> None:
+    @pyqtSlot(ValueRange)
+    def _uiMaxIntensityChange(self, value: Union[float, ValueRange[float]]) -> None:
         self.model.max_intensity = value
 
     @pyqtSlot(Pattern)

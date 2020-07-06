@@ -30,14 +30,14 @@ class FluorophoreSettingsWidget(BaseWidget):
         self.presetPicker.setValueSetter(self.setValue)
 
         self.editProperties.setWavelengthVisible(False)
+
+        # Connect own signal slots
+        self.presetPicker.dataLoaded.connect(self._onLoadPreset)
         
         # Connect forwarded signals
         self.listResponses.currentItemChanged.connect(self.responseSelectionChanged)
         self.btnAddResponse.clicked.connect(self.addResponseClicked)
         self.btnRemoveResponse.clicked.connect(self.removeResponseClicked)
-
-        # Connect own signals
-        self.presetPicker.dataLoaded.connect(self._onLoadPreset)
 
         # Initialize presenter
         self._presenter = FluorophoreSettingsPresenter(self)
@@ -83,8 +83,8 @@ class FluorophoreSettingsWidget(BaseWidget):
             self.editProperties.setEnabled(False)
             self.btnRemoveResponse.setEnabled(False)
 
-    def unselectSelectedRow(self) -> None:
-        """ Unselects the currently selected row in the response list, if any row is selected. """
+    def deselectSelectedRow(self) -> None:
+        """ Deselects the currently selected row in the response list, if any row is selected. """
         self.listResponses.setCurrentRow(-1)
 
     def value(self) -> FluorophoreSettings:
@@ -93,7 +93,7 @@ class FluorophoreSettingsWidget(BaseWidget):
     def setValue(self, model: FluorophoreSettings, emitSignal: bool = True) -> None:
         self.presetPicker.setLoadedPath(None)
         self._presenter.model = model
-        self.unselectSelectedRow()
+        self.deselectSelectedRow()
 
         if emitSignal:
             self.valueChanged.emit(model)
@@ -101,4 +101,4 @@ class FluorophoreSettingsWidget(BaseWidget):
     # Event handling
     @pyqtSlot()
     def _onLoadPreset(self) -> None:
-        self.unselectSelectedRow()
+        self.deselectSelectedRow()

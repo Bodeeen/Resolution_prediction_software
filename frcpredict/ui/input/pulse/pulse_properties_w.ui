@@ -78,7 +78,7 @@
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="FreeFloatBox" name="editDuration"/>
+          <widget class="ExtendedFreeFloatBox" name="editDuration"/>
          </item>
          <item row="2" column="0">
           <widget class="QLabel" name="lblMaxIntensity">
@@ -88,7 +88,7 @@
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="FreeFloatBox" name="editMaxIntensity"/>
+          <widget class="ExtendedFreeFloatBox" name="editMaxIntensity"/>
          </item>
          <item row="3" column="0">
           <widget class="QLabel" name="lblOrder">
@@ -140,18 +140,18 @@
         </widget>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0">
+        <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
          <property name="spacing">
           <number>12</number>
          </property>
-         <item>
+         <item alignment="Qt::AlignTop">
           <widget class="QLabel" name="lblIlluminationPattern">
            <property name="text">
             <string>Illumination pattern:</string>
            </property>
           </widget>
          </item>
-         <item>
+         <item alignment="Qt::AlignTop">
           <widget class="PatternFieldWidget" name="editIlluminationPattern" native="true">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
@@ -160,9 +160,6 @@
             </sizepolicy>
            </property>
           </widget>
-         </item>
-         <item>
-          <widget class="QWidget" name="widget_2" native="true"/>
          </item>
         </layout>
        </item>
@@ -216,8 +213,8 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>FreeFloatBox</class>
-   <extends>QLineEdit</extends>
+   <class>ExtendedFreeFloatBox</class>
+   <extends>QWidget</extends>
    <header>frcpredict.ui</header>
   </customwidget>
   <customwidget>

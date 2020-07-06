@@ -6,8 +6,8 @@ from PyQt5.QtWidgets import QWidget, QDialog, QDialogButtonBox
 
 from frcpredict.model import Pattern, PatternType
 from frcpredict.ui import BaseWidget
-from frcpredict.ui.util import getPatternTypeName, setFormLayoutRowVisibility
-from frcpredict.util import with_cleared_signals
+from frcpredict.ui.util import getEnumEntryName, setFormLayoutRowVisibility
+from frcpredict.util import clear_signals
 from .generate_pattern_dialog_p import GeneratePatternPresenter
 from .list_item_with_value import ListItemWithValue
 
@@ -36,7 +36,7 @@ class GeneratePatternDialog(QDialog, BaseWidget):
         self.setAvailableTypes(availableTypes)
         self._updateOKButton()
 
-        # Connect own signals
+        # Connect own signal slots
         self.listType.currentRowChanged.connect(self._onTypeListRowChange)
 
         # Connect forwarded signals
@@ -53,7 +53,7 @@ class GeneratePatternDialog(QDialog, BaseWidget):
         self.listType.clear()
         for patternType in patternTypes:
             self.listType.addItem(
-                ListItemWithValue(text=getPatternTypeName(patternType), value=patternType)
+                ListItemWithValue(text=getEnumEntryName(patternType), value=patternType)
             )
 
     def setAvailableProperties(self, amplitude: bool = False, radius: bool = False,
@@ -113,7 +113,7 @@ class GeneratePatternDialog(QDialog, BaseWidget):
         result = dialog.exec_()
 
         if result == QDialog.Accepted:
-            pattern_data = with_cleared_signals(dialog.value().pattern_data)
+            pattern_data = clear_signals(dialog.value().pattern_data)
         else:
             pattern_data = None
 

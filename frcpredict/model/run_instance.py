@@ -1,17 +1,17 @@
 from dataclasses import dataclass
-from dataclasses_json import dataclass_json
-import numpy as np
-from PySignal import Signal
 from typing import Tuple
 
+import numpy as np
+from PySignal import Signal
+from dataclasses_json import dataclass_json
+
+from Old_scripts.spectral_analysis_new_temp import simulate  # TODO: Temp!
 from frcpredict.util import dataclass_internal_attrs, observable_property
+from .camera import CameraProperties
 from .fluorophore import FluorophoreSettings
 from .imaging import ImagingSystemSettings
 from .pulse import PulseScheme
 from .sample import SampleProperties
-from .camera import CameraProperties
-
-from Old_scripts.spectral_analysis_new_temp import simulate  # TODO: Temp!
 
 
 @dataclass_json
@@ -46,9 +46,7 @@ class RunInstance:
     )
 
     # Methods
-    def frc(self) -> Tuple[np.ndarray, np.ndarray]:
-        """ TODO. Returns x and y. """
-        frc_spectra, df = simulate(self)
-        x = (np.arange(0, len(frc_spectra)) * df)
-        
-        return x, frc_spectra
+    def frc(self):
+        """ TODO. """
+        simulation_results = simulate(self)
+        return simulation_results

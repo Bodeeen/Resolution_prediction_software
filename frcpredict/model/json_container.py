@@ -1,10 +1,10 @@
 from dataclasses import dataclass
-from dataclasses_json import dataclass_json
-from packaging import version
 from typing import TypeVar, Generic, List
 
-import frcpredict
+from dataclasses_json import dataclass_json
+from packaging import version
 
+import frcpredict
 
 DataType = TypeVar('DataType')
 

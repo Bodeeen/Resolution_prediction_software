@@ -77,8 +77,8 @@ class FluorophoreSettingsPresenter(BasePresenter[FluorophoreSettings]):
         Adds a response. A dialog will open for the user to enter the properties first.
         """
 
-        response, ok_pressed = AddResponseDialog.getResponse(self.widget)
-        if ok_pressed:
+        response, okClicked = AddResponseDialog.getResponse(self.widget)
+        if okClicked:
             self.model.add_response(response)
 
     @pyqtSlot()

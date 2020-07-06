@@ -1,3 +1,3 @@
-from .pattern_ui_utils import getPatternTypeName
-from .qt_utils import getArrayPixmap, setFormLayoutRowVisibility
+from .data_ui_utils import getEnumEntryName
+from .qt_utils import getArrayPixmap, setFormLayoutRowVisibility, connectMulti
 from .user_file_utils import UserFileDirs, initUserFilesIfNeeded

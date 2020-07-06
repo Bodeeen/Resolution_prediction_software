@@ -1,4 +1,7 @@
+from typing import Any, Union, List, Callable
+
 import numpy as np
+from PyQt5.QtCore import pyqtSignal, pyqtBoundSignal
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QFormLayout, QWidget
 
@@ -37,3 +40,16 @@ def setFormLayoutRowVisibility(formLayout: QFormLayout, rowNumber: int, labelWid
             valueWidget.hide()
             formLayout.removeWidget(labelWidget)
             formLayout.removeWidget(valueWidget)
+
+
+def connectMulti(signal: pyqtSignal, arg_types: List[type],
+                 handler: Union[Callable, pyqtBoundSignal]) -> None:
+    """
+    Connects a signal that has multiple possible argument types with a handler that accepts multiple
+    argument types.
+    """
+
+    for arg_type in arg_types:
+        signal[arg_type].connect(
+            handler[arg_type] if isinstance(handler, pyqtBoundSignal) else handler
+        )

@@ -1,9 +1,13 @@
 from dataclasses import dataclass
-from dataclasses_json import dataclass_json
-from PySignal import Signal
-from typing import Optional, List
+from typing import Optional, Union, List
 
-from frcpredict.util import dataclass_internal_attrs, observable_property
+from PySignal import Signal
+from dataclasses_json import dataclass_json
+
+from frcpredict.util import (
+    dataclass_internal_attrs, observable_property, rangeable_field
+)
+from .value_range import ValueRange
 
 
 @dataclass_json
@@ -11,19 +15,25 @@ from frcpredict.util import dataclass_internal_attrs, observable_property
 @dataclass
 class IlluminationResponse:
     wavelength_start: int = observable_property("_wavelength_start", default=0,
-                                                signal_name="basic_field_changed")
+                                                signal_name="basic_field_changed")  # nanometres
 
     wavelength_end: int = observable_property("_wavelength_end", default=0,
-                                              signal_name="basic_field_changed")
+                                              signal_name="basic_field_changed")  # nanometres
 
-    cross_section_off_to_on: float = observable_property("_cross_section_off_to_on", default=0.0,
-                                                         signal_name="basic_field_changed")
+    cross_section_off_to_on: Union[float, ValueRange[float]] = rangeable_field(
+        observable_property("_cross_section_off_to_on", default=0.0,
+                            signal_name="basic_field_changed")
+    )
 
-    cross_section_on_to_off: float = observable_property("_cross_section_on_to_off", default=0.0,
-                                                         signal_name="basic_field_changed")
+    cross_section_on_to_off: Union[float, ValueRange[float]] = rangeable_field(
+        observable_property("_cross_section_on_to_off", default=0.0,
+                            signal_name="basic_field_changed")
+    )
 
-    cross_section_emission: float = observable_property("_cross_section_emission", default=0.0,
-                                                        signal_name="basic_field_changed")
+    cross_section_emission: Union[float, ValueRange[float]] = rangeable_field(
+        observable_property("_cross_section_emission", default=0.0,
+                            signal_name="basic_field_changed")
+    )
 
     # Methods
     def __str__(self) -> str:
@@ -56,7 +66,7 @@ class FluorophoreSettings:
         Adds a response. Returns true if successful, or false if the wavelength was invalid or
         there is an existing response that includes the wavelength.
         """
-        
+
         if response.wavelength_start > response.wavelength_end:
             return False
 

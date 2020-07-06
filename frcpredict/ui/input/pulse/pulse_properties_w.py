@@ -1,7 +1,8 @@
 from PyQt5.QtCore import pyqtSignal
 
-from frcpredict.model import Pulse, PulseType, Pattern, PatternType
+from frcpredict.model import Pulse, PulseType, Pattern, PatternType, ValueRange
 from frcpredict.ui import BaseWidget
+from frcpredict.ui.util import connectMulti
 from .pulse_properties_p import PulsePropertiesPresenter
 
 
@@ -16,9 +17,9 @@ class PulsePropertiesWidget(BaseWidget):
     readoutTypeSelected = pyqtSignal()
 
     wavelengthChanged = pyqtSignal(int)
-    durationChanged = pyqtSignal(float)
-    durationChangedByUser = pyqtSignal(float)
-    maxIntensityChanged = pyqtSignal(float)
+    durationChanged = pyqtSignal([float], [ValueRange])
+    durationChangedByUser = pyqtSignal([float], [ValueRange])
+    maxIntensityChanged = pyqtSignal([float], [ValueRange])
     illuminationPatternChanged = pyqtSignal(Pattern)
 
     moveLeftClicked = pyqtSignal()
@@ -40,9 +41,12 @@ class PulsePropertiesWidget(BaseWidget):
         self.radioTypeReadout.clicked.connect(self.readoutTypeSelected)
 
         self.editWavelength.valueChanged.connect(self.wavelengthChanged)
-        self.editDuration.valueChanged.connect(self.durationChanged)
-        self.editDuration.valueChangedByUser.connect(self.durationChangedByUser)
-        self.editMaxIntensity.valueChanged.connect(self.maxIntensityChanged)
+        connectMulti(self.editDuration.valueChanged, [float, ValueRange],
+                     self.durationChanged)
+        connectMulti(self.editDuration.valueChangedByUser, [float, ValueRange],
+                     self.durationChangedByUser)
+        connectMulti(self.editMaxIntensity.valueChanged, [float, ValueRange],
+                     self.maxIntensityChanged)
         self.editIlluminationPattern.valueChanged.connect(self.illuminationPatternChanged)
 
         self.btnMoveLeft.clicked.connect(self.moveLeftClicked)

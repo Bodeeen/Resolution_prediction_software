@@ -11,6 +11,7 @@ from .window.main_window_w import MainWindow
 from .input.common.free_float_box import FreeFloatBox
 from .input.common.pattern_field_w import PatternFieldWidget
 from .input.common.preset_picker import PresetPickerWidget
+from .input.common.extended_free_float_box import ExtendedFreeFloatBox
 
 from .input.fluorophore.fluorophore_settings_w import FluorophoreSettingsWidget
 from .input.fluorophore.response_properties_w import ResponsePropertiesWidget
@@ -26,4 +27,4 @@ from .input.camera.camera_properties_w import CameraPropertiesWidget
 
 
 # Output
-from .output.frc.frc_graph import FRCResultsWidget
+from .output.frc.frc_results_w import FrcResultsWidget

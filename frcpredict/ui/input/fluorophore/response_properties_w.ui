@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>243</width>
-    <height>122</height>
+    <height>95</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,102 +17,9 @@
    <property name="horizontalSpacing">
     <number>9</number>
    </property>
-   <item row="3" column="0">
-    <widget class="QLabel" name="lblEmission">
-     <property name="text">
-      <string>Fluorescence cross section:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0">
-     <property name="spacing">
-      <number>6</number>
-     </property>
-     <property name="bottomMargin">
-      <number>0</number>
-     </property>
-     <item>
-      <widget class="FreeFloatBox" name="editEmission" />
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_3">
-       <property name="maximumSize">
-        <size>
-         <width>20</width>
-         <height>20</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>?</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="lblOnToOff">
-     <property name="text">
-      <string>OFF cross section:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0">
-     <property name="spacing">
-      <number>6</number>
-     </property>
-     <property name="bottomMargin">
-      <number>0</number>
-     </property>
-     <item>
-      <widget class="FreeFloatBox" name="editOnToOff" />
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_2">
-       <property name="maximumSize">
-        <size>
-         <width>20</width>
-         <height>20</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>?</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="lblOffToOn">
-     <property name="text">
-      <string>ON cross section:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,0">
-     <property name="spacing">
-      <number>6</number>
-     </property>
-     <item>
-      <widget class="FreeFloatBox" name="editOffToOn" />
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton">
-       <property name="maximumSize">
-        <size>
-         <width>20</width>
-         <height>20</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>?</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
+   <property name="verticalSpacing">
+    <number>6</number>
+   </property>
    <item row="0" column="0">
     <widget class="QLabel" name="lblWavelength">
      <property name="text">
@@ -127,23 +34,59 @@
      </property>
     </widget>
    </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="lblOffToOn">
+     <property name="text">
+      <string>ON cross section:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="lblOnToOff">
+     <property name="text">
+      <string>OFF cross section:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="lblEmission">
+     <property name="text">
+      <string>Emission cross section:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="ExtendedFreeFloatBox" name="editEmission" native="true">
+     <property name="infoText" stdset="0">
+      <string>TODO: Add info text here.</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="ExtendedFreeFloatBox" name="editOnToOff" native="true">
+     <property name="infoText" stdset="0">
+      <string>TODO: Add info text here.</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="ExtendedFreeFloatBox" name="editOffToOn" native="true">
+     <property name="infoText" stdset="0">
+      <string>TODO: Add info text here.</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>FreeFloatBox</class>
-   <extends>QLineEdit</extends>
+   <class>ExtendedFreeFloatBox</class>
+   <extends>QWidget</extends>
    <header>frcpredict.ui</header>
   </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>editWavelength</tabstop>
-  <tabstop>editOffToOn</tabstop>
-  <tabstop>editOnToOff</tabstop>
-  <tabstop>editEmission</tabstop>
-  <tabstop>pushButton</tabstop>
-  <tabstop>pushButton_2</tabstop>
-  <tabstop>pushButton_3</tabstop>
  </tabstops>
  <resources/>
  <connections/>

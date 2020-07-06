@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>350</width>
-    <height>184</height>
+    <height>324</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -76,6 +76,12 @@
         </property>
         <item>
          <widget class="QPushButton" name="btnAddPulse">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>24</height>
+           </size>
+          </property>
           <property name="text">
            <string>Add Pulse</string>
           </property>
@@ -83,6 +89,12 @@
         </item>
         <item>
          <widget class="QPushButton" name="btnRemovePulse">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>24</height>
+           </size>
+          </property>
           <property name="text">
            <string>Remove Selected</string>
           </property>
@@ -107,13 +119,13 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>PulsePropertiesWidget</class>
+   <class>PresetPickerWidget</class>
    <extends>QWidget</extends>
    <header>frcpredict.ui</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>PresetPickerWidget</class>
+   <class>PulsePropertiesWidget</class>
    <extends>QWidget</extends>
    <header>frcpredict.ui</header>
    <container>1</container>

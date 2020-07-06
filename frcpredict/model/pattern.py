@@ -108,17 +108,17 @@ class Pattern:
             raise ValueError(f"Invalid pattern type \"{pattern_type}\"")
 
     def _get_pattern_type_from_data(self, pattern_data: PatternData) -> PatternType:
-        if type(pattern_data) == Array2DPatternData:
+        if type(pattern_data) is Array2DPatternData:
             return PatternType.array2d
-        elif type(pattern_data) == GaussianPatternData:
+        elif type(pattern_data) is GaussianPatternData:
             return PatternType.gaussian
-        elif type(pattern_data) == DoughnutPatternData:
+        elif type(pattern_data) is DoughnutPatternData:
             return PatternType.doughnut
-        elif type(pattern_data) == AiryPatternData:
+        elif type(pattern_data) is AiryPatternData:
             return PatternType.airy
-        elif type(pattern_data) == DigitalPinholePatternData:
+        elif type(pattern_data) is DigitalPinholePatternData:
             return PatternType.digital_pinhole
-        elif type(pattern_data) == PhysicalPinholePatternData:
+        elif type(pattern_data) is PhysicalPinholePatternData:
             return PatternType.physical_pinhole
         else:
             raise TypeError(f"Invalid pattern data type \"{type(pattern_data).__name__}\"")

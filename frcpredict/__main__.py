@@ -7,10 +7,12 @@ from frcpredict.ui import MainWindow
 from frcpredict.ui.util import initUserFilesIfNeeded
 
 
+# Init user files if necessary
 initUserFilesIfNeeded()
 
-app = QApplication([])
-main_window = MainWindow()
+# Show main window
+application = QApplication([])
+main_window = MainWindow(application.desktop().screenGeometry())
 main_window.setWindowTitle(frcpredict.__summary__)
 main_window.show()
-sys.exit(app.exec_())
+sys.exit(application.exec_())

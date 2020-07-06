@@ -1,7 +1,10 @@
+from typing import Union
+
 from PyQt5.QtCore import pyqtSlot
 
-from frcpredict.model import SampleProperties
+from frcpredict.model import ValueRange, SampleProperties
 from frcpredict.ui import BasePresenter
+from frcpredict.ui.util import connectMulti
 
 
 class SamplePropertiesPresenter(BasePresenter[SampleProperties]):
@@ -31,17 +34,20 @@ class SamplePropertiesPresenter(BasePresenter[SampleProperties]):
     def __init__(self, widget) -> None:
         # Initialize model
         model = SampleProperties(
-            spectral_power=0.0,
-            labelling_density=0.0,
+            spectral_power=1.0,
+            labelling_density=1.0,
             K_origin=1.0
         )
 
         super().__init__(model, widget)
 
         # Prepare UI events
-        widget.spectralPowerChanged.connect(self._uiSpectralPowerChange)
-        widget.labellingDensityChanged.connect(self._uiLabellingDensityChange)
-        widget.KOriginChanged.connect(self._uiKOriginChange)
+        connectMulti(widget.spectralPowerChanged, [float, ValueRange],
+                     self._uiSpectralPowerChange)
+        connectMulti(widget.labellingDensityChanged, [float, ValueRange],
+                     self._uiLabellingDensityChange)
+        connectMulti(widget.KOriginChanged, [float, ValueRange],
+                     self._uiKOriginChange)
 
     # Model event handling
     def _onBasicFieldChange(self, model: SampleProperties) -> None:
@@ -50,13 +56,16 @@ class SamplePropertiesPresenter(BasePresenter[SampleProperties]):
 
     # UI event handling
     @pyqtSlot(float)
-    def _uiSpectralPowerChange(self, value: float) -> None:
+    @pyqtSlot(ValueRange)
+    def _uiSpectralPowerChange(self, value: Union[float, ValueRange[float]]) -> None:
         self.model.spectral_power = value
 
     @pyqtSlot(float)
-    def _uiLabellingDensityChange(self, value: float) -> None:
+    @pyqtSlot(ValueRange)
+    def _uiLabellingDensityChange(self, value: Union[float, ValueRange[float]]) -> None:
         self.model.labelling_density = value
 
     @pyqtSlot(float)
-    def _uiKOriginChange(self, value: float) -> None:
+    @pyqtSlot(ValueRange)
+    def _uiKOriginChange(self, value: Union[float, ValueRange[float]]) -> None:
         self.model.K_origin = value

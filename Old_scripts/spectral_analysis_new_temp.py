@@ -4,22 +4,15 @@ Created on Tue Jun 11 13:38:07 2019
 @original_author: andreas.boden
 @adapted_by: stafak
 """
+from typing import Union, Tuple, List
 
 import Old_scripts.telegraph as telegraph
 import numpy as np
 from scipy.interpolate import interp1d
-from scipy.ndimage.filters import convolve
 from scipy.signal import fftconvolve
-from scipy.ndimage import maximum_filter
-from scipy.ndimage import minimum_filter
-import sys
-import os
-# if not os.environ['PY_UTILS_PATH'] in sys.path:
-#    sys.path.append(os.environ['PY_UTILS_PATH'])
-#import DataIO_tools
-from skimage import measure
 
-from frcpredict.model import PulseType
+import frcpredict.model
+from frcpredict.util import get_paths_of_ranges, expand_ranges
 
 
 def expected_ONtime(P_on, Ron, Roff, T_obs):  # Eq. 6
@@ -195,7 +188,25 @@ def radial_profile(data, center):
 
 def simulate(run_instance):
     print(run_instance)
+
+    range_paths, num_combinations = get_paths_of_ranges(run_instance)
+    print(f"{num_combinations} combinations")
+
+    expanded_run_instances = expand_ranges(run_instance, range_paths)
+    frc_curves = np.frompyfunc(_simulate_single, 1, 1)(expanded_run_instances)
+
+    return frcpredict.model.FrcSimulationResults(
+        run_instance=run_instance,
+        range_paths=range_paths,
+        frc_curves=frc_curves
+    )
+
+
+def _simulate_single(data):
     """ Main function to run the simulations """
+    range_values, run_instance = data
+    print(run_instance)
+
     px_size_nm = run_instance.imaging_system_settings.scanning_step_size  # Pixel size nanometers
 
     # Radius in nm of all 2D patterns (PSF, illumination patterns, pinholes etc.) (inside the square)
@@ -236,18 +247,17 @@ def simulate(run_instance):
         )[psf_kernel_rad_px - 1][psf_kernel_rad_px - 1:]
 
         response = run_instance.fluorophore_settings.get_response(pulse.wavelength)
-        expected_photons = 0
 
-        if pulse.pulse_type == PulseType.on:
+        if pulse.pulse_type == frcpredict.model.PulseType.on:
             expected_photons = pulse.max_intensity / response.cross_section_off_to_on
-        elif pulse.pulse_type == PulseType.off:
+        elif pulse.pulse_type == frcpredict.model.PulseType.off:
             expected_photons = pulse.max_intensity / response.cross_section_on_to_off
-        elif pulse.pulse_type == PulseType.readout:
+        elif pulse.pulse_type == frcpredict.model.PulseType.readout:
             expected_photons = pulse.max_intensity / response.cross_section_emission
         else:
             raise ValueError(f"Unexpected pulse type \"{pulse.pulse_type}\"")
 
-        if pulse.pulse_type == PulseType.readout:
+        if pulse.pulse_type == frcpredict.model.PulseType.readout:
             kernels, m, N_switches = make_kernels_detection(
                 500000,
                 run_instance.camera_properties.quantum_efficiency,
@@ -273,8 +283,7 @@ def simulate(run_instance):
             ft_kernels2d = np.abs(np.fft.fft2(kernels2d))
 
             """Calculate the power of signal and power of noise """
-            Ps = input_power * \
-                np.power(np.abs(ft_kernels2d[0]), 2)  # Denominator of eq (35) in publication
+            Ps = input_power * np.power(np.abs(ft_kernels2d[0]), 2)  # Denominator of eq (35) in publication
             Pn = D_0_0*ft_kernels2d[1, 0, 0] + ro_var  # NUmerator of eq (35) in publication
             frc_spectra2d = np.divide(Ps, np.add(Ps, Pn))  # Eq (35)
 
@@ -290,4 +299,8 @@ def simulate(run_instance):
                 pulse.duration
             )
 
-    return frc_spectra, df
+    return frcpredict.model.FrcCurve(
+        range_values=range_values,
+        x=np.arange(0, len(frc_spectra)) * df,
+        y=frc_spectra
+    )

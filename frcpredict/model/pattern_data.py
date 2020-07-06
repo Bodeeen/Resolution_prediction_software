@@ -1,16 +1,19 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
+from typing import Union
+
+import numpy as np
 from dataclasses_json import dataclass_json, config as json_config
 from marshmallow import fields
-import numpy as np
 from skimage.io import imread
 from skimage.transform import resize
 
 from frcpredict.util import (
-    get_canvas_params,
+    get_canvas_params, rangeable_field,
     gaussian_test1, doughnut_test1, airy_test1,
     digital_pinhole_test1, physical_pinhole_test1
 )
+from .value_range import ValueRange
 
 
 @dataclass_json
@@ -77,8 +80,8 @@ class Array2DPatternData(PatternData):
 @dataclass_json
 @dataclass
 class GaussianPatternData(PatternData):
-    amplitude: float = 1
-    fwhm: float = 480
+    amplitude: Union[float, ValueRange[float]] = rangeable_field(default=1.0)
+    fwhm: Union[float, ValueRange[float]] = rangeable_field(default=480.0)  # nanometres
 
     # Methods
     def get_numpy_array(self, pixels_per_nm: float) -> np.ndarray:
@@ -91,7 +94,7 @@ class GaussianPatternData(PatternData):
 @dataclass_json
 @dataclass
 class DoughnutPatternData(PatternData):
-    periodicity: float = 540
+    periodicity: Union[float, ValueRange[float]] = rangeable_field(default=540.0)  # nanometres
 
     # Methods
     def get_numpy_array(self, pixels_per_nm: float) -> np.ndarray:
@@ -104,8 +107,8 @@ class DoughnutPatternData(PatternData):
 @dataclass_json
 @dataclass
 class AiryPatternData(PatternData):
-    amplitude: float = 1
-    fwhm: float = 240
+    amplitude: Union[float, ValueRange[float]] = rangeable_field(default=1.0)
+    fwhm: Union[float, ValueRange[float]] = rangeable_field(default=240.0)  # nanometres
 
     # Methods
     def get_numpy_array(self, pixels_per_nm: float) -> np.ndarray:
@@ -118,7 +121,7 @@ class AiryPatternData(PatternData):
 @dataclass_json
 @dataclass
 class DigitalPinholePatternData(PatternData):
-    fwhm: float = 240
+    fwhm: Union[float, ValueRange[float]] = 240.0  # nanometres
 
     # Methods
     def get_numpy_array(self, pixels_per_nm: float) -> np.ndarray:
@@ -131,7 +134,7 @@ class DigitalPinholePatternData(PatternData):
 @dataclass_json
 @dataclass
 class PhysicalPinholePatternData(PatternData):
-    radius: float = 100
+    radius: Union[float, ValueRange[float]] = rangeable_field(default=100.0)  # nanometres
 
     # Methods
     def get_numpy_array(self, pixels_per_nm: float) -> np.ndarray:

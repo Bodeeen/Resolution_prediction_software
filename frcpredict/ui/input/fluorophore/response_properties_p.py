@@ -1,7 +1,10 @@
+from typing import Union
+
 from PyQt5.QtCore import pyqtSlot
 
-from frcpredict.model import IlluminationResponse
+from frcpredict.model import IlluminationResponse, ValueRange
 from frcpredict.ui import BasePresenter
+from frcpredict.ui.util import connectMulti
 
 
 class ResponsePropertiesPresenter(BasePresenter[IlluminationResponse]):
@@ -33,9 +36,9 @@ class ResponsePropertiesPresenter(BasePresenter[IlluminationResponse]):
 
         # Prepare UI events
         widget.wavelengthChanged.connect(self._uiWavelengthChange)
-        widget.offToOnChanged.connect(self._uiOffToOnChange)
-        widget.onToOffChanged.connect(self._uiOnToOffChange)
-        widget.emissionChanged.connect(self._uiEmissionChange)
+        connectMulti(widget.offToOnChanged, [float, ValueRange], self._uiOffToOnChange)
+        connectMulti(widget.onToOffChanged, [float, ValueRange], self._uiOnToOffChange)
+        connectMulti(widget.emissionChanged, [float, ValueRange], self._uiEmissionChange)
 
     # Model event handling
     def _onBasicFieldChange(self, model: IlluminationResponse) -> None:
@@ -50,13 +53,16 @@ class ResponsePropertiesPresenter(BasePresenter[IlluminationResponse]):
             self.model.wavelength_end = value
 
     @pyqtSlot(float)
-    def _uiOffToOnChange(self, value: float) -> None:
+    @pyqtSlot(ValueRange)
+    def _uiOffToOnChange(self, value: Union[float, ValueRange[float]]) -> None:
         self.model.cross_section_off_to_on = value
 
     @pyqtSlot(float)
-    def _uiOnToOffChange(self, value: float) -> None:
+    @pyqtSlot(ValueRange)
+    def _uiOnToOffChange(self, value: Union[float, ValueRange[float]]) -> None:
         self.model.cross_section_on_to_off = value
 
     @pyqtSlot(float)
-    def _uiEmissionChange(self, value: float) -> None:
+    @pyqtSlot(ValueRange)
+    def _uiEmissionChange(self, value: Union[float, ValueRange[float]]) -> None:
         self.model.cross_section_emission = value

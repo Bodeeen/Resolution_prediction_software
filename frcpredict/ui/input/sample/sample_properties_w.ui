@@ -29,6 +29,12 @@
    </item>
    <item>
     <layout class="QFormLayout" name="formLayout">
+     <property name="horizontalSpacing">
+      <number>9</number>
+     </property>
+     <property name="verticalSpacing">
+      <number>6</number>
+     </property>
      <item row="0" column="0">
       <widget class="QLabel" name="lblSpectralPower">
        <property name="text">
@@ -36,41 +42,15 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
-      <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
-       <property name="spacing">
-        <number>6</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <item>
-        <widget class="FreeFloatBox" name="editSpectralPower"/>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButton">
-         <property name="maximumSize">
-          <size>
-           <width>20</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>?</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
      <item row="1" column="0">
       <widget class="QLabel" name="lblLabellingDensity">
        <property name="text">
-        <string>Labelling density [fluoroph./mm²]:</string>
+        <string>Labelling density [fl./mm²]:</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="FreeFloatBox" name="editLabellingDensity"/>
+      <widget class="ExtendedFreeFloatBox" name="editLabellingDensity" native="true"/>
      </item>
      <item row="2" column="0">
       <widget class="QLabel" name="lblKOrigin">
@@ -80,7 +60,14 @@
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="FreeFloatBox" name="editKOrigin"/>
+      <widget class="ExtendedFreeFloatBox" name="editKOrigin" native="true"/>
+     </item>
+     <item row="0" column="1">
+      <widget class="ExtendedFreeFloatBox" name="editSpectralPower" native="true">
+       <property name="infoText" stdset="0">
+        <string>TODO: Add info text here.</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -88,21 +75,19 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>FreeFloatBox</class>
-   <extends>QLineEdit</extends>
-   <header>frcpredict.ui</header>
-  </customwidget>
-  <customwidget>
    <class>PresetPickerWidget</class>
    <extends>QWidget</extends>
    <header>frcpredict.ui</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>ExtendedFreeFloatBox</class>
+   <extends>QWidget</extends>
+   <header>frcpredict.ui</header>
+  </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>editSpectralPower</tabstop>
   <tabstop>editLabellingDensity</tabstop>
-  <tabstop>pushButton</tabstop>
  </tabstops>
  <resources/>
  <connections/>

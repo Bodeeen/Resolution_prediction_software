@@ -18,10 +18,12 @@ class UserFileDirs:
     PulseScheme: str = subdirOfUserFilesDir("pulse_scheme")
     SampleProperties: str = subdirOfUserFilesDir("sample_properties")
     CameraProperties: str = subdirOfUserFilesDir("camera_properties")
+
     RunInstance: str = subdirOfUserFilesDir("run_instance")
+    SavedResults: str = subdirOfUserFilesDir("saved_results")
 
     @staticmethod
     def list():
         return [UserFileDirs.__dict__.get(name) for name in dir(UserFileDirs) if (
-            not callable(getattr(UserFileDirs, name)) and not name.startswith("__")
+            not callable(getattr(UserFileDirs, name)) and not name.startswith("_")
         )]

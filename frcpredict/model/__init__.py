@@ -7,6 +7,7 @@ from .pattern_data import (
     AiryPatternData,
     DigitalPinholePatternData
 )
+from .value_range import RangeType, ValueRange
 
 from .fluorophore import FluorophoreSettings, IlluminationResponse
 from .imaging import ImagingSystemSettings
@@ -15,4 +16,5 @@ from .sample import SampleProperties
 from .camera import CameraProperties
 
 from .run_instance import RunInstance
+from .results import FrcCurve, FrcSimulationResults, FrcSimulationResultsView
 from .json_container import JsonContainer
