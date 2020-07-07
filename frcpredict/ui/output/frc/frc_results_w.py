@@ -6,7 +6,6 @@ import pyqtgraph as pg
 from PyQt5.QtCore import pyqtSignal, Qt, pyqtBoundSignal
 from PyQt5.QtGui import QFontMetrics
 from PyQt5.QtWidgets import QHBoxLayout, QLabel, QSlider
-from scipy.interpolate import interp1d
 
 from frcpredict.model import FrcCurve, FrcSimulationResults, FrcSimulationResultsView
 from frcpredict.ui import BaseWidget
@@ -150,21 +149,9 @@ class FrcResultsWidget(BaseWidget):
             self._thresholdPlotItem = self.plotFrc.plot([0, 1 / 25], [threshold, threshold],
                                                         pen=pg.mkPen("r", style=Qt.DashLine))
 
-            # TODO: This logic should probably not be here.
-            try:
-                x = np.copy(curve.x)
-                y = np.copy(curve.y)
-                for i in range(1, len(y)):  # Prevent issues when threshold line crosses two points
-                    if y[i] > y[i - 1]:
-                        x = x[:i-1]
-                        y = y[:i-1]
-                        break
-
-                self.lblResolutionValue.setText(
-                    "%.2f nm" % (1 / interp1d(y, x)(threshold))
-                )
-            except ValueError:
-                # Probably raised because the entered threshold is outside the interpolation range
-                self.lblResolutionValue.setText("")
+            value_at_threshold = curve.resolution_at_threshold(threshold)
+            self.lblResolutionValue.setText(
+                ("%.2f nm" % value_at_threshold) if value_at_threshold is not None else ""
+            )
         else:
             self.lblResolutionValue.setText("")

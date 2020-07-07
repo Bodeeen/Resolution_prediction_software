@@ -5,6 +5,7 @@ import numpy as np
 from PySignal import Signal
 from dataclasses_json import dataclass_json, config as json_config
 from marshmallow import fields
+from scipy.interpolate import interp1d
 
 from frcpredict.util import dataclass_internal_attrs, observable_property
 from .run_instance import RunInstance
@@ -29,6 +30,24 @@ class FrcCurve:
             mm_field=fields.List
         ))
 
+    def resolution_at_threshold(self, threshold: float) -> Optional[float]:
+        """
+        Returns the resolution at a certain threshold, or None if the curve doesn't cross the
+        threshold.
+        """
+
+        try:
+            # Prevent issues when threshold line crosses two points by creating a copy of the y
+            # value array and modifying it so that it doesn't happen
+            y = np.copy(self.y)
+            for i in range(1, len(y)):
+                if y[i] > y[i - 1]:
+                    y[i] = y[i - 1]
+
+            return 1 / interp1d(y, self.x)(threshold)
+        except ValueError:
+            # Probably raised because the entered threshold is outside the interpolation range
+            return None
 
 @dataclass_json
 @dataclass
