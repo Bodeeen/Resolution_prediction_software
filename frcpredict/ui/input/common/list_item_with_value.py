@@ -2,7 +2,7 @@ from typing import TypeVar, Generic
 
 from PyQt5.QtWidgets import QListWidgetItem
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class ListItemWithValue(QListWidgetItem, Generic[T]):

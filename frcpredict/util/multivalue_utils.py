@@ -74,8 +74,7 @@ def get_paths_of_multivalues(dataclass_instance: object) -> Tuple[List[FieldPath
     return paths, num_combinations
 
 
-def expand_multivalues(dataclass_instance: object,
-                        multivalue_paths: List[FieldPath]) -> np.ndarray:
+def expand_multivalues(dataclass_instance: object, multivalue_paths: List[FieldPath]) -> np.ndarray:
     """
     Takes a dataclass instance that contains multivalues and a list of multivalue paths, and returns
     an n-dimensional (n = max(1, number of multivalue paths)) array that contains copies of this

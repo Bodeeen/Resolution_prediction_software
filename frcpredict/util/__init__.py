@@ -8,5 +8,6 @@ from .pattern_utils import (
 )
 
 from .multivalue_utils import (
-    multi_accepting_field, get_paths_of_multivalues, expand_multivalues, avg_value_if_multivalue, get_value_from_path
+    multi_accepting_field, get_paths_of_multivalues, expand_multivalues, avg_value_if_multivalue,
+    get_value_from_path
 )

@@ -60,8 +60,7 @@ class FluorophoreSettingsPresenter(BasePresenter[FluorophoreSettings]):
 
     # UI event handling
     @pyqtSlot(QListWidgetItem, QListWidgetItem)
-    def _uiResponseSelectionChange(self, selectedItem: Optional[ResponseListItem],
-                                   _: Optional[ResponseListItem] = None) -> None:
+    def _uiResponseSelectionChange(self, selectedItem: Optional[ResponseListItem], _=None) -> None:
         """ Updates state and response properties widget based on the current selection. """
 
         if selectedItem is None:

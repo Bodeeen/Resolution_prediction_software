@@ -6,7 +6,7 @@ from packaging import version
 
 import frcpredict
 
-DataType = TypeVar('DataType')
+DataType = TypeVar("DataType")
 
 
 @dataclass_json

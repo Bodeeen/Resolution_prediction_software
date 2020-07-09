@@ -12,7 +12,7 @@ initUserFilesIfNeeded()
 
 # Show main window
 application = QApplication([])
-main_window = MainWindow(application.desktop().screenGeometry())
-main_window.setWindowTitle(frcpredict.__summary__)
-main_window.show()
+mainWindow = MainWindow(application.desktop().screenGeometry())
+mainWindow.setWindowTitle(frcpredict.__summary__)
+mainWindow.show()
 sys.exit(application.exec_())

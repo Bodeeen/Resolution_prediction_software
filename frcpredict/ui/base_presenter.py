@@ -4,7 +4,7 @@ from typing import TypeVar, Generic
 
 from PyQt5.QtCore import QObject
 
-Model = TypeVar('Model')
+Model = TypeVar("Model")
 
 
 class BasePresenter(QObject, Generic[Model]):
