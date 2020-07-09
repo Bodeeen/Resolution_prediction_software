@@ -1,6 +1,6 @@
 from PyQt5.QtCore import pyqtSignal
 
-from frcpredict.model import Pulse, PulseType, Pattern, PatternType, ValueRange
+from frcpredict.model import Pulse, PulseType, Pattern, PatternType, Multivalue
 from frcpredict.ui import BaseWidget
 from frcpredict.ui.util import connectMulti
 from .pulse_properties_p import PulsePropertiesPresenter
@@ -16,10 +16,10 @@ class PulsePropertiesWidget(BaseWidget):
     offTypeSelected = pyqtSignal()
     readoutTypeSelected = pyqtSignal()
 
-    wavelengthChanged = pyqtSignal(int)
-    durationChanged = pyqtSignal([float], [ValueRange])
-    durationChangedByUser = pyqtSignal([float], [ValueRange])
-    maxIntensityChanged = pyqtSignal([float], [ValueRange])
+    wavelengthChanged = pyqtSignal([int], [Multivalue])
+    durationChanged = pyqtSignal([float], [Multivalue])
+    durationChangedByUser = pyqtSignal([float], [Multivalue])
+    maxIntensityChanged = pyqtSignal([float], [Multivalue])
     illuminationPatternChanged = pyqtSignal(Pattern)
 
     moveLeftClicked = pyqtSignal()
@@ -40,12 +40,13 @@ class PulsePropertiesWidget(BaseWidget):
         self.radioTypeOff.clicked.connect(self.offTypeSelected)
         self.radioTypeReadout.clicked.connect(self.readoutTypeSelected)
 
-        self.editWavelength.valueChanged.connect(self.wavelengthChanged)
-        connectMulti(self.editDuration.valueChanged, [float, ValueRange],
+        connectMulti(self.editWavelength.valueChanged, [int, Multivalue],
+                     self.wavelengthChanged)
+        connectMulti(self.editDuration.valueChanged, [float, Multivalue],
                      self.durationChanged)
-        connectMulti(self.editDuration.valueChangedByUser, [float, ValueRange],
+        connectMulti(self.editDuration.valueChangedByUser, [float, Multivalue],
                      self.durationChangedByUser)
-        connectMulti(self.editMaxIntensity.valueChanged, [float, ValueRange],
+        connectMulti(self.editMaxIntensity.valueChanged, [float, Multivalue],
                      self.maxIntensityChanged)
         self.editIlluminationPattern.valueChanged.connect(self.illuminationPatternChanged)
 
@@ -58,6 +59,7 @@ class PulsePropertiesWidget(BaseWidget):
     def setEditWavelengthEnabled(self, enabled: bool) -> None:
         """ Sets whether the field for editing the wavelength is enabled. """
         self.editWavelength.setEnabled(enabled)
+        self.editWavelength.allowSetList = enabled
     
     def setChangeOrderVisible(self, visible: bool) -> None:
         """

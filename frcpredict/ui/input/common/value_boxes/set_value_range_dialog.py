@@ -1,6 +1,6 @@
 from typing import Optional, Union, Tuple
 
-from PyQt5.QtCore import pyqtSlot, Qt
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QDialog, QDialogButtonBox
 
 from frcpredict.model import RangeType, ValueRange
@@ -8,20 +8,17 @@ from frcpredict.ui import BaseWidget
 from frcpredict.ui.util import getEnumEntryName
 
 
-class SetRangeDialog(QDialog, BaseWidget):
+class SetValueRangeDialog(QDialog, BaseWidget):
     """
     A dialog for setting a value range.
     """
 
     # Methods
     def __init__(self, parent: Optional[QWidget] = None,
-                 initialValue: Union[float, ValueRange[float]] = 0.0) -> None:
-        self._noRange = False
+                 initialValue: Union[float, ValueRange] = 0.0) -> None:
         super().__init__(__file__, parent, Qt.WindowSystemMenuHint | Qt.WindowTitleHint)
 
         # Prepare UI elements
-        noRangeButton = self.buttonBox.addButton("Remove Range", QDialogButtonBox.ResetRole)
-
         for rangeType in RangeType:
             self.editRangeType.addItem(getEnumEntryName(rangeType), rangeType)
 
@@ -31,11 +28,6 @@ class SetRangeDialog(QDialog, BaseWidget):
             self.editNumEvaluations.setValue(initialValue.num_evaluations)
             self.editRangeType.setCurrentText(getEnumEntryName(initialValue.range_type))
 
-            noRangeButton.setEnabled(True)
-            noRangeButton.clicked.connect(self._onClickNoRange)
-        else:
-            noRangeButton.setEnabled(False)
-
         self._updateOKButton()
         self.editMinimum.selectAll()
 
@@ -44,29 +36,24 @@ class SetRangeDialog(QDialog, BaseWidget):
         self.editMaximum.valueChanged.connect(self._updateOKButton)
 
     @staticmethod
-    def getRange(parent: Optional[QWidget] = None,
-                 initialValue: Union[float, ValueRange[float]] = 0.0) -> Tuple[Optional[ValueRange], bool]:
+    def getValueRange(parent: Optional[QWidget] = None,
+                      initialValue: Union[float, ValueRange] = 0.0) -> Tuple[Optional[ValueRange], bool]:
         """
         Synchronously opens a dialog for setting a value range. The second value in the returned
         tuple refers to whether the "OK" button was pressed when the dialog closed. If it's true,
         the first value will contain the value range.
         """
 
-        dialog = SetRangeDialog(parent, initialValue)
+        dialog = SetValueRangeDialog(parent, initialValue)
         result = dialog.exec_()
 
         if result == QDialog.Accepted:
-            if not dialog._noRange:
-                value = ValueRange(
-                    start=dialog.editMinimum.value(),
-                    end=dialog.editMaximum.value(),
-                    num_evaluations=dialog.editNumEvaluations.value(),
-                    range_type=dialog.editRangeType.itemData(dialog.editRangeType.currentIndex()),
-                )
-            elif isinstance(initialValue, ValueRange):
-                value = 0.0
-            else:
-                value = None
+            value = ValueRange(
+                start=dialog.editMinimum.value(),
+                end=dialog.editMaximum.value(),
+                num_evaluations=dialog.editNumEvaluations.value(),
+                range_type=dialog.editRangeType.itemData(dialog.editRangeType.currentIndex()),
+            )
         else:
             value = None
 
@@ -81,9 +68,3 @@ class SetRangeDialog(QDialog, BaseWidget):
             self.editMaximum.isValid() and
             self.editMinimum.value() < self.editMaximum.value()
         )
-
-    # Event handling
-    @pyqtSlot()
-    def _onClickNoRange(self) -> None:
-        self._noRange = True
-        self.accept()

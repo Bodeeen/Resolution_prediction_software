@@ -12,12 +12,20 @@ class BaseWidget(QWidget):
     """
 
     # Methods
-    def __init__(self, py_file_path: str, *args, **kwargs) -> None:
+    def __init__(self, pyFilePath: str, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
         # Load UI from file
-        ui_file_path = f"{os.path.splitext(py_file_path)[0]}.ui"
-        ui_file = QFile(ui_file_path)
-        ui_file.open(QFile.ReadOnly)
-        uic.loadUi(ui_file, self)
-        ui_file.close()
+        uiFilePath = f"{os.path.splitext(pyFilePath)[0]}.ui"
+        uiFile = QFile(uiFilePath)
+        uiFile.open(QFile.ReadOnly)
+        uic.loadUi(uiFile, self)
+        uiFile.close()
+
+        self._uiLoaded = True
+
+    def isUiLoaded(self) -> bool:
+        try:
+            return self._uiLoaded
+        except AttributeError:
+            return False  # UI loaded flag not yet set, which means the UI isn't loaded

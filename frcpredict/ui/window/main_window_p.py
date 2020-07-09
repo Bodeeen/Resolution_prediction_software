@@ -127,7 +127,9 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
 
             # Clear results
             self.widget.setFrcSimulationResults(
-                FrcSimulationResults(run_instance=None, range_paths=[], frc_curves=np.array([]))
+                FrcSimulationResults(
+                    run_instance=None, multivalue_paths=[], frc_curves=np.array([])
+                )
             )
 
             # Do work

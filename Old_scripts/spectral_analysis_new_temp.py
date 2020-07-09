@@ -12,7 +12,7 @@ from scipy.interpolate import interp1d
 from scipy.signal import fftconvolve
 
 import frcpredict.model
-from frcpredict.util import get_paths_of_ranges, expand_ranges
+from frcpredict.util import get_paths_of_multivalues, expand_multivalues
 
 
 def expected_ONtime(P_on, Ron, Roff, T_obs):  # Eq. 6
@@ -189,22 +189,22 @@ def radial_profile(data, center):
 def simulate(run_instance):
     print(run_instance)
 
-    range_paths, num_combinations = get_paths_of_ranges(run_instance)
+    multivalue_paths, num_combinations = get_paths_of_multivalues(run_instance)
     print(f"{num_combinations} combinations")
 
-    expanded_run_instances = expand_ranges(run_instance, range_paths)
+    expanded_run_instances = expand_multivalues(run_instance, multivalue_paths)
     frc_curves = np.frompyfunc(_simulate_single, 1, 1)(expanded_run_instances)
 
     return frcpredict.model.FrcSimulationResults(
         run_instance=run_instance,
-        range_paths=range_paths,
+        multivalue_paths=multivalue_paths,
         frc_curves=frc_curves
     )
 
 
 def _simulate_single(data):
     """ Main function to run the simulations """
-    range_values, run_instance = data
+    multivalue_values, run_instance = data
     print(run_instance)
 
     px_size_nm = run_instance.imaging_system_settings.scanning_step_size  # Pixel size nanometers
@@ -300,7 +300,7 @@ def _simulate_single(data):
             )
 
     return frcpredict.model.FrcCurve(
-        range_values=range_values,
+        multivalue_values=multivalue_values,
         x=np.arange(0, len(frc_spectra)) * df,
         y=frc_spectra
     )

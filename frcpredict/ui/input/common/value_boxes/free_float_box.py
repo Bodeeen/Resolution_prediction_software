@@ -1,5 +1,4 @@
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
-from PyQt5.QtGui import QPalette
 from PyQt5.QtWidgets import QLineEdit
 
 
@@ -41,13 +40,15 @@ class FreeFloatBox(QLineEdit):
 
     def setValue(self, value: float) -> None:
         """ Sets the value of the field. """
-        if type(value) is not type(self._value) or value != self._value or not self._valid:
-            self._value = value
+        if type(value) is type(self._value) and value == self._value and self._valid:
+            return
 
-            self.blockSignals(True)  # Ensure that change event isn't triggered automatically
-            self.setText(str(value))
-            self.blockSignals(False)
-            self._onChange(str(value), changedByUser=False)
+        self._value = value
+
+        self.blockSignals(True)  # Ensure that change event isn't triggered automatically
+        self.setText(str(value))
+        self.blockSignals(False)
+        self._onChange(str(value), changedByUser=False)  # Trigger change event manually
 
     # Event handling
     @pyqtSlot(str)
@@ -71,5 +72,8 @@ class FreeFloatBox(QLineEdit):
 
     @pyqtSlot()
     def _onFinishEditing(self) -> None:
+        if self.isReadOnly():
+            return
+
         # Auto-format e.g. "0.00001" to "1e-05" when the user leaves the box
         self.setText(str(self._value))

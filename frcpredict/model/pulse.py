@@ -7,9 +7,9 @@ from typing import Union, List
 from PySignal import Signal
 from dataclasses_json import dataclass_json
 
-from frcpredict.util import dataclass_internal_attrs, observable_property, rangeable_field
+from frcpredict.util import dataclass_internal_attrs, observable_property, multi_accepting_field
 from .pattern import Pattern, Array2DPatternData
-from .value_range import ValueRange
+from .multivalue import Multivalue
 
 
 class PulseType(Enum):
@@ -25,14 +25,15 @@ class Pulse:
     pulse_type: PulseType = observable_property("_pulse_type", default=PulseType.on,
                                                 signal_name="basic_field_changed")
 
-    wavelength: int = observable_property("_wavelength", default=0.0,
-                                          signal_name="basic_field_changed")  # nanometres
+    wavelength: Union[int, Multivalue[int]] = multi_accepting_field(  # nanometres
+        observable_property("_wavelength", default=0.0, signal_name="basic_field_changed")
+    )
 
-    duration: Union[float, ValueRange[float]] = rangeable_field(  # milliseconds
+    duration: Union[float, Multivalue[float]] = multi_accepting_field(  # milliseconds
         observable_property("_duration", default=0.0, signal_name="basic_field_changed")
     )
 
-    max_intensity: Union[float, ValueRange[float]] = rangeable_field(  # kW/cm^2
+    max_intensity: Union[float, Multivalue[float]] = multi_accepting_field(  # kW/cm^2
         observable_property("_max_intensity", default=0.0, signal_name="basic_field_changed")
     )
 

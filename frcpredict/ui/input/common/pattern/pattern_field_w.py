@@ -25,7 +25,7 @@ class PatternFieldWidget(BaseWidget):
     def normaliseVisualisation(self, value: bool) -> None:
         self._normaliseVisualisation = value
 
-        # This is an ugly way to listen to changes on the "normaliseVisualisation" property
+        # This is an ugly way to handle changes to the "normaliseVisualisation" property
         self._presenter.deleteLater()
         self._presenter = PatternFieldPresenter(self, normaliseVisualisation=value)
 

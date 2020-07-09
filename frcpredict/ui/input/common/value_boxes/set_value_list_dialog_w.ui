@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>300</width>
+    <width>240</width>
     <height>240</height>
    </rect>
   </property>
@@ -18,100 +18,82 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>300</width>
+    <width>240</width>
     <height>240</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>300</width>
+    <width>240</width>
     <height>240</height>
    </size>
   </property>
   <property name="windowTitle">
-   <string>Set Range</string>
+   <string>Set Value List</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
    <property name="spacing">
     <number>18</number>
    </property>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1">
+    <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0">
      <property name="spacing">
-      <number>18</number>
+      <number>6</number>
      </property>
      <item>
-      <layout class="QFormLayout" name="formLayout">
-       <property name="horizontalSpacing">
-        <number>6</number>
+      <widget class="QListWidget" name="listValues">
+       <property name="sortingEnabled">
+        <bool>true</bool>
        </property>
-       <property name="verticalSpacing">
-        <number>6</number>
-       </property>
-       <item row="0" column="0">
-        <widget class="QLabel" name="lblMinimum">
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1,0">
+       <item>
+        <widget class="QLabel" name="lblValueToAdd">
          <property name="text">
-          <string>Minimum:</string>
+          <string>Value:</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="FreeFloatBox" name="editMinimum"/>
+       <item>
+        <widget class="QWidget" name="editValueToAdd" native="true"/>
        </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="lblMaximum">
+       <item>
+        <widget class="QPushButton" name="btnAddValue">
          <property name="text">
-          <string>Maximum:</string>
+          <string>Add</string>
          </property>
         </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="FreeFloatBox" name="editMaximum"/>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="lblNumEvaluations">
-         <property name="text">
-          <string># evaluations:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QSpinBox" name="editNumEvaluations">
-         <property name="minimum">
-          <number>2</number>
-         </property>
-         <property name="maximum">
-          <number>10000</number>
-         </property>
-         <property name="value">
-          <number>21</number>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="lblRangeType">
-         <property name="text">
-          <string>Range type:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QComboBox" name="editRangeType"/>
        </item>
       </layout>
      </item>
      <item>
-      <widget class="QLabel" name="label_5">
-       <property name="text">
-        <string>The &quot;# evaluations&quot; and &quot;range type&quot; options are not applicable during optimization.</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-       </property>
-       <property name="wordWrap">
-        <bool>true</bool>
-       </property>
-      </widget>
+      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,0">
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnRemoveValue">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Remove Selected</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>
@@ -130,13 +112,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>FreeFloatBox</class>
-   <extends>QLineEdit</extends>
-   <header>frcpredict.ui</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections>
   <connection>

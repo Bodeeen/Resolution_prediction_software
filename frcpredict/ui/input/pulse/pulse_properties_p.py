@@ -2,7 +2,7 @@ from typing import Union
 
 from PyQt5.QtCore import pyqtSlot
 
-from frcpredict.model import Pulse, PulseType, Pattern, Array2DPatternData, ValueRange
+from frcpredict.model import Pulse, PulseType, Pattern, Array2DPatternData, Multivalue
 from frcpredict.ui import BasePresenter
 from frcpredict.ui.util import connectMulti
 
@@ -48,9 +48,9 @@ class PulsePropertiesPresenter(BasePresenter[Pulse]):
         widget.onTypeSelected.connect(self._uiOnTypeSelect)
         widget.offTypeSelected.connect(self._uiOffTypeSelect)
         widget.readoutTypeSelected.connect(self._uiReadoutTypeSelect)
-        widget.wavelengthChanged.connect(self._uiWavelengthChange)
-        connectMulti(widget.durationChanged, [float, ValueRange], self._uiDurationChange)
-        connectMulti(widget.maxIntensityChanged, [float, ValueRange], self._uiMaxIntensityChange)
+        connectMulti(widget.wavelengthChanged, [int, Multivalue], self._uiWavelengthChange)
+        connectMulti(widget.durationChanged, [float, Multivalue], self._uiDurationChange)
+        connectMulti(widget.maxIntensityChanged, [float, Multivalue], self._uiMaxIntensityChange)
         widget.illuminationPatternChanged.connect(self._uiSetIlluminationPatternModel)
 
     # Model event handling
@@ -72,17 +72,18 @@ class PulsePropertiesPresenter(BasePresenter[Pulse]):
         self.model.pulse_type = PulseType.readout
     
     @pyqtSlot(int)
-    def _uiWavelengthChange(self, value: int) -> None:
+    @pyqtSlot(Multivalue)
+    def _uiWavelengthChange(self, value: Union[int, Multivalue[int]]) -> None:
         self.model.wavelength = value
 
     @pyqtSlot(float)
-    @pyqtSlot(ValueRange)
-    def _uiDurationChange(self, value: Union[float, ValueRange[float]]) -> None:
+    @pyqtSlot(Multivalue)
+    def _uiDurationChange(self, value: Union[float, Multivalue[float]]) -> None:
         self.model.duration = value
 
     @pyqtSlot(float)
-    @pyqtSlot(ValueRange)
-    def _uiMaxIntensityChange(self, value: Union[float, ValueRange[float]]) -> None:
+    @pyqtSlot(Multivalue)
+    def _uiMaxIntensityChange(self, value: Union[float, Multivalue[float]]) -> None:
         self.model.max_intensity = value
 
     @pyqtSlot(Pattern)

@@ -2,7 +2,7 @@ from typing import Union
 
 from PyQt5.QtCore import pyqtSlot
 
-from frcpredict.model import ValueRange, CameraProperties
+from frcpredict.model import Multivalue, CameraProperties
 from frcpredict.ui import BasePresenter
 from frcpredict.ui.util import connectMulti
 
@@ -41,9 +41,9 @@ class CameraPropertiesPresenter(BasePresenter[CameraProperties]):
         super().__init__(model, widget)
 
         # Prepare UI events
-        connectMulti(widget.readoutNoiseChanged, [float, ValueRange],
+        connectMulti(widget.readoutNoiseChanged, [float, Multivalue],
                      self._uiReadoutNoiseChange)
-        connectMulti(widget.quantumEfficiencyChanged, [float, ValueRange],
+        connectMulti(widget.quantumEfficiencyChanged, [float, Multivalue],
                      self._uiQuantumEfficiencyChange)
 
     # Model event handling
@@ -53,11 +53,11 @@ class CameraPropertiesPresenter(BasePresenter[CameraProperties]):
 
     # UI event handling
     @pyqtSlot(float)
-    @pyqtSlot(ValueRange)
-    def _uiReadoutNoiseChange(self, value: Union[float, ValueRange[float]]) -> None:
+    @pyqtSlot(Multivalue)
+    def _uiReadoutNoiseChange(self, value: Union[float, Multivalue[float]]) -> None:
         self.model.readout_noise = value
 
     @pyqtSlot(float)
-    @pyqtSlot(ValueRange)
-    def _uiQuantumEfficiencyChange(self, value: Union[float, ValueRange[float]]) -> None:
+    @pyqtSlot(Multivalue)
+    def _uiQuantumEfficiencyChange(self, value: Union[float, Multivalue[float]]) -> None:
         self.model.quantum_efficiency = value

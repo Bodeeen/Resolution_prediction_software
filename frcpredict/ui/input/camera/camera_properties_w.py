@@ -1,6 +1,6 @@
 from PyQt5.QtCore import pyqtSignal
 
-from frcpredict.model import CameraProperties, ValueRange
+from frcpredict.model import CameraProperties, Multivalue
 from frcpredict.ui import BaseWidget
 from frcpredict.ui.util import connectMulti, UserFileDirs
 from .camera_properties_p import CameraPropertiesPresenter
@@ -13,8 +13,8 @@ class CameraPropertiesWidget(BaseWidget):
 
     # Signals
     valueChanged = pyqtSignal(CameraProperties)
-    readoutNoiseChanged = pyqtSignal([float], [ValueRange])
-    quantumEfficiencyChanged = pyqtSignal([float], [ValueRange])
+    readoutNoiseChanged = pyqtSignal([float], [Multivalue])
+    quantumEfficiencyChanged = pyqtSignal([float], [Multivalue])
 
     # Methods
     def __init__(self, *args, **kwargs) -> None:
@@ -27,9 +27,9 @@ class CameraPropertiesWidget(BaseWidget):
         self.presetPicker.setValueSetter(self.setValue)
         
         # Connect forwarded signals
-        connectMulti(self.editReadoutNoise.valueChanged, [float, ValueRange],
+        connectMulti(self.editReadoutNoise.valueChanged, [float, Multivalue],
                      self.readoutNoiseChanged)
-        connectMulti(self.editQuantumEfficiency.valueChanged, [float, ValueRange],
+        connectMulti(self.editQuantumEfficiency.valueChanged, [float, Multivalue],
                      self.quantumEfficiencyChanged)
 
         # Initialize presenter

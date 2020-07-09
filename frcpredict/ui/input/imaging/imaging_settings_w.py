@@ -1,6 +1,6 @@
 from PyQt5.QtCore import pyqtSignal
 
-from frcpredict.model import ImagingSystemSettings, Pattern, PatternType, ValueRange
+from frcpredict.model import ImagingSystemSettings, Pattern, PatternType, Multivalue
 from frcpredict.ui import BaseWidget
 from frcpredict.ui.util import connectMulti, UserFileDirs
 from .imaging_settings_p import ImagingSystemSettingsPresenter
@@ -15,7 +15,7 @@ class ImagingSystemSettingsWidget(BaseWidget):
     valueChanged = pyqtSignal(ImagingSystemSettings)
     opticalPsfChanged = pyqtSignal(Pattern)
     pinholeFunctionChanged = pyqtSignal(Pattern)
-    scanningStepSizeChanged = pyqtSignal([float], [ValueRange])
+    scanningStepSizeChanged = pyqtSignal([float], [Multivalue])
 
     # Methods
     def __init__(self, *args, **kwargs) -> None:
@@ -42,7 +42,7 @@ class ImagingSystemSettingsWidget(BaseWidget):
         # Connect forwarded signals
         self.editOpticalPsf.valueChanged.connect(self.opticalPsfChanged)
         self.editPinholeFunction.valueChanged.connect(self.pinholeFunctionChanged)
-        connectMulti(self.editScanningStepSize.valueChanged, [float, ValueRange],
+        connectMulti(self.editScanningStepSize.valueChanged, [float, Multivalue],
                      self.scanningStepSizeChanged)
 
         # Initialize presenter

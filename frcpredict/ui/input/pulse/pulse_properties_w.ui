@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>365</width>
-    <height>167</height>
+    <height>146</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -57,19 +57,6 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
-          <widget class="QSpinBox" name="editWavelength">
-           <property name="minimum">
-            <number>0</number>
-           </property>
-           <property name="maximum">
-            <number>10000</number>
-           </property>
-           <property name="value">
-            <number>0</number>
-           </property>
-          </widget>
-         </item>
          <item row="1" column="0">
           <widget class="QLabel" name="lblDuration">
            <property name="text">
@@ -78,7 +65,7 @@
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="ExtendedFreeFloatBox" name="editDuration"/>
+          <widget class="ExtendedFreeFloatBox" name="editDuration" native="true"/>
          </item>
          <item row="2" column="0">
           <widget class="QLabel" name="lblMaxIntensity">
@@ -88,7 +75,7 @@
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="ExtendedFreeFloatBox" name="editMaxIntensity"/>
+          <widget class="ExtendedFreeFloatBox" name="editMaxIntensity" native="true"/>
          </item>
          <item row="3" column="0">
           <widget class="QLabel" name="lblOrder">
@@ -129,6 +116,9 @@
             </widget>
            </item>
           </layout>
+         </item>
+         <item row="0" column="1">
+          <widget class="ExtendedSpinBox" name="editWavelength" native="true"/>
          </item>
         </layout>
        </item>
@@ -213,12 +203,18 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>PatternFieldWidget</class>
+   <extends>QWidget</extends>
+   <header>frcpredict.ui</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>ExtendedFreeFloatBox</class>
    <extends>QWidget</extends>
    <header>frcpredict.ui</header>
   </customwidget>
   <customwidget>
-   <class>PatternFieldWidget</class>
+   <class>ExtendedSpinBox</class>
    <extends>QWidget</extends>
    <header>frcpredict.ui</header>
    <container>1</container>

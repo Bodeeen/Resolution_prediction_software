@@ -5,9 +5,9 @@ from PySignal import Signal
 from dataclasses_json import dataclass_json
 
 from frcpredict.util import (
-    dataclass_internal_attrs, observable_property, rangeable_field
+    dataclass_internal_attrs, observable_property, multi_accepting_field
 )
-from .value_range import ValueRange
+from .multivalue import Multivalue
 
 
 @dataclass_json
@@ -20,17 +20,17 @@ class IlluminationResponse:
     wavelength_end: int = observable_property("_wavelength_end", default=0,
                                               signal_name="basic_field_changed")  # nanometres
 
-    cross_section_off_to_on: Union[float, ValueRange[float]] = rangeable_field(
+    cross_section_off_to_on: Union[float, Multivalue[float]] = multi_accepting_field(
         observable_property("_cross_section_off_to_on", default=0.0,
                             signal_name="basic_field_changed")
     )
 
-    cross_section_on_to_off: Union[float, ValueRange[float]] = rangeable_field(
+    cross_section_on_to_off: Union[float, Multivalue[float]] = multi_accepting_field(
         observable_property("_cross_section_on_to_off", default=0.0,
                             signal_name="basic_field_changed")
     )
 
-    cross_section_emission: Union[float, ValueRange[float]] = rangeable_field(
+    cross_section_emission: Union[float, Multivalue[float]] = multi_accepting_field(
         observable_property("_cross_section_emission", default=0.0,
                             signal_name="basic_field_changed")
     )

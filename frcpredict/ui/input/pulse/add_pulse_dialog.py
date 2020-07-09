@@ -3,7 +3,7 @@ from typing import Optional, Tuple
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QDialog, QDialogButtonBox
 
-from frcpredict.model import Pulse, ValueRange
+from frcpredict.model import Pulse, Multivalue
 from frcpredict.ui import BaseWidget
 from frcpredict.util import clear_signals
 
@@ -48,9 +48,11 @@ class AddPulseDialog(QDialog, BaseWidget):
     def _updateOKButton(self) -> None:
         """ Enables or disables the "OK" button depending on whether the entered data is valid. """
         self.buttonBox.button(QDialogButtonBox.Ok).setEnabled(
-            self.editProperties.editWavelength.value() > 0 and
+            (isinstance(self.editProperties.editWavelength.value(), Multivalue) or
+             self.editProperties.editWavelength.value() > 0
+             ) and
             self.editProperties.editDuration.isValid() and
-            (isinstance(self.editProperties.editDuration.value(), ValueRange) or
+            (isinstance(self.editProperties.editDuration.value(), Multivalue) or
              self.editProperties.editDuration.value() > 0
              ) and
             self.editProperties.editMaxIntensity.isValid()

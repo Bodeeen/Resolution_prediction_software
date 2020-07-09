@@ -8,8 +8,8 @@ from frcpredict.model import Pattern, PatternType
 from frcpredict.ui import BaseWidget
 from frcpredict.ui.util import getEnumEntryName, setFormLayoutRowVisibility
 from frcpredict.util import clear_signals
+from ..list_item_with_value import ListItemWithValue
 from .generate_pattern_dialog_p import GeneratePatternPresenter
-from .list_item_with_value import ListItemWithValue
 
 
 class GeneratePatternDialog(QDialog, BaseWidget):

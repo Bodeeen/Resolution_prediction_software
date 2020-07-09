@@ -55,7 +55,7 @@ class FluorophoreSettingsWidget(BaseWidget):
         for matchingRow in matchingRows:
             self.listResponses.takeItem(self.listResponses.row(matchingRow))
 
-        self.listResponses.setCurrentRow(-1)
+        self.deselectSelectedRow()
 
     def clearResponseList(self) -> None:
         """ Removes all responses from the response list. """

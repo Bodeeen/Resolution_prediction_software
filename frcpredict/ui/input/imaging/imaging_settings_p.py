@@ -2,7 +2,7 @@ from typing import Union
 
 from PyQt5.QtCore import pyqtSlot
 
-from frcpredict.model import ImagingSystemSettings, Pattern, Array2DPatternData, ValueRange
+from frcpredict.model import ImagingSystemSettings, Pattern, Array2DPatternData, Multivalue
 from frcpredict.ui import BasePresenter
 from frcpredict.ui.util import connectMulti
 
@@ -46,7 +46,7 @@ class ImagingSystemSettingsPresenter(BasePresenter[ImagingSystemSettings]):
         # Prepare UI events
         widget.opticalPsfChanged.connect(self._uiSetOpticalPsfModel)
         widget.pinholeFunctionChanged.connect(self._uiSetPinholeFunctionModel)
-        connectMulti(widget.scanningStepSizeChanged, [float, ValueRange],
+        connectMulti(widget.scanningStepSizeChanged, [float, Multivalue],
                      self._uiScanningStepSizeChange)
 
     # Model event handling
@@ -64,6 +64,6 @@ class ImagingSystemSettingsPresenter(BasePresenter[ImagingSystemSettings]):
         self.model.pinhole_function = value
 
     @pyqtSlot(float)
-    @pyqtSlot(ValueRange)
-    def _uiScanningStepSizeChange(self, value: Union[float, ValueRange[float]]) -> None:
+    @pyqtSlot(Multivalue)
+    def _uiScanningStepSizeChange(self, value: Union[float, Multivalue[float]]) -> None:
         self.model.scanning_step_size = value

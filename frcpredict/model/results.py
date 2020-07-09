@@ -14,7 +14,7 @@ from .run_instance import RunInstance
 @dataclass_json
 @dataclass
 class FrcCurve:
-    range_values: List[float]
+    multivalue_values: List[float]
 
     x: np.ndarray = field(  # frequency
         metadata=json_config(
@@ -23,7 +23,7 @@ class FrcCurve:
             mm_field=fields.List
         ))
 
-    y: np.ndarray = field(  # [0, 1]
+    y: np.ndarray = field(  # FRC, [0, 1]
         metadata=json_config(
             encoder=lambda x: np.array(x).astype(float).tolist(),
             decoder=np.array,
@@ -37,8 +37,8 @@ class FrcCurve:
         """
 
         try:
-            # Prevent issues when threshold line crosses two points by creating a copy of the y
-            # value array and modifying it so that it doesn't happen
+            # Prevent issues when the curve crosses the threshold at multiple points, by creating a
+            # copy of the y value array and modifying it so that it doesn't happen
             y = np.copy(self.y)
             for i in range(1, len(y)):
                 if y[i] > y[i - 1]:
@@ -49,12 +49,13 @@ class FrcCurve:
             # Probably raised because the entered threshold is outside the interpolation range
             return None
 
+
 @dataclass_json
 @dataclass
 class FrcSimulationResults:
     run_instance: RunInstance
 
-    range_paths: List[List[Union[int, str]]]
+    multivalue_paths: List[List[Union[int, str]]]
 
     frc_curves: np.ndarray = field(  # array of FrcCurve
         metadata=json_config(
@@ -66,7 +67,7 @@ class FrcSimulationResults:
 
 @dataclass_json
 @dataclass_internal_attrs(
-    results_changed=Signal, range_value_index_changed=Signal, threshold_changed=Signal
+    results_changed=Signal, multivalue_value_index_changed=Signal, threshold_changed=Signal
 )
 @dataclass
 class FrcSimulationResultsView:
@@ -74,19 +75,19 @@ class FrcSimulationResultsView:
         "_results", default=None, signal_name="results_changed", emit_arg_name="results"
     )
 
-    range_value_indices: List[float] = observable_property(
-        "_range_value_indices", default=[], signal_name="range_value_index_changed",
-        emit_arg_name="range_value_indices"
+    multivalue_value_indices: List[float] = observable_property(
+        "_multivalue_value_indices", default=[], signal_name="multivalue_value_index_changed",
+        emit_arg_name="multivalue_value_indices"
     )
 
     threshold: float = observable_property(
         "_threshold", default=0.15, signal_name="threshold_changed", emit_arg_name="threshold"
     )
 
-    def set_range_value(self, index_of_range: int, index_in_range: int) -> None:
+    def set_multivalue_value(self, index_of_multivalue: int, index_in_multivalue: int) -> None:
         """
-        Sets which index in the list of possible values (index_in_range) should be used when
-        displaying the curve. index_of_range gives the index of the ranged value to adjust.
+        Sets which index in the list of possible values (index_in_multivalue) should be used when
+        displaying the curve. index_of_multivalue gives the index of the multivalue to adjust.
         """
-        self.range_value_indices[index_of_range] = index_in_range
-        self.range_value_index_changed.emit(self.range_value_indices)
+        self.multivalue_value_indices[index_of_multivalue] = index_in_multivalue
+        self.multivalue_value_index_changed.emit(self.multivalue_value_indices)

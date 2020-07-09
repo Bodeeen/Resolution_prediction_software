@@ -2,7 +2,7 @@ from typing import Union
 
 from PyQt5.QtCore import pyqtSlot
 
-from frcpredict.model import ValueRange, SampleProperties
+from frcpredict.model import Multivalue, SampleProperties
 from frcpredict.ui import BasePresenter
 from frcpredict.ui.util import connectMulti
 
@@ -42,11 +42,11 @@ class SamplePropertiesPresenter(BasePresenter[SampleProperties]):
         super().__init__(model, widget)
 
         # Prepare UI events
-        connectMulti(widget.spectralPowerChanged, [float, ValueRange],
+        connectMulti(widget.spectralPowerChanged, [float, Multivalue],
                      self._uiSpectralPowerChange)
-        connectMulti(widget.labellingDensityChanged, [float, ValueRange],
+        connectMulti(widget.labellingDensityChanged, [float, Multivalue],
                      self._uiLabellingDensityChange)
-        connectMulti(widget.KOriginChanged, [float, ValueRange],
+        connectMulti(widget.KOriginChanged, [float, Multivalue],
                      self._uiKOriginChange)
 
     # Model event handling
@@ -56,16 +56,16 @@ class SamplePropertiesPresenter(BasePresenter[SampleProperties]):
 
     # UI event handling
     @pyqtSlot(float)
-    @pyqtSlot(ValueRange)
-    def _uiSpectralPowerChange(self, value: Union[float, ValueRange[float]]) -> None:
+    @pyqtSlot(Multivalue)
+    def _uiSpectralPowerChange(self, value: Union[float, Multivalue[float]]) -> None:
         self.model.spectral_power = value
 
     @pyqtSlot(float)
-    @pyqtSlot(ValueRange)
-    def _uiLabellingDensityChange(self, value: Union[float, ValueRange[float]]) -> None:
+    @pyqtSlot(Multivalue)
+    def _uiLabellingDensityChange(self, value: Union[float, Multivalue[float]]) -> None:
         self.model.labelling_density = value
 
     @pyqtSlot(float)
-    @pyqtSlot(ValueRange)
-    def _uiKOriginChange(self, value: Union[float, ValueRange[float]]) -> None:
+    @pyqtSlot(Multivalue)
+    def _uiKOriginChange(self, value: Union[float, Multivalue[float]]) -> None:
         self.model.K_origin = value

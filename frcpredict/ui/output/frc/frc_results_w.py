@@ -52,7 +52,7 @@ class FrcResultsWidget(BaseWidget):
         self._presenter.model = value
 
     def updateData(self, curve: Optional[FrcCurve]) -> None:
-        """ Draws the FRC curve in the FRC plot, and updates the parameter range value labels. """
+        """ Draws the FRC curve in the FRC plot, and updates the parameter multivalue labels. """
 
         self.plotFrc.clear()
 
@@ -60,59 +60,61 @@ class FrcResultsWidget(BaseWidget):
             # Update plot
             self.plotFrc.plot(curve.x, curve.y, clickable=True)
 
-            # Update parameter range value labels
+            # Update parameter multivalue labels
             for i in range(0, len(self._valueLabels)):
-                self._valueLabels[i].setText("%#.4g" % curve.range_values[i])
+                self._valueLabels[i].setText("%#.4g" % curve.multivalue_values[i])
         else:
             self.lblResolutionValue.setText("")
 
         self.editThreshold.setEnabled(curve is not None)
         self.btnExportResults.setEnabled(curve is not None)
 
-    def updateRangePaths(self, results: Optional[FrcSimulationResults]) -> List[pyqtBoundSignal]:
+    def updateMultivaluePaths(self,
+                              results: Optional[FrcSimulationResults]) -> List[pyqtBoundSignal]:
         """
-        Updates the range value inputs to contain sliders for each range path used in the
-        simulation. Returns a list of value change signals, one for each range path. The indices in
-        the returned list of signals correspond to the indices in the range path list.
+        Updates the multivalue inputs to contain sliders for each multivalue path used in the
+        simulation. Returns a list of value change signals, one for each multivalue path. The
+        indices in the returned list of signals correspond to the indices in the multivalue path
+        list.
         """
 
         sliderValueChangeEvents = []
         valueLabels = []
         
-        parameterControlLayout = self.frmRangeParameters.layout()
+        parameterControlLayout = self.frmMultivalueParameters.layout()
 
-        # Remove all existing range parameter widgets
+        # Remove all existing multivalue parameter widgets
         for i in reversed(range(parameterControlLayout.rowCount())):
             parameterControlLayout.removeRow(i)
 
         # Add new ones
         if results is not None:
-            for rangePath in results.range_paths:
+            for multivaluePath in results.multivalue_paths:
                 # Field label
                 fieldName = reduce(
                     lambda x, y: x + (f"[{y}]" if isinstance(y, int) else f" → {y}"),
-                    rangePath
+                    multivaluePath
                 )
 
                 fieldText = f"{fieldName}:"
 
                 fieldLabelFont = self.font()
                 while (QFontMetrics(fieldLabelFont).boundingRect(fieldText).width() >
-                       self.frmRangeParameters.width()):  # Adjust font size to fit form
+                       self.frmMultivalueParameters.width()):  # Adjust font size to fit form
                     fieldLabelFont.setPointSize(fieldLabelFont.pointSize() - 1)
 
                 # Slider
-                valueRange = get_value_from_path(results.run_instance, rangePath)
+                multivalue = get_value_from_path(results.run_instance, multivaluePath)
 
                 slider = QSlider(
                     Qt.Horizontal,
                     minimum=0,
-                    maximum=valueRange.num_evaluations - 1,
+                    maximum=multivalue.num_values() - 1,
                     value=0
                 )
 
                 # Value label
-                valueLabel = QLabel(str(valueRange.start))
+                valueLabel = QLabel(str(multivalue.as_array()[0]))
                 valueLabel.setAlignment(Qt.AlignVCenter | Qt.AlignRight)
                 valueLabels.append(valueLabel)
 

@@ -5,10 +5,10 @@ from PySignal import Signal
 from dataclasses_json import dataclass_json
 
 from frcpredict.util import (
-    dataclass_internal_attrs, observable_property, rangeable_field
+    dataclass_internal_attrs, observable_property, multi_accepting_field
 )
 from .pattern import Pattern
-from .value_range import ValueRange
+from .multivalue import Multivalue
 
 
 @dataclass_json
@@ -19,6 +19,6 @@ class ImagingSystemSettings:
 
     pinhole_function: Pattern
 
-    scanning_step_size: Union[float, ValueRange[float]] = rangeable_field(
+    scanning_step_size: Union[float, Multivalue[float]] = multi_accepting_field(
         observable_property("_scanning_step_size", default=0.0, signal_name="basic_field_changed")
     )

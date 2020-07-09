@@ -7,6 +7,6 @@ from .pattern_utils import (
     gaussian_test1, doughnut_test1, airy_test1, digital_pinhole_test1, physical_pinhole_test1
 )
 
-from .range_utils import (
-    rangeable_field, get_paths_of_ranges, expand_ranges, avg_value_if_range, get_value_from_path
+from .multivalue_utils import (
+    multi_accepting_field, get_paths_of_multivalues, expand_multivalues, avg_value_if_multivalue, get_value_from_path
 )

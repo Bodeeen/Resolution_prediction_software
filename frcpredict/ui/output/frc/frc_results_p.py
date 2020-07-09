@@ -1,7 +1,6 @@
 from traceback import format_exc
 from typing import Optional, Union
 
-import numpy as np
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QMessageBox, QFileDialog
 
@@ -24,12 +23,13 @@ class FrcResultsPresenter(BasePresenter[FrcSimulationResultsView]):
             # Set model
             self._model = model
 
-            # Trigger model change event handlers
+            # Trigger model change event handlers (only results change event, since it in turn also
+            # triggers the others)
             self._onResultsChange(model.results)
 
             # Prepare model events
             model.results_changed.connect(self._onResultsChange)
-            model.range_value_index_changed.connect(self._onRangeValueIndexChange)
+            model.multivalue_value_index_changed.connect(self._onMultivalueIndexChange)
             model.threshold_changed.connect(self._onThresholdChange)
 
     # Methods
@@ -37,7 +37,7 @@ class FrcResultsPresenter(BasePresenter[FrcSimulationResultsView]):
         # Initialize model
         model = FrcSimulationResultsView(
             results=None,
-            range_value_indices=[],
+            multivalue_value_indices=[],
             threshold=0.15
         )
 
@@ -51,16 +51,16 @@ class FrcResultsPresenter(BasePresenter[FrcSimulationResultsView]):
     # Internal methods
     def _getCurrentCurve(self) -> Optional[FrcCurve]:
         """
-        Returns the currently selected FrcCurve, based on the range value indices in the model.
+        Returns the currently selected FrcCurve, based on the multivalue indices in the model.
         """
 
         if self.model.results is not None and len(self.model.results.frc_curves) > 0:
-            return self.model.results.frc_curves[tuple(self.model.range_value_indices)]
+            return self.model.results.frc_curves[tuple(self.model.multivalue_value_indices)]
         else:
             return None
 
-    def _updateCurveInWidget(self) -> None:
-        """ TODO. """
+    def _updateDataInWidget(self) -> None:
+        """ Updates the widget to show the current curve. """
 
         currentCurve = self._getCurrentCurve()
         self.widget.updateData(currentCurve)
@@ -68,30 +68,30 @@ class FrcResultsPresenter(BasePresenter[FrcSimulationResultsView]):
 
     # Model event handling
     def _onResultsChange(self, results: Optional[FrcSimulationResults]) -> None:
-        rangeValueChangeSignals = self.widget.updateRangePaths(results)
+        multivalueChangeSignals = self.widget.updateMultivaluePaths(results)
 
         # Prepare events for sliders
-        for signalIndex, signal in enumerate(rangeValueChangeSignals):
-            signal.connect(lambda value, index=signalIndex: self._uiRangeValueChange(index, value))
+        for signalIndex, signal in enumerate(multivalueChangeSignals):
+            signal.connect(lambda value, index=signalIndex: self._uiMultivalueChange(index, value))
 
-        # Reset range value indices
+        # Reset multivalue indices
         if results is not None:
-            self.model._range_value_indices = [0] * results.frc_curves.ndim
+            self.model._multivalue_value_indices = [0] * results.frc_curves.ndim
         else:
-            self.model._range_value_indices = []
+            self.model._multivalue_value_indices = []
 
         # Update widget
-        self._updateCurveInWidget()
+        self._updateDataInWidget()
 
-    def _onRangeValueIndexChange(self, _) -> None:
-        self._updateCurveInWidget()
+    def _onMultivalueIndexChange(self, _) -> None:
+        self._updateDataInWidget()
 
     def _onThresholdChange(self, threshold: float) -> None:
         self.widget.updateThreshold(self._getCurrentCurve(), threshold)
 
     # UI event handling
-    def _uiRangeValueChange(self, index_of_range: int, index_in_range: int) -> None:
-        self.model.set_range_value(index_of_range, index_in_range)
+    def _uiMultivalueChange(self, index_of_multivalue: int, index_in_multivalue: int) -> None:
+        self.model.set_multivalue_value(index_of_multivalue, index_in_multivalue)
 
     @pyqtSlot(float)
     def _uiThresholdChange(self, threshold: float) -> None:

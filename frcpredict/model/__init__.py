@@ -7,7 +7,7 @@ from .pattern_data import (
     AiryPatternData,
     DigitalPinholePatternData
 )
-from .value_range import RangeType, ValueRange
+from .multivalue import Multivalue, ValueList, RangeType, ValueRange
 
 from .fluorophore import FluorophoreSettings, IlluminationResponse
 from .imaging import ImagingSystemSettings

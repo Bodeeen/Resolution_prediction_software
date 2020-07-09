@@ -2,10 +2,10 @@ import functools
 
 from PyQt5.QtCore import pyqtSignal
 
-from frcpredict.model import PulseScheme, Pulse, PulseType, Pattern, Array2DPatternData, ValueRange
+from frcpredict.model import PulseScheme, Pulse, PulseType, Pattern, Array2DPatternData, Multivalue
 from frcpredict.ui import BaseWidget
 from frcpredict.ui.util import UserFileDirs
-from frcpredict.util import avg_value_if_range
+from frcpredict.util import avg_value_if_multivalue
 from .pulse_scheme_p import PulseSchemePresenter
 from .pulse_curve_item import PulseCurveItem
 
@@ -103,15 +103,15 @@ class PulseSchemeWidget(BaseWidget):
         self.plot.clear()
 
         plotEndTime = functools.reduce(
-            lambda current, pulse: 1 + current + avg_value_if_range(pulse.duration),
+            lambda current, pulse: 1 + current + avg_value_if_multivalue(pulse.duration),
             model._pulses.values(), 0
         )
         
         nextStartTime = 1
         for (key, pulse) in model._pulses.items():
             curve = PulseCurveItem(
-                key, wavelength=pulse.wavelength,
-                startTime=nextStartTime, duration=avg_value_if_range(pulse.duration),
+                key, wavelength=int(round(avg_value_if_multivalue(pulse.wavelength))),
+                startTime=nextStartTime, duration=avg_value_if_multivalue(pulse.duration),
                 plotEndTime=plotEndTime
             )
 
