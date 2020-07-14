@@ -59,7 +59,10 @@ class JsonContainer(Generic[DataType]):
         corresponding dataclass.
         """
 
-        json_container = JsonContainer[data_type].from_json(json)
+        json_container = JsonContainer[data_type].from_json(json, infer_missing=True)
+
+        if json_container.data is None:
+            raise Exception("JSON does not contain data object.")
 
         if isinstance(json_container.data, dict):
             try:
