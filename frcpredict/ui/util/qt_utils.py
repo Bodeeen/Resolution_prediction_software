@@ -35,7 +35,7 @@ def setFormLayoutRowVisibility(formLayout: QFormLayout, rowNumber: int, labelWid
             labelWidget.show()
             valueWidget.show()
     else:
-        if valueWidget.isVisible():
+        if not valueWidget.isHidden():
             labelWidget.hide()
             valueWidget.hide()
             formLayout.removeWidget(labelWidget)

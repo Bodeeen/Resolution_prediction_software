@@ -2,7 +2,7 @@ from PyQt5.QtCore import pyqtSignal
 
 from frcpredict.model import IlluminationResponse, Multivalue
 from frcpredict.ui import BaseWidget
-from frcpredict.ui.util import connectMulti
+from frcpredict.ui.util import setFormLayoutRowVisibility, connectMulti
 from .response_properties_p import ResponsePropertiesPresenter
 
 
@@ -38,8 +38,8 @@ class ResponsePropertiesWidget(BaseWidget):
 
     def setWavelengthVisible(self, visible: bool) -> None:
         """ Sets whether the field for editing the wavelength is visible. """
-        self.lblWavelength.setVisible(visible)
-        self.editWavelength.setVisible(visible)
+        setFormLayoutRowVisibility(self.layout(), 0, self.lblWavelength, self.editWavelength,
+                                   visible=visible)
 
     def updateBasicFields(self, model: IlluminationResponse) -> None:
         self.editWavelength.setValue(model.wavelength_start)

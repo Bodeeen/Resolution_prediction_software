@@ -2,7 +2,7 @@ from PyQt5.QtCore import pyqtSignal
 
 from frcpredict.model import Pulse, PulseType, Pattern, PatternType, Multivalue
 from frcpredict.ui import BaseWidget
-from frcpredict.ui.util import connectMulti
+from frcpredict.ui.util import setFormLayoutRowVisibility, connectMulti
 from .pulse_properties_p import PulsePropertiesPresenter
 
 
@@ -65,10 +65,9 @@ class PulsePropertiesWidget(BaseWidget):
         """
         Sets whether the buttons for changing the pulse's position in the scheme are visible.
         """
-        # TODO: Fix these still taking up space when hidden
-        self.lblOrder.setVisible(visible)
-        self.btnMoveLeft.setVisible(visible)
-        self.btnMoveRight.setVisible(visible)
+        setFormLayoutRowVisibility(
+            self.frmBasicProperties, 3, self.lblOrder, self.editOrderContainer, visible=visible
+        )
 
     def value(self) -> Pulse:
         return self._presenter.model

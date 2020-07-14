@@ -127,9 +127,13 @@ class BaseExtendedValueBox(BaseWidget, Generic[T]):
 
         if self._allowSetList or self._allowSetRange:
             actionMenu = QMenu()
+
             if self._allowSetRange:
                 actionMenu.addAction("Set value range…", self._onClickSetRange)
-            actionMenu.addAction("Set value list…", self._onClickSetList)
+
+            if self._allowSetList:
+                actionMenu.addAction("Set value list…", self._onClickSetList)
+
             resetAction = actionMenu.addAction("Reset to scalar value", self._onClickResetToScalar)
             resetAction.setEnabled(self._multivalue is not None)
 

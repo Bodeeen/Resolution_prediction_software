@@ -153,7 +153,7 @@
              <number>16</number>
             </property>
             <item>
-             <layout class="QVBoxLayout" name="verticalLayout_6" stretch="1,0">
+             <layout class="QVBoxLayout" name="verticalLayout_6" stretch="2,3">
               <property name="spacing">
                <number>12</number>
               </property>
