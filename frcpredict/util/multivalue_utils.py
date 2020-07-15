@@ -88,7 +88,7 @@ def expand_multivalues(dataclass_instance: object, multivalue_paths: List[FieldP
 
     if len(multivalue_paths) < 1:
         results = np.ndarray((1,), dtype=np.object)
-        results[0] = ([], dataclass_instance)
+        results[0] = ([], clear_signals(deepcopy(dataclass_instance)))
         return results
 
     def build_results(results: np.ndarray, obj: object,
