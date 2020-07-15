@@ -13,6 +13,10 @@ T = TypeVar("T")
 
 
 class Multivalue(ABC, Generic[T]):
+    """
+    Abstract class that describes a value that could be many different scalar values.
+    """
+
     @abstractmethod
     def as_array(self) -> np.ndarray:
         """ Returns an array representation of all possible states that the value can be in. """
@@ -37,6 +41,10 @@ class Multivalue(ABC, Generic[T]):
 @dataclass_internal_attrs(value_added=Signal, value_removed=Signal)
 @dataclass
 class ValueList(Multivalue[T]):
+    """
+    A multivalue described by a list of values.
+    """
+
     values: List[T]
 
     # Methods
@@ -70,6 +78,10 @@ class ValueList(Multivalue[T]):
 
 
 class RangeType(Enum):
+    """
+    All supported range types for ValueRange.
+    """
+
     linear = "linear"
     logarithmic = "logarithmic"
     inverse_logarithmic = "inverse_logarithmic"
@@ -78,6 +90,10 @@ class RangeType(Enum):
 @dataclass_json
 @dataclass
 class ValueRange(Multivalue[float]):
+    """
+    A multivalue described by a range.
+    """
+
     start: float
 
     end: float

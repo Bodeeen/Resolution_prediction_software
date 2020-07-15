@@ -27,6 +27,10 @@ from .sample import SampleProperties
 )
 @dataclass
 class RunInstance:
+    """
+    A description of all parameters part of a simulation that can be run.
+    """
+
     fluorophore_settings: FluorophoreSettings = observable_property(
         "_fluorophore_settings", default=None,
         signal_name="fluorophore_settings_loaded", emit_arg_name="fluorophore_settings"

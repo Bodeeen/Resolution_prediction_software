@@ -19,6 +19,10 @@ from .multivalue import Multivalue
 @dataclass_json
 @dataclass
 class PatternData(ABC):
+    """
+    Abstract class that describes the actual properties of a pattern.
+    """
+
     @abstractmethod
     def get_numpy_array(self, pixels_per_nm: float) -> np.ndarray:
         """ Returns a numpy array representation of the pattern data. """
@@ -32,6 +36,10 @@ class PatternData(ABC):
 @dataclass_json
 @dataclass
 class Array2DPatternData(PatternData):
+    """
+    A description of a pattern given by a 2D array, typically loaded from an image.
+    """
+
     value: np.ndarray = field(
         default=np.zeros((1, 1)),
         metadata=json_config(
@@ -80,6 +88,10 @@ class Array2DPatternData(PatternData):
 @dataclass_json
 @dataclass
 class GaussianPatternData(PatternData):
+    """
+    A description of the properties of a gaussian pattern.
+    """
+
     amplitude: Union[float, Multivalue[float]] = multi_accepting_field(default=1.0)
     fwhm: Union[float, Multivalue[float]] = multi_accepting_field(default=480.0)  # nanometres
 
@@ -94,6 +106,10 @@ class GaussianPatternData(PatternData):
 @dataclass_json
 @dataclass
 class DoughnutPatternData(PatternData):
+    """
+    A description of the properties of a doughnut pattern.
+    """
+
     periodicity: Union[float, Multivalue[float]] = multi_accepting_field(default=540.0)  # nanometres
 
     # Methods
@@ -107,6 +123,10 @@ class DoughnutPatternData(PatternData):
 @dataclass_json
 @dataclass
 class AiryPatternData(PatternData):
+    """
+    A description of the properties of an airy pattern.
+    """
+
     amplitude: Union[float, Multivalue[float]] = multi_accepting_field(default=1.0)
     fwhm: Union[float, Multivalue[float]] = multi_accepting_field(default=240.0)  # nanometres
 
@@ -121,6 +141,10 @@ class AiryPatternData(PatternData):
 @dataclass_json
 @dataclass
 class DigitalPinholePatternData(PatternData):
+    """
+    A description of the properties of a digital pinhole pattern.
+    """
+
     fwhm: Union[float, Multivalue[float]] = 240.0  # nanometres
 
     # Methods
@@ -134,6 +158,10 @@ class DigitalPinholePatternData(PatternData):
 @dataclass_json
 @dataclass
 class PhysicalPinholePatternData(PatternData):
+    """
+    A description of the properties of a physical pinhole pattern.
+    """
+
     radius: Union[float, Multivalue[float]] = multi_accepting_field(default=100.0)  # nanometres
 
     # Methods

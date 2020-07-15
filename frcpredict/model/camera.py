@@ -14,6 +14,10 @@ from .multivalue import Multivalue
 @dataclass_internal_attrs(basic_field_changed=Signal)
 @dataclass
 class CameraProperties:
+    """
+    A description of a camera.
+    """
+
     readout_noise: Union[float, Multivalue[float]] = multi_accepting_field(  # electrons
         observable_property("_readout_noise", default=0.0, signal_name="basic_field_changed")
     )

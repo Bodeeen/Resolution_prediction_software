@@ -14,6 +14,10 @@ from .pattern_data import (
 
 
 class PatternType(Enum):
+    """
+    All supported pattern types.
+    """
+
     array2d = "array2d"
     gaussian = "gaussian"
     doughnut = "doughnut"
@@ -26,6 +30,10 @@ class PatternType(Enum):
 @dataclass_internal_attrs(data_loaded=Signal)
 @dataclass
 class Pattern:
+    """
+    A description of a pattern.
+    """
+
     pattern_type: PatternType = PatternType.array2d
     pattern_data: Union[dict, PatternData] = Array2DPatternData()
 

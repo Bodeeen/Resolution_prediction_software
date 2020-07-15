@@ -15,6 +15,10 @@ from .multivalue import Multivalue
 @dataclass_internal_attrs(basic_field_changed=Signal)
 @dataclass
 class ImagingSystemSettings:
+    """
+    A description of an imaging system.
+    """
+
     optical_psf: Pattern
 
     pinhole_function: Pattern

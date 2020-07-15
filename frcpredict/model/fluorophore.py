@@ -14,6 +14,10 @@ from .multivalue import Multivalue
 @dataclass_internal_attrs(basic_field_changed=Signal)
 @dataclass
 class IlluminationResponse:
+    """
+    A description of the illumination response of a fluorophore at a certain wavelength.
+    """
+
     wavelength_start: int = observable_property("_wavelength_start", default=0,
                                                 signal_name="basic_field_changed")  # nanometres
 
@@ -47,6 +51,10 @@ class IlluminationResponse:
 @dataclass_internal_attrs(_responses=dict, response_added=Signal, response_removed=Signal)
 @dataclass
 class FluorophoreSettings:
+    """
+    A description of a fluorophore.
+    """
+
     responses: List[IlluminationResponse]
 
     # Properties

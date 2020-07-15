@@ -13,6 +13,10 @@ from .multivalue import Multivalue
 
 
 class PulseType(Enum):
+    """
+    All supported pulse types.
+    """
+
     on = "on"
     off = "off"
     readout = "readout"
@@ -22,6 +26,10 @@ class PulseType(Enum):
 @dataclass_internal_attrs(basic_field_changed=Signal)
 @dataclass
 class Pulse:
+    """
+    A description of a laser pulse.
+    """
+
     pulse_type: PulseType = observable_property("_pulse_type", default=PulseType.on,
                                                 signal_name="basic_field_changed")
 
@@ -46,6 +54,10 @@ class Pulse:
 )
 @dataclass
 class PulseScheme:
+    """
+    A description of a laser pulse scheme.
+    """
+
     pulses: List[Pulse]
 
     # Properties

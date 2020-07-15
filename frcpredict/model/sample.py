@@ -14,6 +14,10 @@ from .multivalue import Multivalue
 @dataclass_internal_attrs(basic_field_changed=Signal)
 @dataclass
 class SampleProperties:
+    """
+    A description of sample-related properties of an environment.
+    """
+
     spectral_power: Union[float, Multivalue[float]] = multi_accepting_field(
         observable_property("_spectral_power", default=0.0, signal_name="basic_field_changed")
     )

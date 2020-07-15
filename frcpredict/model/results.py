@@ -14,6 +14,12 @@ from .run_instance import RunInstance
 @dataclass_json
 @dataclass
 class FrcCurve:
+    """
+    An FRC curve given by a list of X values and a corresponding list of Y values. Also contains the
+    values of the multivalue fields that were set when this curve was simulated; the indices in this
+    list correspond to the indices in the multivalue path list in FrcSimulationResults.
+    """
+
     multivalue_values: List[float]
 
     x: np.ndarray = field(  # frequency
@@ -53,6 +59,17 @@ class FrcCurve:
 @dataclass_json
 @dataclass
 class FrcSimulationResults:
+    """
+    Results of an FRC simulation. This includes the RunInstance that was used as input, a list of
+    paths to all multivalues in the RunInstance, and an array of FRC curves that were generated from
+    the simulation.
+
+    If the RunInstance contains multivalues, the FRC curve array will be of the shape
+    (n_1, n_2, n_3, ...), where n_1 is the number of states the first multivalue can be in, n_2, is
+    the number of states the second multivalue can be in, and so on. Otherwise, the FRC curve array
+    will be a 1-dimensional array with one item.
+    """
+
     run_instance: RunInstance
 
     multivalue_paths: List[List[Union[int, str]]]
@@ -71,6 +88,10 @@ class FrcSimulationResults:
 )
 @dataclass
 class FrcSimulationResultsView:
+    """
+    A representation of a view of results of an FRC simulation.
+    """
+
     results: Optional[FrcSimulationResults] = observable_property(
         "_results", default=None, signal_name="results_changed", emit_arg_name="results"
     )
