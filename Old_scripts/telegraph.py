@@ -8,7 +8,7 @@ try:
     jit = numba.jit
 except ImportError:
     print("Couldn't import numba. This might be a little slow...")
-    def jit(nopython=True):
+    def jit(nopython=True, parallel=False):
         def pass_through(f):
             return f
         return pass_through
@@ -19,7 +19,7 @@ except ImportError:
 # long time behavior.
 
 
-@jit(nopython=True)
+@jit(nopython=True, parallel=True)
 def make_random_telegraph_data(num_trials=10000, t_on = 1.0, t_off=1.0, t_bleach=10.0,
                                t_exp=10.0, p_on=.5):
     """generate realization of on times from telegraph process with bleaching
@@ -42,9 +42,9 @@ def make_random_telegraph_data(num_trials=10000, t_on = 1.0, t_off=1.0, t_bleach
     output_array : 1d ndarray of float
         each entry is fraction of exposure time spent in on state
     """
-    output_array = []
-    N_switch_array = []
-    for _ in range(num_trials):
+    output_array = np.zeros(num_trials)
+    N_switch_array = np.zeros(num_trials)
+    for i in numba.prange(num_trials):
         on_time = 0.0
         t_elapsed = 0.0
         N_switches = -1
@@ -56,10 +56,10 @@ def make_random_telegraph_data(num_trials=10000, t_on = 1.0, t_off=1.0, t_bleach
             on_time += state*(min(time_until_switch, t_exp - t_elapsed))
             state = (state + 1) % 2
             t_elapsed += time_until_switch
-        N_switch_array.append(N_switches)  # For some reason this line apparently has to run before
-        output_array.append(on_time)       # this line in some configurations?
+        N_switch_array[i] = N_switches  # For some reason this line apparently has to run before
+        output_array[i] = on_time       # this line in some configurations?
     lifetimes = np.random.exponential(t_bleach, size=(num_trials))
-    return np.minimum(np.array(output_array), lifetimes), np.array(N_switch_array)
+    return np.minimum(output_array, lifetimes), N_switch_array
 
 
 if __name__ == '__main__':
