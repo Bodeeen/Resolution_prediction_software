@@ -118,7 +118,7 @@ def expand_multivalues(dataclass_instance: object, multivalue_paths: List[FieldP
         dtype=np.object
     )
 
-    build_results(results, clear_signals(dataclass_instance))
+    build_results(results, clear_signals(deepcopy(dataclass_instance)))
     return results
 
 

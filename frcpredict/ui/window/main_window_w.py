@@ -26,6 +26,7 @@ class MainWindow(QMainWindow, BaseWidget):
     cameraPropertiesModelSet = pyqtSignal(CameraProperties)
 
     simulateFrcClicked = pyqtSignal()
+    abortClicked = pyqtSignal()
 
     # Methods
     def __init__(self, screenGeometry: Optional[QRect] = None) -> None:
@@ -58,18 +59,18 @@ class MainWindow(QMainWindow, BaseWidget):
         self.cameraProperties.valueChanged.connect(self.cameraPropertiesModelSet)
 
         self.btnSimulateFrc.clicked.connect(self.simulateFrcClicked)
-
-        # TODO: Make these work and then unhide them.
-        self.btnAbort.setVisible(False)
-        self.pbProgress.setVisible(False)
+        self.btnAbort.clicked.connect(self.abortClicked)
 
         # Initialize presenter
         self._presenter = MainWindowPresenter(self)
 
     def setFrcSimulationResults(self, frcSimulationResults: FrcSimulationResults) -> None:
+        """ Sets FRC simulation results. """
         self.frcResults.setValue(frcSimulationResults)
 
     def setSimulating(self, simulating: bool) -> None:
+        """ Sets whether a simulation is currently in progress. """
+
         self.btnSimulateFrc.setEnabled(not simulating)
         self.btnAbort.setEnabled(simulating)
 
@@ -77,6 +78,15 @@ class MainWindow(QMainWindow, BaseWidget):
             self.btnSimulateFrc.setText("SIMULATING…")
         else:
             self.btnSimulateFrc.setText("SIMULATE")
+
+    def setAborting(self, aborting: bool) -> None:
+        """ Sets whether the current simulation is being aborted. """
+
+        if aborting:
+            self.btnAbort.setEnabled(False)
+            self.btnAbort.setText("Aborting…")
+        else:
+            self.btnAbort.setText("Abort")
 
     def value(self) -> RunInstance:
         return self._presenter.model
@@ -98,3 +108,9 @@ class MainWindow(QMainWindow, BaseWidget):
 
     def updateCameraProperties(self, cameraProperties: CameraProperties) -> None:
         self.cameraProperties.setValue(cameraProperties, emitSignal=False)
+
+    def updateSimulationProgress(self, progress: float) -> None:
+        if 0 < progress < 1:
+            self.pbProgress.setValue(progress * 100)
+        else:
+            self.pbProgress.setValue(0)

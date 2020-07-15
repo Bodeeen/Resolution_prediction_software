@@ -4,7 +4,9 @@ Created on Tue Jun 11 13:38:07 2019
 @original_author: andreas.boden
 @adapted_by: stafak
 """
-from typing import Union, Tuple, List
+from typing import Optional
+
+from PySignal import Signal
 
 import Old_scripts.telegraph as telegraph
 import numpy as np
@@ -186,20 +188,50 @@ def radial_profile(data, center):
     return radialprofile
 
 
-def simulate(run_instance):
+def simulate(run_instance, abort_signal: Optional[Signal] = None):
+    aborting = False
+    completed_simulations = 0
+
+    # Set up abort handling
+    if abort_signal is not None:
+        def abort_handler():
+            nonlocal aborting
+            aborting = True
+
+        abort_signal.connect(abort_handler)
+
+    run_instance.simulation_progress_updated.emit(0)
+
+    # Expand run instances
     print(run_instance)
-
-    multivalue_paths, num_combinations = get_paths_of_multivalues(run_instance)
-    print(f"{num_combinations} combinations")
-
+    multivalue_paths, num_simulations = get_paths_of_multivalues(run_instance)
+    print(f"{num_simulations} simulations")
     expanded_run_instances = expand_multivalues(run_instance, multivalue_paths)
-    frc_curves = np.frompyfunc(_simulate_single, 1, 1)(expanded_run_instances)
 
-    return frcpredict.model.FrcSimulationResults(
-        run_instance=run_instance,
-        multivalue_paths=multivalue_paths,
-        frc_curves=frc_curves
-    )
+    # Run simulations
+    def dynamic_simulate_single(data):
+        if aborting:
+            return None
+
+        result = _simulate_single(data)
+
+        nonlocal completed_simulations
+        completed_simulations += 1
+        run_instance.simulation_progress_updated.emit(completed_simulations / num_simulations)
+        
+        return result
+
+    frc_curves = np.frompyfunc(dynamic_simulate_single, 1, 1)(expanded_run_instances)
+
+    # Return results, or None if aborted
+    if not aborting:
+        return frcpredict.model.FrcSimulationResults(
+            run_instance=run_instance,
+            multivalue_paths=multivalue_paths,
+            frc_curves=frc_curves
+        )
+    else:
+        return None
 
 
 def _simulate_single(data):

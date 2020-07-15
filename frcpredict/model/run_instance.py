@@ -1,7 +1,6 @@
+from copy import deepcopy
 from dataclasses import dataclass
-from typing import Tuple
 
-import numpy as np
 from PySignal import Signal
 from dataclasses_json import dataclass_json
 
@@ -20,7 +19,11 @@ from .sample import SampleProperties
     imaging_system_settings_loaded=Signal,
     pulse_scheme_loaded=Signal,
     sample_properties_loaded=Signal,
-    camera_properties_loaded=Signal
+    camera_properties_loaded=Signal,
+
+    simulation_progress_updated=Signal,
+
+    _abort_signal=Signal
 )
 @dataclass
 class RunInstance:
@@ -46,7 +49,14 @@ class RunInstance:
     )
 
     # Methods
-    def frc(self):
-        """ TODO. """
-        simulation_results = simulate(self)
-        return simulation_results
+    def simulate_frc(self):
+        """ Simulates FRC curves. """
+        return simulate(deepcopy(self), self._abort_signal)
+
+    def abort_running_simulations(self) -> None:
+        """
+        Emits a signal to abort any running simulations. Note that the simulations may not terminate
+        immediately after this method returns.
+        """
+        self._abort_signal.emit()
+
