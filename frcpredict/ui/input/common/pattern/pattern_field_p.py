@@ -86,7 +86,8 @@ class PatternFieldPresenter(BasePresenter[Pattern]):
             title=f"Generate {self.widget.fieldName()}",
             availableTypes=self.widget.availableGenerationTypes(),
             allowEditAmplitude=self.widget.allowEditGenerationAmplitude(),
-            normalisePreview=self._normaliseVisualisation
+            normalisePreview=self._normaliseVisualisation,
+            initialValue=self.model
         )
         
         if okClicked:

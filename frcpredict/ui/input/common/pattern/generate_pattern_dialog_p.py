@@ -60,6 +60,8 @@ class GeneratePatternPresenter(BasePresenter[Pattern]):
             )
         )
 
+        self.widget.updateType(model.pattern_type)
+
         hasAmplitudeProperty = (model.pattern_type == PatternType.gaussian or
                                 model.pattern_type == PatternType.airy)
 

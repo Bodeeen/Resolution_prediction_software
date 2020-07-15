@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Optional, Tuple, List
 
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt
@@ -28,8 +29,8 @@ class GeneratePatternDialog(QDialog, BaseWidget):
     def __init__(self, parent: Optional[QWidget] = None, title: str = "Generate Pattern",
                  availableTypes: List[PatternType] = [], allowEditAmplitude: bool = True,
                  normalisePreview: bool = False) -> None:
-        self._hasHandledInitialRowChange = False
         self._allowEditAmplitude = allowEditAmplitude
+        self._hasHandledInitialRowChange = False
 
         super().__init__(__file__, parent, Qt.WindowSystemMenuHint | Qt.WindowTitleHint)
         self.setWindowTitle(title)
@@ -77,9 +78,26 @@ class GeneratePatternDialog(QDialog, BaseWidget):
 
     def setValue(self, model: Pattern) -> None:
         self._presenter.model = model
+        self._hasHandledInitialRowChange = True
 
     def updatePreview(self, pixmap: QPixmap) -> None:
+        """ Updates the preview in the widget. """
         self.imgPreview.setPixmap(pixmap)
+
+    def updateType(self, patternType: PatternType) -> None:
+        """ Updates the selected pattern type in the widget. """
+
+        self.listType.blockSignals(True)
+        try:
+            for i in range(0, self.listType.count()):
+                if self.listType.item(i).value() == patternType:
+                    self.listType.setCurrentRow(i)
+                    return
+
+            self.listType.setCurrentRow(-1)  # Unselect if no match found in type list
+        finally:
+            self.listType.blockSignals(False)
+            self._updateOKButton()
 
     def updatePropertyFields(self, amplitude: Optional[float] = None,
                              radius: Optional[float] = None, fwhm: Optional[float] = None,
@@ -101,7 +119,8 @@ class GeneratePatternDialog(QDialog, BaseWidget):
     @staticmethod
     def getPatternData(parent: Optional[QWidget] = None, title: str = "Generate Pattern",
                        availableTypes: List[PatternType] = [], allowEditAmplitude: bool = True,
-                       normalisePreview: bool = False) -> Tuple[Optional[Pattern], bool]:
+                       normalisePreview: bool = False,
+                       initialValue: Optional[Pattern] = None) -> Tuple[Optional[Pattern], bool]:
         """
         Synchronously opens a dialog for entering pattern properties. The second value in the
         returned tuple refers to whether the "OK" button was pressed when the dialog closed. If
@@ -110,6 +129,10 @@ class GeneratePatternDialog(QDialog, BaseWidget):
 
         dialog = GeneratePatternDialog(parent, title, availableTypes,
                                        allowEditAmplitude, normalisePreview)
+
+        if initialValue is not None and initialValue.pattern_type != PatternType.array2d:
+            dialog.setValue(clear_signals(deepcopy(initialValue)))
+
         result = dialog.exec_()
 
         if result == QDialog.Accepted:
@@ -134,7 +157,6 @@ class GeneratePatternDialog(QDialog, BaseWidget):
             # We do this to make sure no row is selected when the dialog opens
             self.listType.setCurrentRow(-1)
             self._hasHandledInitialRowChange = True
-            self.typeChanged.emit(None)
             return
 
         if selectedRow > -1:
