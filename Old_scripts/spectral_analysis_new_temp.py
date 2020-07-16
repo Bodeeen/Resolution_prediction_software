@@ -8,6 +8,7 @@ from typing import Optional
 
 from PySignal import Signal
 
+from Old_scripts.conversions import Int2Flux
 import Old_scripts.telegraph as telegraph
 import numpy as np
 from scipy.interpolate import interp1d
@@ -284,18 +285,10 @@ def _simulate_single(data):
     for pulse in run_instance.pulse_scheme.pulses:
         illumination_pattern_rad = pulse.illumination_pattern.get_numpy_array(
             px_size_nm
-        )[psf_kernel_rad_px - 1][psf_kernel_rad_px - 1:]
+        )[psf_kernel_rad_px - 1][psf_kernel_rad_px - 1:]  # TODO: This currently only extracts the radial profile
 
         response = run_instance.fluorophore_settings.get_response(pulse.wavelength)
-
-        if pulse.pulse_type == frcpredict.model.PulseType.on:
-            expected_photons = pulse.max_intensity / response.cross_section_off_to_on
-        elif pulse.pulse_type == frcpredict.model.PulseType.off:
-            expected_photons = pulse.max_intensity / response.cross_section_on_to_off
-        elif pulse.pulse_type == frcpredict.model.PulseType.readout:
-            expected_photons = pulse.max_intensity / response.cross_section_emission
-        else:
-            raise ValueError(f"Unexpected pulse type \"{pulse.pulse_type}\"")
+        expected_photons = Int2Flux(pulse.max_intensity * 1000, pulse.wavelength) * px_size_nm**2
 
         if pulse.pulse_type == frcpredict.model.PulseType.readout:
             kernels, m, N_switches = make_kernels_detection(
