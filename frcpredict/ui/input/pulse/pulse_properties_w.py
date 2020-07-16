@@ -12,10 +12,6 @@ class PulsePropertiesWidget(BaseWidget):
     """
 
     # Signals
-    onTypeSelected = pyqtSignal()
-    offTypeSelected = pyqtSignal()
-    readoutTypeSelected = pyqtSignal()
-
     wavelengthChanged = pyqtSignal([int], [Multivalue])
     durationChanged = pyqtSignal([float], [Multivalue])
     durationChangedByUser = pyqtSignal([float], [Multivalue])
@@ -36,10 +32,6 @@ class PulsePropertiesWidget(BaseWidget):
         )
         
         # Connect forwarded signals
-        self.radioTypeOn.clicked.connect(self.onTypeSelected)
-        self.radioTypeOff.clicked.connect(self.offTypeSelected)
-        self.radioTypeReadout.clicked.connect(self.readoutTypeSelected)
-
         connectMulti(self.editWavelength.valueChanged, [int, Multivalue],
                      self.wavelengthChanged)
         connectMulti(self.editDuration.valueChanged, [float, Multivalue],
@@ -79,13 +71,6 @@ class PulsePropertiesWidget(BaseWidget):
         self.editIlluminationPattern.setValue(pattern, emitSignal=False)
 
     def updateBasicFields(self, model: Pulse) -> None:
-        if model.pulse_type == PulseType.on:
-            self.radioTypeOn.setChecked(True)
-        elif model.pulse_type == PulseType.off:
-            self.radioTypeOff.setChecked(True)
-        elif model.pulse_type == PulseType.readout:
-            self.radioTypeReadout.setChecked(True)
-
         self.editWavelength.setValue(model.wavelength)
         self.editDuration.setValue(model.duration)
         self.editMaxIntensity.setValue(model.max_intensity)

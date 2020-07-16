@@ -282,7 +282,7 @@ def _simulate_single(data):
 
     """ Calculate ON-state probabilities after ON-switching illumination"""
     P_on = np.zeros(psf_kernel_rad_px)
-    for pulse in run_instance.pulse_scheme.pulses:
+    for pulse_index, pulse in enumerate(run_instance.pulse_scheme.pulses):
         illumination_pattern_rad = pulse.illumination_pattern.get_numpy_array(
             px_size_nm
         )[psf_kernel_rad_px - 1][psf_kernel_rad_px - 1:]  # TODO: This currently only extracts the radial profile
@@ -290,7 +290,14 @@ def _simulate_single(data):
         response = run_instance.fluorophore_settings.get_response(pulse.wavelength)
         expected_photons = Int2Flux(pulse.max_intensity * 1000, pulse.wavelength) * px_size_nm**2
 
-        if pulse.pulse_type == frcpredict.model.PulseType.readout:
+        if pulse_index < len(run_instance.pulse_scheme.pulses) - 1:
+            P_on = expected_Pon(
+                P_on,
+                expected_photons * response.cross_section_off_to_on * illumination_pattern_rad,
+                expected_photons * response.cross_section_on_to_off * illumination_pattern_rad,
+                pulse.duration
+            )
+        else:
             kernels, m, N_switches = make_kernels_detection(
                 500000,
                 run_instance.camera_properties.quantum_efficiency,
@@ -324,13 +331,6 @@ def _simulate_single(data):
             center = np.floor(np.divide(frc_spectra2d.shape, 2)
                               )  # gives index of zero-frequencu component in unshifted fft spectra
             frc_spectra = radial_profile_of_raw_fft(frc_spectra2d, center)
-        else:
-            P_on = expected_Pon(
-                P_on,
-                expected_photons * response.cross_section_off_to_on * illumination_pattern_rad,
-                expected_photons * response.cross_section_on_to_off * illumination_pattern_rad,
-                pulse.duration
-            )
 
     return frcpredict.model.FrcCurve(
         multivalue_values=multivalue_values,

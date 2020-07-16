@@ -30,9 +30,6 @@ class Pulse:
     A description of a laser pulse.
     """
 
-    pulse_type: PulseType = observable_property("_pulse_type", default=PulseType.on,
-                                                signal_name="basic_field_changed")
-
     wavelength: Union[int, Multivalue[int]] = multi_accepting_field(  # nanometres
         observable_property("_wavelength", default=0.0, signal_name="basic_field_changed")
     )

@@ -35,7 +35,6 @@ class PulsePropertiesPresenter(BasePresenter[Pulse]):
     def __init__(self, widget) -> None:
         # Initialize model
         model = Pulse(
-            pulse_type=PulseType.on,
             wavelength=0,
             duration=0.0,
             max_intensity=0.0,
@@ -45,9 +44,6 @@ class PulsePropertiesPresenter(BasePresenter[Pulse]):
         super().__init__(model, widget)
 
         # Prepare UI events
-        widget.onTypeSelected.connect(self._uiOnTypeSelect)
-        widget.offTypeSelected.connect(self._uiOffTypeSelect)
-        widget.readoutTypeSelected.connect(self._uiReadoutTypeSelect)
         connectMulti(widget.wavelengthChanged, [int, Multivalue], self._uiWavelengthChange)
         connectMulti(widget.durationChanged, [float, Multivalue], self._uiDurationChange)
         connectMulti(widget.maxIntensityChanged, [float, Multivalue], self._uiMaxIntensityChange)
@@ -59,18 +55,6 @@ class PulsePropertiesPresenter(BasePresenter[Pulse]):
         self.widget.updateBasicFields(model)
 
     # UI event handling
-    @pyqtSlot()
-    def _uiOnTypeSelect(self) -> None:
-        self.model.pulse_type = PulseType.on
-    
-    @pyqtSlot()
-    def _uiOffTypeSelect(self) -> None:
-        self.model.pulse_type = PulseType.off
-    
-    @pyqtSlot()
-    def _uiReadoutTypeSelect(self) -> None:
-        self.model.pulse_type = PulseType.readout
-    
     @pyqtSlot(int)
     @pyqtSlot(Multivalue)
     def _uiWavelengthChange(self, value: Union[int, Multivalue[int]]) -> None:

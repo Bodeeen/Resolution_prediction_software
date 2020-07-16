@@ -75,7 +75,6 @@ class PulseSchemeWidget(BaseWidget):
             # Clear properties
             self.editProperties.setValue(
                 Pulse(
-                    pulse_type=PulseType.on,
                     wavelength=0,
                     duration=0.0,
                     max_intensity=0.0,
