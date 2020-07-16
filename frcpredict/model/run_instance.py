@@ -1,5 +1,6 @@
 from copy import deepcopy
 from dataclasses import dataclass
+from typing import Optional
 
 from PySignal import Signal
 from dataclasses_json import dataclass_json
@@ -20,8 +21,6 @@ from .sample import SampleProperties
     pulse_scheme_loaded=Signal,
     sample_properties_loaded=Signal,
     camera_properties_loaded=Signal,
-
-    simulation_progress_updated=Signal,
 
     _abort_signal=Signal
 )
@@ -53,9 +52,15 @@ class RunInstance:
     )
 
     # Methods
-    def simulate_frc(self):
+    def simulate_frc(self, preprocessing_finished_callback: Optional[Signal] = None,
+                     progress_updated_callback: Optional[Signal] = None):
         """ Simulates FRC curves. """
-        return simulate(deepcopy(self), self._abort_signal)
+        return simulate(
+            deepcopy(self),
+            self._abort_signal,
+            preprocessing_finished_callback,
+            progress_updated_callback
+        )
 
     def abort_running_simulations(self) -> None:
         """

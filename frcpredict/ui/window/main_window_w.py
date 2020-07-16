@@ -35,7 +35,7 @@ class MainWindow(QMainWindow, BaseWidget):
 
         # Try to resize the window to fit everything without being too small or too large. The text
         # size-based calculations are there to approximately account for differences in text size on
-        # different systems, as this has an effect how large the window should be.
+        # different computers, as this has an effect how large the window should be.
         textSizeInfo = QFontMetrics(self.font()).boundingRect(
             "The quick brown fox jumps over the lazy dog"
         )
@@ -50,6 +50,9 @@ class MainWindow(QMainWindow, BaseWidget):
         self.presetPicker.setStartDirectory(UserFileDirs.RunInstance)
         self.presetPicker.setValueGetter(self.value)
         self.presetPicker.setValueSetter(self.setValue)
+
+        self.setSimulating(False)
+        self.setAborting(False)
 
         # Connect forwarded signals
         self.fluorophoreSettings.valueChanged.connect(self.fluorophoreSettingsModelSet)
@@ -78,6 +81,7 @@ class MainWindow(QMainWindow, BaseWidget):
             self.btnSimulateFrc.setText("SIMULATING…")
         else:
             self.btnSimulateFrc.setText("SIMULATE")
+            self.pbProgress.setVisible(False)
 
     def setAborting(self, aborting: bool) -> None:
         """ Sets whether the current simulation is being aborted. """
@@ -87,6 +91,9 @@ class MainWindow(QMainWindow, BaseWidget):
             self.btnAbort.setText("Aborting…")
         else:
             self.btnAbort.setText("Abort")
+
+    def setProgressBarVisible(self, visible: bool) -> None:
+        self.pbProgress.setVisible(visible)
 
     def value(self) -> RunInstance:
         return self._presenter.model

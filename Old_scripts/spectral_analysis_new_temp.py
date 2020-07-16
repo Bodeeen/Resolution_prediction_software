@@ -188,7 +188,9 @@ def radial_profile(data, center):
     return radialprofile
 
 
-def simulate(run_instance, abort_signal: Optional[Signal] = None):
+def simulate(run_instance, abort_signal: Optional[Signal] = None,
+             preprocessing_finished_callback: Optional[Signal] = None,
+             progress_updated_callback: Optional[Signal] = None):
     aborting = False
     completed_simulations = 0
 
@@ -200,13 +202,17 @@ def simulate(run_instance, abort_signal: Optional[Signal] = None):
 
         abort_signal.connect(abort_handler)
 
-    run_instance.simulation_progress_updated.emit(0)
+    if progress_updated_callback is not None:
+        progress_updated_callback.emit(0)
 
     # Expand run instances
     print(run_instance)
     multivalue_paths, num_simulations = get_paths_of_multivalues(run_instance)
     print(f"{num_simulations} simulations")
     expanded_run_instances = expand_multivalues(run_instance, multivalue_paths)
+
+    if preprocessing_finished_callback is not None:
+        preprocessing_finished_callback.emit(num_simulations)
 
     # Run simulations
     def dynamic_simulate_single(data):
@@ -217,7 +223,9 @@ def simulate(run_instance, abort_signal: Optional[Signal] = None):
 
         nonlocal completed_simulations
         completed_simulations += 1
-        run_instance.simulation_progress_updated.emit(completed_simulations / num_simulations)
+
+        if progress_updated_callback is not None:
+            progress_updated_callback.emit(completed_simulations / num_simulations)
         
         return result
 

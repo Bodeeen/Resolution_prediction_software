@@ -26,8 +26,6 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
             self._model.pulse_scheme_loaded.disconnect(self._onPulseSchemeLoad)
             self._model.sample_properties_loaded.disconnect(self._onSamplePropertiesLoad)
             self._model.camera_properties_loaded.disconnect(self._onCameraPropertiesLoad)
-
-            self._model.simulation_progress_updated.disconnect(self._onSimulationProgressUpdate)
         except AttributeError:
             pass
 
@@ -47,8 +45,6 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
         model.pulse_scheme_loaded.connect(self._onPulseSchemeLoad)
         model.sample_properties_loaded.connect(self._onSamplePropertiesLoad)
         model.camera_properties_loaded.connect(self._onCameraPropertiesLoad)
-
-        model.simulation_progress_updated.connect(self._onSimulationProgressUpdate)
 
     # Methods
     def __init__(self, widget) -> None:
@@ -92,6 +88,7 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
         self._actionLock.unlock()
         self.widget.setSimulating(False)
         self.widget.setAborting(False)
+        self.widget.setProgressBarVisible(False)
 
     # Model event handling
     def _onFluorophoreSettingsLoad(self, fluorophoreSettings: FluorophoreSettings) -> None:
@@ -108,9 +105,6 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
 
     def _onCameraPropertiesLoad(self, cameraProperties: CameraProperties) -> None:
         self.widget.updateCameraProperties(cameraProperties)
-
-    def _onSimulationProgressUpdate(self, progress: float) -> None:
-        self.widget.updateSimulationProgress(progress)
 
     # UI event handling
     @pyqtSlot(FluorophoreSettings)
@@ -151,6 +145,8 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
             self._currentWorker.signals.done.connect(self._onWorkerDone)
             self._currentWorker.signals.aborted.connect(self._onWorkerAbort)
             self._currentWorker.signals.error.connect(self._onWorkerError)
+            self._currentWorker.signals.preprocessingFinished.connect(self._onWorkerPreprocessed)
+            self._currentWorker.signals.progressUpdated.connect(self._onWorkerProgressUpdate)
             self._threadPool.start(self._currentWorker)
 
     @pyqtSlot()
@@ -158,8 +154,12 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
         if self._currentWorker is None or self._currentWorker.hasFinished():
             return
 
-        self.widget.setAborting(True)
-        self._currentWorker.abort()
+        confirmation_result = QMessageBox.question(
+            self.widget, "Abort Simulation", "Abort the current simulation?")
+
+        if confirmation_result == QMessageBox.Yes:
+            self.widget.setAborting(True)
+            self._currentWorker.abort()
 
     # Worker stuff
     @pyqtSlot(FrcSimulationResults)
@@ -182,6 +182,14 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
             self._doPostSimulationReset()
             self.widget.updateSimulationProgress(0)
 
+    @pyqtSlot(int)
+    def _onWorkerPreprocessed(self, numEvaluations: int) -> None:
+        self.widget.setProgressBarVisible(numEvaluations > 1)
+
+    @pyqtSlot(float)
+    def _onWorkerProgressUpdate(self, progress: float) -> None:
+        self.widget.updateSimulationProgress(progress)
+
     class FRCWorker(QRunnable):
         def __init__(self, runInstance: RunInstance) -> None:
             super().__init__()
@@ -192,7 +200,10 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
 
         def run(self) -> None:
             try:
-                results = self._runInstance.simulate_frc()
+                results = self._runInstance.simulate_frc(
+                    self.signals.preprocessingFinished, self.signals.progressUpdated
+                )
+
                 if results is not None:
                     self.signals.done.emit(results)
                 else:
@@ -213,3 +224,6 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
             done = pyqtSignal(FrcSimulationResults)
             aborted = pyqtSignal()
             error = pyqtSignal(str)
+
+            preprocessingFinished = pyqtSignal(int)
+            progressUpdated = pyqtSignal(float)
