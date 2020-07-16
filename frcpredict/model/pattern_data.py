@@ -10,8 +10,8 @@ from skimage.transform import resize
 
 from frcpredict.util import (
     get_canvas_params, multi_accepting_field,
-    gaussian_test1, doughnut_test1, airy_test1,
-    digital_pinhole_test1, physical_pinhole_test1
+    generate_gaussian, generate_doughnut, generate_airy,
+    generate_digital_pinhole, generate_physical_pinhole
 )
 from .multivalue import Multivalue
 
@@ -97,7 +97,7 @@ class GaussianPatternData(PatternData):
 
     # Methods
     def get_numpy_array(self, pixels_per_nm: float) -> np.ndarray:
-        return gaussian_test1(amplitude=self.amplitude, fwhm=self.fwhm, pixels_per_nm=pixels_per_nm)
+        return generate_gaussian(amplitude=self.amplitude, fwhm=self.fwhm, pixels_per_nm=pixels_per_nm)
 
     def __str__(self) -> str:
         return f"Gaussian; amplitude = {self.amplitude}, FWHM = {self.fwhm} nm"
@@ -114,7 +114,7 @@ class DoughnutPatternData(PatternData):
 
     # Methods
     def get_numpy_array(self, pixels_per_nm: float) -> np.ndarray:
-        return doughnut_test1(periodicity=self.periodicity, pixels_per_nm=pixels_per_nm)
+        return generate_doughnut(periodicity=self.periodicity, pixels_per_nm=pixels_per_nm)
 
     def __str__(self) -> str:
         return f"Doughnut; periodicity = {self.periodicity} nm"
@@ -132,7 +132,7 @@ class AiryPatternData(PatternData):
 
     # Methods
     def get_numpy_array(self, pixels_per_nm: float) -> np.ndarray:
-        return airy_test1(amplitude=self.amplitude, fwhm=self.fwhm, pixels_per_nm=pixels_per_nm)
+        return generate_airy(amplitude=self.amplitude, fwhm=self.fwhm, pixels_per_nm=pixels_per_nm)
 
     def __str__(self) -> str:
         return f"Airy; amplitude = {self.amplitude}, FWHM = {self.fwhm} nm"
@@ -149,7 +149,7 @@ class DigitalPinholePatternData(PatternData):
 
     # Methods
     def get_numpy_array(self, pixels_per_nm: float) -> np.ndarray:
-        return digital_pinhole_test1(fwhm=self.fwhm, pixels_per_nm=pixels_per_nm)
+        return generate_digital_pinhole(fwhm=self.fwhm, pixels_per_nm=pixels_per_nm)
 
     def __str__(self) -> str:
         return f"Digital pinhole; FWHM = {self.fwhm} nm"
@@ -166,7 +166,7 @@ class PhysicalPinholePatternData(PatternData):
 
     # Methods
     def get_numpy_array(self, pixels_per_nm: float) -> np.ndarray:
-        return physical_pinhole_test1(radius=self.radius, pixels_per_nm=pixels_per_nm)
+        return generate_physical_pinhole(radius=self.radius, pixels_per_nm=pixels_per_nm)
 
     def __str__(self) -> str:
         return f"Physical pinhole; radius = {self.radius} nm"

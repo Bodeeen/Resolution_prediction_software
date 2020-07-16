@@ -17,7 +17,7 @@ def get_canvas_params(pixels_per_nm: float) -> Tuple[int, int]:
     return canvas_inner_radius_px, canvas_side_length_px
 
 
-def gaussian_test1(amplitude: float, fwhm: float, pixels_per_nm: float) -> np.ndarray:
+def generate_gaussian(amplitude: float, fwhm: float, pixels_per_nm: float) -> np.ndarray:
     stddev = fwhm / pixels_per_nm * gaussian_fwhm_to_sigma
     model = Gaussian2D(amplitude=amplitude, x_stddev=stddev, y_stddev=stddev)
 
@@ -27,7 +27,7 @@ def gaussian_test1(amplitude: float, fwhm: float, pixels_per_nm: float) -> np.nd
     return result
 
 
-def doughnut_test1(periodicity: float, pixels_per_nm: float) -> np.ndarray:
+def generate_doughnut(periodicity: float, pixels_per_nm: float) -> np.ndarray:
     def Doughnut1D(radius: float) -> np.ndarray:
         return np.where(
             radius < periodicity / (2 * pixels_per_nm),
@@ -38,7 +38,7 @@ def doughnut_test1(periodicity: float, pixels_per_nm: float) -> np.ndarray:
     return Doughnut1D(_radial_to_2d(pixels_per_nm))
 
 
-def airy_test1(amplitude: float, fwhm: float, pixels_per_nm: float) -> np.ndarray:
+def generate_airy(amplitude: float, fwhm: float, pixels_per_nm: float) -> np.ndarray:
     airy_radius = fwhm/pixels_per_nm * 0.353/(0.61/2)  # TODO: Might not be correct
     model = AiryDisk2D(amplitude=amplitude, radius=airy_radius)
 
@@ -48,8 +48,8 @@ def airy_test1(amplitude: float, fwhm: float, pixels_per_nm: float) -> np.ndarra
     return result
 
 
-def digital_pinhole_test1(fwhm: float, pixels_per_nm: float) -> np.ndarray:
-    g_base = gaussian_test1(amplitude=1, fwhm=fwhm, pixels_per_nm=pixels_per_nm)
+def generate_digital_pinhole(fwhm: float, pixels_per_nm: float) -> np.ndarray:
+    g_base = generate_gaussian(amplitude=1, fwhm=fwhm, pixels_per_nm=pixels_per_nm)
     const_base = np.ones_like(g_base)
 
     b0_vec = g_base.reshape(g_base.size)
@@ -62,7 +62,7 @@ def digital_pinhole_test1(fwhm: float, pixels_per_nm: float) -> np.ndarray:
     return b_inv[:, 0].reshape(g_base.shape)
 
 
-def physical_pinhole_test1(radius: float, pixels_per_nm: float) -> np.ndarray:
+def generate_physical_pinhole(radius: float, pixels_per_nm: float) -> np.ndarray:
     def model(x: np.ndarray, y: np.ndarray) -> np.ndarray:
         return (x**2 + y**2 < (radius/pixels_per_nm)**2).astype(float)
 

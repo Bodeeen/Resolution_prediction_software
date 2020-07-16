@@ -4,7 +4,8 @@ from .dataclass_extras import dataclass_internal_attrs, observable_property, cle
 
 from .pattern_utils import (
     get_canvas_params,
-    gaussian_test1, doughnut_test1, airy_test1, digital_pinhole_test1, physical_pinhole_test1
+    generate_gaussian, generate_doughnut, generate_airy,
+    generate_digital_pinhole, generate_physical_pinhole
 )
 
 from .multivalue_utils import (
