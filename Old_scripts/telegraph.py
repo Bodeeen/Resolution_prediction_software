@@ -6,12 +6,16 @@ import matplotlib.pyplot as plt
 try:
     import numba
     jit = numba.jit
+    prange = numba.prange
 except ImportError:
     print("Couldn't import numba. This might be a little slow...")
+
     def jit(nopython=True, parallel=False):
         def pass_through(f):
             return f
         return pass_through
+
+    prange = range
 
 # https://en.wikipedia.org/wiki/Telegraph_process
 # The mean and variance listed there don't map precisely on to what
@@ -44,7 +48,7 @@ def make_random_telegraph_data(num_trials=10000, t_on = 1.0, t_off=1.0, t_bleach
     """
     output_array = np.zeros(num_trials)
     N_switch_array = np.zeros(num_trials)
-    for i in numba.prange(num_trials):
+    for i in prange(num_trials):
         on_time = 0.0
         t_elapsed = 0.0
         N_switches = -1
