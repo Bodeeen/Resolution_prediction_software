@@ -1,16 +1,14 @@
-from astropy.modeling.functional_models import AiryDisk2D, Gaussian2D
-from astropy.stats import gaussian_fwhm_to_sigma
-import numpy as np
 from typing import Tuple
 
-# Temp stuff!
-# TODO: Make everything better.
+import numpy as np
+from astropy.modeling.functional_models import AiryDisk2D, Gaussian2D
+from astropy.stats import gaussian_fwhm_to_sigma
 
 
-_canvas_inner_radius_nm = 2000
-
-
+# Functions
 def get_canvas_params(pixels_per_nm: float) -> Tuple[int, int]:
+    """ Returns the inner radius and side length of the canvas respectively, in pixels. """
+
     canvas_inner_radius_px = np.int(_canvas_inner_radius_nm / pixels_per_nm)
     canvas_side_length_px = canvas_inner_radius_px * 2 - 1
 
@@ -18,6 +16,8 @@ def get_canvas_params(pixels_per_nm: float) -> Tuple[int, int]:
 
 
 def generate_gaussian(amplitude: float, fwhm: float, pixels_per_nm: float) -> np.ndarray:
+    """ Generates a 2D gaussian pattern. """
+
     stddev = fwhm / pixels_per_nm * gaussian_fwhm_to_sigma
     model = Gaussian2D(amplitude=amplitude, x_stddev=stddev, y_stddev=stddev)
 
@@ -28,6 +28,8 @@ def generate_gaussian(amplitude: float, fwhm: float, pixels_per_nm: float) -> np
 
 
 def generate_doughnut(periodicity: float, pixels_per_nm: float) -> np.ndarray:
+    """ Generates a 2D doughnut pattern. """
+
     def Doughnut1D(radius: float) -> np.ndarray:
         return np.where(
             radius < periodicity / (2 * pixels_per_nm),
@@ -39,7 +41,9 @@ def generate_doughnut(periodicity: float, pixels_per_nm: float) -> np.ndarray:
 
 
 def generate_airy(amplitude: float, fwhm: float, pixels_per_nm: float) -> np.ndarray:
-    airy_radius = fwhm/pixels_per_nm * 0.353/(0.61/2)  # TODO: Might not be correct
+    """ Generates a 2D airy pattern. """
+
+    airy_radius = fwhm / pixels_per_nm * 0.353 / (0.61 / 2)  # TODO: Might not be correct
     model = AiryDisk2D(amplitude=amplitude, radius=airy_radius)
 
     x, y = _canvas_meshgrid(pixels_per_nm)
@@ -49,6 +53,8 @@ def generate_airy(amplitude: float, fwhm: float, pixels_per_nm: float) -> np.nda
 
 
 def generate_digital_pinhole(fwhm: float, pixels_per_nm: float) -> np.ndarray:
+    """ Generates a 2D digital pinhole pattern. """
+
     g_base = generate_gaussian(amplitude=1, fwhm=fwhm, pixels_per_nm=pixels_per_nm)
     const_base = np.ones_like(g_base)
 
@@ -63,15 +69,18 @@ def generate_digital_pinhole(fwhm: float, pixels_per_nm: float) -> np.ndarray:
 
 
 def generate_physical_pinhole(radius: float, pixels_per_nm: float) -> np.ndarray:
+    """ Generates a 2D physical pinhole pattern. """
+
     def model(x: np.ndarray, y: np.ndarray) -> np.ndarray:
-        return (x**2 + y**2 < (radius/pixels_per_nm)**2).astype(float)
+        return (x ** 2 + y ** 2 < (radius / pixels_per_nm) ** 2).astype(float)
 
     x, y = _canvas_meshgrid(pixels_per_nm)
     result = model(x, y)
-    
+
     return result
 
 
+# Internal functions
 def _canvas_meshgrid(pixels_per_nm: float) -> np.ndarray:
     canvas_inner_radius_px, _ = get_canvas_params(pixels_per_nm)
 
@@ -85,4 +94,8 @@ def _canvas_meshgrid(pixels_per_nm: float) -> np.ndarray:
 
 def _radial_to_2d(pixels_per_nm: float) -> np.ndarray:
     x, y = _canvas_meshgrid(pixels_per_nm)
-    return np.sqrt(x**2 + y**2)
+    return np.sqrt(x ** 2 + y ** 2)
+
+
+# Constants
+_canvas_inner_radius_nm = 2000
