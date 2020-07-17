@@ -23,6 +23,9 @@ class MultivalueListSignals:
 
 
 class MultivaluesEditWidget(BaseWidget):
+    # Signals
+    optimizeClicked = pyqtSignal()
+
     # Methods
     def __init__(self, *args, **kwargs) -> None:
         self._inspectionCheckBoxes = []
@@ -32,6 +35,12 @@ class MultivaluesEditWidget(BaseWidget):
         self._currentMultivalueValues = None
 
         super().__init__(__file__, *args, **kwargs)
+
+        # Prepare UI elements
+        self.btnOptimize.setVisible(False)
+
+        # Connect forwarded signals
+        self.btnOptimize.clicked.connect(self.optimizeClicked)
 
     def updateEditWidgets(self,
                           results: Optional[FrcSimulationResults]) -> MultivalueListSignals:
@@ -114,6 +123,8 @@ class MultivaluesEditWidget(BaseWidget):
                     QLabel(fieldText, font=fieldLabelFont),
                     hBox
                 )
+
+        self.btnOptimize.setVisible(results is not None and len(results.multivalue_paths) > 0)
 
         self._inspectionCheckBoxes = inspectionCheckBoxes
         self._multivalueSliders = sliders

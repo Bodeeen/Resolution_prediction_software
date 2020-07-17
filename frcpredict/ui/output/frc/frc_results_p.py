@@ -58,6 +58,7 @@ class FrcResultsPresenter(BasePresenter[FrcSimulationResultsView]):
 
         # Prepare UI events
         widget.thresholdChanged.connect(self._uiThresholdChange)
+        widget.optimizeClicked.connect(self._uiClickOptimize)
         widget.importResultsClicked.connect(self._uiClickImportResults)
         widget.exportResultsClicked.connect(self._uiClickExportResults)
 
@@ -161,6 +162,27 @@ class FrcResultsPresenter(BasePresenter[FrcSimulationResultsView]):
     @pyqtSlot(float)
     def _uiThresholdChange(self, threshold: float) -> None:
         self.model.threshold = threshold
+
+    @pyqtSlot()
+    def _uiClickOptimize(self) -> None:
+        """
+        Sets the multivalues to the values that give the best resolution at the current threshold.
+        """
+
+        if self.model.results.frc_curves is None:
+            return
+
+        bestMultivalueIndices = self.model.multivalue_value_indices
+        bestResolution = math.inf
+
+        curveIterator = np.nditer(self.model.results.frc_curves, flags=["refs_ok", "multi_index"])
+        for curve in curveIterator:
+            resolutionForCurve = curve.item().resolution_at_threshold(self.model.threshold)
+            if resolutionForCurve is not None and resolutionForCurve < bestResolution:
+                bestMultivalueIndices = list(curveIterator.multi_index)
+                bestResolution = resolutionForCurve
+
+        self.model.multivalue_value_indices = bestMultivalueIndices
 
     @pyqtSlot()
     def _uiClickImportResults(self) -> None:

@@ -17,6 +17,7 @@ class FrcResultsWidget(BaseWidget):
 
     # Signals
     thresholdChanged = pyqtSignal(float)
+    optimizeClicked = pyqtSignal()
     importResultsClicked = pyqtSignal()
     exportResultsClicked = pyqtSignal()
 
@@ -48,6 +49,7 @@ class FrcResultsWidget(BaseWidget):
 
         # Connect forwarded signals
         self.editThreshold.valueChanged.connect(self.thresholdChanged)
+        self.multivaluesEdit.optimizeClicked.connect(self.optimizeClicked)
         self.btnImportResults.clicked.connect(self.importResultsClicked)
         self.btnExportResults.clicked.connect(self.exportResultsClicked)
 
