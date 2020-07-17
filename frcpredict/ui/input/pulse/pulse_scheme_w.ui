@@ -41,6 +41,18 @@
         <string>Selected Pulse</string>
        </property>
        <layout class="QGridLayout" name="gridLayout">
+        <property name="leftMargin">
+         <number>18</number>
+        </property>
+        <property name="topMargin">
+         <number>18</number>
+        </property>
+        <property name="rightMargin">
+         <number>18</number>
+        </property>
+        <property name="bottomMargin">
+         <number>18</number>
+        </property>
         <item row="0" column="0">
          <widget class="PulsePropertiesWidget" name="editProperties" native="true"/>
         </item>
@@ -93,6 +105,12 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>PlotWidget</class>
+   <extends>QWidget</extends>
+   <header>pyqtgraph</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>PresetPickerWidget</class>
    <extends>QWidget</extends>
    <header>frcpredict.ui</header>
@@ -102,12 +120,6 @@
    <class>PulsePropertiesWidget</class>
    <extends>QWidget</extends>
    <header>frcpredict.ui</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>PlotWidget</class>
-   <extends>QWidget</extends>
-   <header>pyqtgraph</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

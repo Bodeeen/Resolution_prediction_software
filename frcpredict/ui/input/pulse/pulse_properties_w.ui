@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>365</width>
-    <height>102</height>
+    <width>315</width>
+    <height>84</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -25,6 +25,18 @@
   <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0">
    <property name="spacing">
     <number>12</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
    </property>
    <item>
     <layout class="QFormLayout" name="frmBasicProperties">
@@ -172,15 +184,15 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>ExtendedFreeFloatBox</class>
+   <extends>QWidget</extends>
+   <header>frcpredict.ui</header>
+  </customwidget>
+  <customwidget>
    <class>PatternFieldWidget</class>
    <extends>QWidget</extends>
    <header>frcpredict.ui</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>ExtendedFreeFloatBox</class>
-   <extends>QWidget</extends>
-   <header>frcpredict.ui</header>
   </customwidget>
   <customwidget>
    <class>ExtendedSpinBox</class>

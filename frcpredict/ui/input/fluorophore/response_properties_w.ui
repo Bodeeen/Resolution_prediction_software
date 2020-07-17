@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>243</width>
-    <height>95</height>
+    <height>77</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,6 +19,18 @@
    </property>
    <property name="verticalSpacing">
     <number>6</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
    </property>
    <item row="0" column="0">
     <widget class="QLabel" name="lblWavelength">
@@ -87,6 +99,9 @@
  </customwidgets>
  <tabstops>
   <tabstop>editWavelength</tabstop>
+  <tabstop>editOffToOn</tabstop>
+  <tabstop>editOnToOff</tabstop>
+  <tabstop>editEmission</tabstop>
  </tabstops>
  <resources/>
  <connections/>
