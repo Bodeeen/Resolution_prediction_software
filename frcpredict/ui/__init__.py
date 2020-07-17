@@ -29,3 +29,4 @@ from .input.camera.camera_properties_w import CameraPropertiesWidget
 
 # Output
 from .output.frc.frc_results_w import FrcResultsWidget
+from .output.frc.multivalues_edit import MultivaluesEditWidget

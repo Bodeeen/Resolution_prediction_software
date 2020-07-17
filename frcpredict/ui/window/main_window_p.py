@@ -133,14 +133,6 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
         if self._actionLock.tryLock():
             self.widget.setSimulating(True)
 
-            # Clear results
-            self.widget.setFrcSimulationResults(
-                FrcSimulationResults(
-                    run_instance=None, multivalue_paths=[], frc_curves=np.array([])
-                )
-            )
-
-            # Do work
             self._currentWorker = self.FRCWorker(self.model)
             self._currentWorker.signals.done.connect(self._onWorkerDone)
             self._currentWorker.signals.aborted.connect(self._onWorkerAbort)

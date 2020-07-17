@@ -1,16 +1,13 @@
-from functools import reduce
 from typing import Optional, List, Union
 
 import numpy as np
 import pyqtgraph as pg
-from PyQt5.QtCore import pyqtSignal, Qt, pyqtBoundSignal
-from PyQt5.QtGui import QFontMetrics
-from PyQt5.QtWidgets import QHBoxLayout, QLabel, QSlider
+from PyQt5.QtCore import pyqtSignal, Qt
 
 from frcpredict.model import FrcCurve, FrcSimulationResults, FrcSimulationResultsView
 from frcpredict.ui import BaseWidget
-from frcpredict.util import get_value_from_path
 from .frc_results_p import FrcResultsPresenter
+from .multivalues_edit import MultivalueListSignals
 
 
 class FrcResultsWidget(BaseWidget):
@@ -18,13 +15,15 @@ class FrcResultsWidget(BaseWidget):
     A widget that displays results of an FRC simulation.
     """
 
+    # Signals
     thresholdChanged = pyqtSignal(float)
     importResultsClicked = pyqtSignal()
     exportResultsClicked = pyqtSignal()
 
+    # Methods
     def __init__(self, *args, **kwargs) -> None:
-        self._valueLabels = []
-        self._thresholdPlotItem = None
+        self._currentFrcCurve = None
+        self._thresholdPlotItems = []
 
         super().__init__(__file__, *args, **kwargs)
 
@@ -37,7 +36,17 @@ class FrcResultsWidget(BaseWidget):
         )
         self.plotFrc.setLabel("bottom", "Resolution [nm]")
         self.plotFrc.getAxis("bottom").setHeight(30)
+        self.plotFrc.setLabel("left", "FRC")
+        self.plotFrc.getAxis("left").setWidth(45)
 
+        self.plotInspection.getAxis("bottom").setHeight(30)
+        self.plotInspection.setLabel("left", "Resolution [nm]")
+        self.plotInspection.getAxis("left").setWidth(45)
+
+        self.plotFrc.setVisible(True)
+        self.plotInspection.setVisible(False)
+
+        # Connect forwarded signals
         self.editThreshold.valueChanged.connect(self.thresholdChanged)
         self.btnImportResults.clicked.connect(self.importResultsClicked)
         self.btnExportResults.clicked.connect(self.exportResultsClicked)
@@ -51,109 +60,102 @@ class FrcResultsWidget(BaseWidget):
     def setValue(self, value: Union[FrcSimulationResults, FrcSimulationResultsView]) -> None:
         self._presenter.model = value
 
-    def updateData(self, curve: Optional[FrcCurve]) -> None:
+    def updateMultivaluesEditWidgets(self,
+                                     results: Optional[FrcSimulationResults]) -> MultivalueListSignals:
+        """
+        Updates the multivalue editor to contain inputs for each multivalue path used in the
+        simulation. Returns an object that contains state change signals, one for each multivalue
+        path. The indices in the returned lists of signals correspond to the indices in the
+        multivalue path list.
+        """
+
+        return self.multivaluesEdit.updateEditWidgets(results)
+
+    def updateDisplayedFrcCurve(self, curve: Optional[FrcCurve],
+                                multivalueIndices: List[int], inspectedIndex: int) -> None:
         """ Draws the FRC curve in the FRC plot, and updates the parameter multivalue labels. """
 
+        self._currentFrcCurve = curve
         self.plotFrc.clear()
 
         if curve is not None:
-            # Update plot
-            self.plotFrc.plot(curve.x, curve.y, clickable=True)
-
-            # Update parameter multivalue labels
-            for i in range(0, len(self._valueLabels)):
-                self._valueLabels[i].setText("%#.4g" % curve.multivalue_values[i])
-        else:
-            self.lblResolutionValue.setText("")
+            self.plotFrc.plot(curve.x, curve.y)
+            self.multivaluesEdit.updateMultivalueValues(
+                multivalueIndices, curve.multivalue_values, inspectedIndex
+            )
 
         self.editThreshold.setEnabled(curve is not None)
         self.btnExportResults.setEnabled(curve is not None)
 
-    def updateMultivaluePaths(self,
-                              results: Optional[FrcSimulationResults]) -> List[pyqtBoundSignal]:
+    def updateViewOptions(self, threshold: float, inspectedIndex: int,
+                          inspectionCurveX: Optional[np.ndarray] = None,
+                          inspectionCurveY: Optional[np.ndarray] = None,
+                          inspectionLabel: str = "") -> None:
         """
-        Updates the multivalue inputs to contain sliders for each multivalue path used in the
-        simulation. Returns a list of value change signals, one for each multivalue path. The
-        indices in the returned list of signals correspond to the indices in the multivalue path
-        list.
+        Updates the threshold as well as the inspection state/plot. If inspectedIndex is zero or
+        greater, inspectionCurveX and inspectionCurveY must also be passed.
         """
 
-        sliderValueChangeEvents = []
-        valueLabels = []
-        
-        parameterControlLayout = self.frmMultivalueParameters.layout()
+        if inspectedIndex > -1 and (inspectionCurveX is None or inspectionCurveY is None):
+            raise ValueError(
+                "inspectedIndex > -1, but inspectionCurveX and/or inspectionCurveY were not given."
+            )
 
-        # Remove all existing multivalue parameter widgets
-        for i in reversed(range(parameterControlLayout.rowCount())):
-            parameterControlLayout.removeRow(i)
+        self._updateInspection(inspectedIndex, inspectionCurveX, inspectionCurveY, inspectionLabel)
+        self._updateThreshold(threshold, inspectedIndex)
 
-        # Add new ones
-        if results is not None:
-            for multivaluePath in results.multivalue_paths:
-                # Field label
-                fieldName = reduce(
-                    lambda x, y: x + (f"[{y}]" if isinstance(y, int) else f" → {y}"),
-                    multivaluePath
-                )
+    # Internal methods
+    def _updateInspection(self, inspectedIndex: int, inspectionCurveX: Optional[np.ndarray] = None,
+                          inspectionCurveY: Optional[np.ndarray] = None, label: str = "") -> None:
+        """ Updates the inspection state/plot. """
 
-                fieldText = f"{fieldName}:"
+        # Update multivalue editor
+        self.multivaluesEdit.updateInspection(inspectedIndex)
 
-                fieldLabelFont = self.font()
-                while (QFontMetrics(fieldLabelFont).boundingRect(fieldText).width() >
-                       self.frmMultivalueParameters.width()):  # Adjust font size to fit form
-                    fieldLabelFont.setPointSize(fieldLabelFont.pointSize() - 1)
+        # Update plots
+        self.plotInspection.clear()
 
-                # Slider
-                multivalue = get_value_from_path(results.run_instance, multivaluePath)
+        if inspectedIndex > -1:
+            if inspectionCurveX is not None and inspectionCurveY is not None:
+                self.plotInspection.plot(inspectionCurveX, inspectionCurveY)
 
-                slider = QSlider(
-                    Qt.Horizontal,
-                    minimum=0,
-                    maximum=multivalue.num_values() - 1,
-                    value=0
-                )
+            self.plotInspection.setLabel("bottom", label)
 
-                # Value label
-                valueLabel = QLabel(str(multivalue.as_array()[0]))
-                valueLabel.setAlignment(Qt.AlignVCenter | Qt.AlignRight)
-                valueLabels.append(valueLabel)
+            self.plotFrc.setVisible(False)
+            self.plotInspection.setVisible(True)
+        else:
+            self.plotInspection.setVisible(False)
+            self.plotFrc.setVisible(True)
 
-                # Layout containing slider and value label
-                hBox = QHBoxLayout()
-                hBox.addWidget(slider)
-                hBox.addWidget(valueLabel)
-                hBox.setSpacing(9)
-                hBox.setStretch(0, 3)
-                hBox.setStretch(1, 2)
-
-                # Append
-                parameterControlLayout.addRow(
-                    QLabel(fieldText, font=fieldLabelFont),
-                    hBox
-                )
-
-                sliderValueChangeEvents.append(slider.valueChanged)
-
-        self._valueLabels = valueLabels
-
-        # Return slider value change signals
-        return sliderValueChangeEvents
-
-    def updateThreshold(self, curve: Optional[FrcCurve], threshold: float) -> None:
-        """ Draws the threshold line in the FRC plot. """
+    def _updateThreshold(self, threshold: float, inspectedIndex: int) -> None:
+        """ Updates the threshold-related values and draws threshold lines in the FRC plot. """
 
         self.editThreshold.setValue(threshold)
 
-        if self._thresholdPlotItem is not None:
-            self.plotFrc.removeItem(self._thresholdPlotItem)
+        for plotItem in self._thresholdPlotItems:
+            self.plotFrc.removeItem(plotItem)
 
-        if curve is not None:
-            self._thresholdPlotItem = self.plotFrc.plot([0, 1 / 25], [threshold, threshold],
-                                                        pen=pg.mkPen("r", style=Qt.DashLine))
+        self._thresholdPlotItems = []
 
-            value_at_threshold = curve.resolution_at_threshold(threshold)
+        if self._currentFrcCurve is not None and inspectedIndex < 0:
+            value_at_threshold = self._currentFrcCurve.resolution_at_threshold(threshold)
+
+            # Set resolution value label text
             self.lblResolutionValue.setText(
                 ("%.2f nm" % value_at_threshold) if value_at_threshold is not None else ""
             )
+
+            # Draw threshold lines in the FRC plot
+            if value_at_threshold is not None:
+                self._thresholdPlotItems.append(
+                    self.plotFrc.plot([0, 1 / 25], [threshold, threshold],
+                                      pen=pg.mkPen("r", style=Qt.DashLine))
+                )
+
+                if value_at_threshold != 0:
+                    self._thresholdPlotItems.append(
+                        self.plotFrc.plot([1 / value_at_threshold, 1 / value_at_threshold], [0, 1],
+                                          pen=pg.mkPen("r", style=Qt.DashLine))
+                    )
         else:
-            self.lblResolutionValue.setText("")
+            self.lblResolutionValue.setText("–")

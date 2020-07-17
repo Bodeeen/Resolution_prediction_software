@@ -350,7 +350,7 @@
          </font>
         </property>
         <property name="title">
-         <string>FRC</string>
+         <string>FRC/Resolution</string>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
          <item>

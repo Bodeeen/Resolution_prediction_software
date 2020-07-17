@@ -84,7 +84,8 @@ class FrcSimulationResults:
 
 @dataclass_json
 @dataclass_internal_attrs(
-    results_changed=Signal, multivalue_value_index_changed=Signal, threshold_changed=Signal
+    results_changed=Signal, inspected_multivalue_index_changed=Signal,
+    multivalue_value_index_changed=Signal, threshold_changed=Signal
 )
 @dataclass
 class FrcSimulationResultsView:
@@ -96,7 +97,12 @@ class FrcSimulationResultsView:
         "_results", default=None, signal_name="results_changed", emit_arg_name="results"
     )
 
-    multivalue_value_indices: List[float] = observable_property(
+    inspected_multivalue_index: int = observable_property(  # -1 if no multivalue inspected
+        "_inspected_multivalue_index", default=-1, signal_name="inspected_multivalue_index_changed",
+        emit_arg_name="inspected_multivalue_index"
+    )
+
+    multivalue_value_indices: List[int] = observable_property(  # viewed multivalue value indices
         "_multivalue_value_indices", default=[], signal_name="multivalue_value_index_changed",
         emit_arg_name="multivalue_value_indices"
     )
