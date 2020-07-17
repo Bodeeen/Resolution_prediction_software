@@ -1,6 +1,6 @@
 from PyQt5.QtCore import pyqtSignal
 
-from frcpredict.model import Pulse, PulseType, Pattern, PatternType, Multivalue
+from frcpredict.model import Pulse, Pattern, PatternType, Multivalue
 from frcpredict.ui import BaseWidget
 from frcpredict.ui.util import setFormLayoutRowVisibility, connectMulti
 from .pulse_properties_p import PulsePropertiesPresenter

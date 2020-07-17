@@ -2,7 +2,7 @@ from typing import Union
 
 from PyQt5.QtCore import pyqtSlot
 
-from frcpredict.model import Pulse, PulseType, Pattern, Array2DPatternData, Multivalue
+from frcpredict.model import Pulse, Pattern, Array2DPatternData, Multivalue
 from frcpredict.ui import BasePresenter
 from frcpredict.ui.util import connectMulti
 

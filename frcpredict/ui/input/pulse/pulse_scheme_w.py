@@ -2,7 +2,7 @@ import functools
 
 from PyQt5.QtCore import pyqtSignal
 
-from frcpredict.model import PulseScheme, Pulse, PulseType, Pattern, Array2DPatternData, Multivalue
+from frcpredict.model import PulseScheme, Pulse, Pattern, Array2DPatternData, Multivalue
 from frcpredict.ui import BaseWidget
 from frcpredict.ui.util import UserFileDirs
 from frcpredict.util import avg_value_if_multivalue

@@ -12,16 +12,6 @@ from .pattern import Pattern, Array2DPatternData
 from .multivalue import Multivalue
 
 
-class PulseType(Enum):
-    """
-    All supported pulse types.
-    """
-
-    on = "on"
-    off = "off"
-    readout = "readout"
-
-
 @dataclass_json
 @dataclass_internal_attrs(basic_field_changed=Signal)
 @dataclass
