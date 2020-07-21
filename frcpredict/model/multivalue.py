@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import TypeVar, Generic, List
 
@@ -45,7 +45,7 @@ class ValueList(Multivalue[T]):
     A multivalue described by a list of values.
     """
 
-    values: List[T]
+    values: List[T] = field(default_factory=list)
 
     # Methods
     def add(self, value: T) -> None:

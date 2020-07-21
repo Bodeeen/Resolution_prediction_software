@@ -1,18 +1,20 @@
 import uuid
 from collections import OrderedDict
 from dataclasses import dataclass, field
-from enum import Enum
 from typing import Union, List
 
 from PySignal import Signal
 from dataclasses_json import dataclass_json
 
-from frcpredict.util import dataclass_internal_attrs, observable_property, multi_accepting_field
+from frcpredict.util import (
+    dataclass_internal_attrs, dataclass_with_observables, observable_field, multi_accepting_field
+)
 from .pattern import Pattern, Array2DPatternData
 from .multivalue import Multivalue
 
 
 @dataclass_json
+@dataclass_with_observables
 @dataclass_internal_attrs(basic_field_changed=Signal)
 @dataclass
 class Pulse:
@@ -21,18 +23,18 @@ class Pulse:
     """
 
     wavelength: Union[float, Multivalue[float]] = multi_accepting_field(  # nanometres
-        observable_property("_wavelength", default=0.0, signal_name="basic_field_changed")
+        observable_field("_wavelength", default=0.0, signal_name="basic_field_changed")
     )
 
     duration: Union[float, Multivalue[float]] = multi_accepting_field(  # milliseconds
-        observable_property("_duration", default=0.0, signal_name="basic_field_changed")
+        observable_field("_duration", default=0.0, signal_name="basic_field_changed")
     )
 
     max_intensity: Union[float, Multivalue[float]] = multi_accepting_field(  # kW/cm^2
-        observable_property("_max_intensity", default=0.0, signal_name="basic_field_changed")
+        observable_field("_max_intensity", default=0.0, signal_name="basic_field_changed")
     )
 
-    illumination_pattern: Pattern = field(default=Pattern(pattern_data=Array2DPatternData()))
+    illumination_pattern: Pattern = field(default_factory=Pattern)
 
 
 @dataclass_json
@@ -45,7 +47,7 @@ class PulseScheme:
     A description of a laser pulse scheme.
     """
 
-    pulses: List[Pulse]
+    pulses: List[Pulse] = field(default_factory=list)
 
     # Properties
     @property
@@ -54,6 +56,9 @@ class PulseScheme:
 
     @pulses.setter
     def pulses(self, pulses: List[Pulse]) -> None:
+        if not isinstance(pulses, list):
+            return
+
         self.clear_pulses()
         for pulse in pulses:
             self.add_pulse(pulse)

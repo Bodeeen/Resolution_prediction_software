@@ -72,14 +72,7 @@ class FluorophoreSettingsWidget(BaseWidget):
         else:
             # Clear properties
             self.groupProperties.setTitle("Selected Response")
-            self.editProperties.setValue(  # Clear properties
-                IlluminationResponse(
-                    wavelength=0,
-                    cross_section_off_to_on=0.0,
-                    cross_section_on_to_off=0.0,
-                    cross_section_emission=0.0
-                )
-            )
+            self.editProperties.setValue(IlluminationResponse())  # Clear properties
             self.editProperties.setEnabled(False)
             self.btnRemoveResponse.setEnabled(False)
 

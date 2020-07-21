@@ -46,15 +46,7 @@ class FrcResultsPresenter(BasePresenter[FrcSimulationResultsView]):
 
     # Methods
     def __init__(self, widget) -> None:
-        # Initialize model
-        model = FrcSimulationResultsView(
-            results=None,
-            inspected_multivalue_index=-1,
-            multivalue_value_indices=[],
-            threshold=0.15
-        )
-
-        super().__init__(model, widget)
+        super().__init__(FrcSimulationResultsView(), widget)
 
         # Prepare UI events
         widget.thresholdChanged.connect(self._uiThresholdChange)

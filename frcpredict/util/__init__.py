@@ -1,6 +1,8 @@
 from .colour_utils import wavelength_to_rgb
 
-from .dataclass_extras import dataclass_internal_attrs, observable_property, clear_signals
+from .dataclass_extras import (
+    dataclass_internal_attrs, dataclass_with_observables, observable_field, clear_signals
+)
 
 from .pattern_utils import (
     get_canvas_params,

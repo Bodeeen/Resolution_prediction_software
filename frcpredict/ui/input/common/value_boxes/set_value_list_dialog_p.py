@@ -41,11 +41,8 @@ class SetValueListPresenter(BasePresenter[ValueList], Generic[T]):
 
     # Methods
     def __init__(self, widget) -> None:
-        # Initialize model
-        model = ValueList(values=[])
-
-        super().__init__(model, widget)
         self._selectedValue = None
+        super().__init__(ValueList(), widget)
 
         # Prepare UI events
         widget.valueSelectionChanged.connect(self._uiValueSelectionChange)

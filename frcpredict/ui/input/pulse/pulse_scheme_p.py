@@ -38,12 +38,8 @@ class PulseSchemePresenter(BasePresenter[PulseScheme]):
 
     # Methods
     def __init__(self, widget) -> None:
-        # Initialize model
-        model = PulseScheme(pulses=[])
-
-        # Initialize self
         self._selectedPulseKey = None
-        super().__init__(model, widget)
+        super().__init__(PulseScheme(), widget)
 
         # Prepare UI elements
         widget.setSelectedPulse(None)

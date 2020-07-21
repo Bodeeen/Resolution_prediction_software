@@ -32,13 +32,7 @@ class CameraPropertiesPresenter(BasePresenter[CameraProperties]):
 
     # Methods
     def __init__(self, widget) -> None:
-        # Initialize model
-        model = CameraProperties(
-            readout_noise=0.0,
-            quantum_efficiency=0.0
-        )
-        
-        super().__init__(model, widget)
+        super().__init__(CameraProperties(), widget)
 
         # Prepare UI events
         connectMulti(widget.readoutNoiseChanged, [float, Multivalue],

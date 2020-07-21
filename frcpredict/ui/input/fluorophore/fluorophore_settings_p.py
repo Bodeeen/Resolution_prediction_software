@@ -40,11 +40,8 @@ class FluorophoreSettingsPresenter(BasePresenter[FluorophoreSettings]):
 
     # Methods
     def __init__(self, widget) -> None:
-        # Initialize model
-        model = FluorophoreSettings(responses=[])
-
-        super().__init__(model, widget)
         self._selectedResponse = None
+        super().__init__(FluorophoreSettings(), widget)
 
         # Prepare UI events
         widget.responseSelectionChanged.connect(self._uiResponseSelectionChange)

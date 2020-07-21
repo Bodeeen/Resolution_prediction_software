@@ -25,13 +25,7 @@ class ResponsePropertiesPresenter(BasePresenter[IlluminationResponse]):
 
     # Methods
     def __init__(self, widget) -> None:
-        # Initialize model
-        model = IlluminationResponse(
-            wavelength=0,
-            cross_section_off_to_on=0.0, cross_section_on_to_off=0.0, cross_section_emission=0.0
-        )
-
-        super().__init__(model, widget)
+        super().__init__(IlluminationResponse(), widget)
 
         # Prepare UI events
         widget.wavelengthChanged.connect(self._uiWavelengthChange)

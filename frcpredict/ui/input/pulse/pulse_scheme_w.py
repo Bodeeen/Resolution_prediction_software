@@ -76,15 +76,7 @@ class PulseSchemeWidget(BaseWidget):
             self.editProperties.setEnabled(True)
             self.btnRemovePulse.setEnabled(True)
         else:
-            # Clear properties
-            self.editProperties.setValue(
-                Pulse(
-                    wavelength=0,
-                    duration=0.0,
-                    max_intensity=0.0,
-                    illumination_pattern=Pattern(pattern_data=Array2DPatternData())
-                )
-            )
+            self.editProperties.setValue(Pulse())  # Clear properties
             self.editProperties.setEnabled(False)
             self.btnRemovePulse.setEnabled(False)
 

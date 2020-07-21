@@ -32,14 +32,7 @@ class SamplePropertiesPresenter(BasePresenter[SampleProperties]):
 
     # Methods
     def __init__(self, widget) -> None:
-        # Initialize model
-        model = SampleProperties(
-            spectral_power=1.0,
-            labelling_density=1.0,
-            K_origin=1.0
-        )
-
-        super().__init__(model, widget)
+        super().__init__(SampleProperties(), widget)
 
         # Prepare UI events
         connectMulti(widget.spectralPowerChanged, [float, Multivalue],

@@ -1,6 +1,5 @@
 from traceback import format_exc
 
-import numpy as np
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QObject, QThreadPool, QRunnable, QMutex
 from PyQt5.QtWidgets import QMessageBox
 
@@ -48,27 +47,7 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
 
     # Methods
     def __init__(self, widget) -> None:
-        # Initialize model
-        model = RunInstance(
-            fluorophore_settings=FluorophoreSettings(responses=[]),
-            imaging_system_settings=ImagingSystemSettings(
-                optical_psf=Pattern(pattern_data=Array2DPatternData()),
-                pinhole_function=Pattern(pattern_data=Array2DPatternData()),
-                scanning_step_size=20.0
-            ),
-            pulse_scheme=PulseScheme(pulses=[]),
-            sample_properties=SampleProperties(
-                spectral_power=1.0,
-                labelling_density=1.0,
-                K_origin=1.0
-            ),
-            camera_properties=CameraProperties(
-                readout_noise=0.0,
-                quantum_efficiency=0.75
-            )
-        )
-
-        super().__init__(model, widget)
+        super().__init__(RunInstance(), widget)
         self._threadPool = QThreadPool.globalInstance()
         self._actionLock = QMutex()
         self._currentWorker = None

@@ -58,9 +58,9 @@ class Pattern:
     def __init__(self, pattern_type: Optional[PatternType] = None,
                  pattern_data: Optional[Union[dict, PatternData]] = None):
         if pattern_type is None and pattern_data is None:
-            raise ValueError("Either pattern type or pattern data must be specified")
-
-        if pattern_data is not None:
+            self.pattern_type = PatternType.array2d
+            self.pattern_data = Array2DPatternData()
+        elif pattern_data is not None:
             if isinstance(pattern_data, dict):
                 if pattern_type is None:
                     raise ValueError(

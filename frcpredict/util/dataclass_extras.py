@@ -1,17 +1,26 @@
+from dataclasses import fields
 from typing import Any, Optional
 
 from PySignal import Signal
 
 
-def dataclass_internal_attrs(cls=None, super_cls: type = object, **internal_attr_factories):
+class observable_property(property):
+    def __init__(self, fget, fset, default) -> None:
+        self.default = default
+        super().__init__(fget, fset)
+
+
+def dataclass_internal_attrs(cls=None, **internal_attr_factories):
     """
     Decorator for adding internal attributes into the dataclass. This is useful for declaring
     attributes that should be hidden when the dataclass is serialized to a string or JSON.
     """
 
     def wrap(cls):
+        overridden_newfunc = cls.__new__
+
         def newfunc(new_cls, *_new_args, **_new_kwargs):
-            instance = super_cls().__new__(new_cls)
+            instance = overridden_newfunc(new_cls)
             for key, value in internal_attr_factories.items():
                 setattr(instance, key, value())
 
@@ -26,15 +35,44 @@ def dataclass_internal_attrs(cls=None, super_cls: type = object, **internal_attr
     return wrap(cls)
 
 
-def observable_property(internal_name: str, default: Any,
-                        signal_name: str, emit_arg_name: Optional[str] = None) -> property:
+def dataclass_with_observables(cls=None):
     """
-    A property that emits a specific PySignal signal that is also a member of its owner class.
+    Decorator for automatically initializing observable fields in a dataclass.
+    """
+
+    def wrap(cls):
+        overridden_initfunc = cls.__init__
+
+        def initfunc(self, *_init_args, **_init_kwargs):
+            overridden_initfunc(self, *_init_args, **_init_kwargs)
+
+            for dataclass_field in fields(cls):
+                if (isinstance(getattr(self, dataclass_field.name), observable_property) and
+                        isinstance(dataclass_field.default, observable_property)):
+                    default = dataclass_field.default.default
+                    if callable(default):
+                        default = default()
+
+                    setattr(self, dataclass_field.name, default)
+
+        cls.__init__ = initfunc
+        return cls
+
+    if cls is None:
+        return wrap
+
+    return wrap(cls)
+
+
+def observable_field(internal_name: str, default: Any,
+                     signal_name: str, emit_arg_name: Optional[str] = None) -> observable_property:
+    """
+    A field that emits a specific PySignal signal that is also a member of its owner class.
 
     Arguments:
-    internal_name -- the observable property will use this instance variable name internally to
-                     store the value of the property
-    default       -- default value of the property
+    internal_name -- the observable field will use this instance variable name internally to
+                     store the value of the field
+    default       -- default value of the field, or a factory for the default value
     signal_name   -- the name of an attribute in the same class instance, that is the signal that
                      should be emitted
     emit_arg_name -- the name of an attribute in the same class instance, the value of which will be
@@ -43,20 +81,20 @@ def observable_property(internal_name: str, default: Any,
     """
 
     def getter(self):
-        return getattr(self, internal_name, default)
+        return getattr(self, internal_name)
 
     def setter(self, value: Any):
         setattr(self, internal_name, value)
 
-        signal = getattr(self, signal_name, None)
+        signal = getattr(self, signal_name)
         if signal:
             if emit_arg_name is not None:
-                emit_arg = getattr(self, emit_arg_name, None)
+                emit_arg = getattr(self, emit_arg_name)
                 signal.emit(emit_arg)
             else:
                 signal.emit(self)
 
-    return property(getter, setter)
+    return observable_property(getter, setter, default)
 
 
 def clear_signals(dataclass_instance):

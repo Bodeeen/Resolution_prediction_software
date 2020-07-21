@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional, Union, List
 
 import numpy as np
@@ -7,12 +7,13 @@ from PySignal import Signal
 from scipy.interpolate import interp1d
 
 from frcpredict.util import (
-    dataclass_internal_attrs, observable_property, multi_accepting_field
+    dataclass_internal_attrs, dataclass_with_observables, observable_field, multi_accepting_field
 )
 from .multivalue import Multivalue
 
 
 @dataclass_json
+@dataclass_with_observables
 @dataclass_internal_attrs(basic_field_changed=Signal)
 @dataclass
 class IlluminationResponse:
@@ -20,22 +21,22 @@ class IlluminationResponse:
     A description of the illumination response of a fluorophore at a certain wavelength.
     """
 
-    wavelength: float = observable_property("_wavelength", default=0.0,
-                                          signal_name="basic_field_changed")  # nanometres
+    wavelength: float = observable_field("_wavelength", default=0.0,
+                                         signal_name="basic_field_changed")  # nanometres
 
     cross_section_off_to_on: Union[float, Multivalue[float]] = multi_accepting_field(
-        observable_property("_cross_section_off_to_on", default=0.0,
-                            signal_name="basic_field_changed")
+        observable_field("_cross_section_off_to_on", default=0.0,
+                         signal_name="basic_field_changed")
     )
 
     cross_section_on_to_off: Union[float, Multivalue[float]] = multi_accepting_field(
-        observable_property("_cross_section_on_to_off", default=0.0,
-                            signal_name="basic_field_changed")
+        observable_field("_cross_section_on_to_off", default=0.0,
+                         signal_name="basic_field_changed")
     )
 
     cross_section_emission: Union[float, Multivalue[float]] = multi_accepting_field(
-        observable_property("_cross_section_emission", default=0.0,
-                            signal_name="basic_field_changed")
+        observable_field("_cross_section_emission", default=0.0,
+                         signal_name="basic_field_changed")
     )
 
     # Methods
@@ -51,7 +52,7 @@ class FluorophoreSettings:
     A description of a fluorophore.
     """
 
-    responses: List[IlluminationResponse]
+    responses: List[IlluminationResponse] = field(default_factory=list)
 
     # Properties
     @property
@@ -60,6 +61,9 @@ class FluorophoreSettings:
 
     @responses.setter
     def responses(self, responses: List[IlluminationResponse]) -> None:
+        if not isinstance(responses, list):
+            return
+
         self.clear_responses()
         for response in responses:
             self.add_response(response)

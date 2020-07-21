@@ -33,11 +33,7 @@ class GeneratePatternPresenter(BasePresenter[Pattern]):
     # Methods
     def __init__(self, widget, normalisePreview: bool = False) -> None:
         self._normalisePreview = normalisePreview
-
-        # Initialize model
-        model = Pattern(pattern_data=Array2DPatternData())
-
-        super().__init__(model, widget)
+        super().__init__(Pattern(), widget)
 
         # Prepare UI events
         widget.typeChanged.connect(self._uiTypeChange)

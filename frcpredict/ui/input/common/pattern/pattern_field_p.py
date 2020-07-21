@@ -33,11 +33,7 @@ class PatternFieldPresenter(BasePresenter[Pattern]):
     # Methods
     def __init__(self, widget, normaliseVisualisation: bool = False) -> None:
         self._normaliseVisualisation = normaliseVisualisation
-
-        # Initialize model
-        model = Pattern(pattern_data=Array2DPatternData())
-
-        super().__init__(model, widget)
+        super().__init__(Pattern(), widget)
 
         # Prepare UI events
         widget.loadFileClicked.connect(self._uiClickLoadFile)

@@ -34,14 +34,7 @@ class ImagingSystemSettingsPresenter(BasePresenter[ImagingSystemSettings]):
 
     # Methods
     def __init__(self, widget) -> None:
-        # Initialize model
-        model = ImagingSystemSettings(
-            optical_psf=Pattern(pattern_data=Array2DPatternData()),
-            pinhole_function=Pattern(pattern_data=Array2DPatternData()),
-            scanning_step_size=1.0
-        )
-
-        super().__init__(model, widget)
+        super().__init__(ImagingSystemSettings(), widget)
 
         # Prepare UI events
         widget.opticalPsfChanged.connect(self._uiSetOpticalPsfModel)

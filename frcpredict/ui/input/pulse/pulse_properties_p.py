@@ -33,15 +33,7 @@ class PulsePropertiesPresenter(BasePresenter[Pulse]):
 
     # Methods
     def __init__(self, widget) -> None:
-        # Initialize model
-        model = Pulse(
-            wavelength=0,
-            duration=0.0,
-            max_intensity=0.0,
-            illumination_pattern=Pattern(pattern_data=Array2DPatternData())
-        )
-
-        super().__init__(model, widget)
+        super().__init__(Pulse(), widget)
 
         # Prepare UI events
         connectMulti(widget.wavelengthChanged, [float, Multivalue], self._uiWavelengthChange)

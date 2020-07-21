@@ -7,7 +7,9 @@ from dataclasses_json import dataclass_json, config as json_config
 from marshmallow import fields
 from scipy.interpolate import interp1d
 
-from frcpredict.util import dataclass_internal_attrs, observable_property
+from frcpredict.util import (
+    dataclass_internal_attrs, dataclass_with_observables, observable_field
+)
 from .run_instance import RunInstance
 
 
@@ -83,6 +85,7 @@ class FrcSimulationResults:
 
 
 @dataclass_json
+@dataclass_with_observables
 @dataclass_internal_attrs(
     results_changed=Signal, inspected_multivalue_index_changed=Signal,
     multivalue_value_index_changed=Signal, threshold_changed=Signal
@@ -93,21 +96,21 @@ class FrcSimulationResultsView:
     A representation of a view of results of an FRC simulation.
     """
 
-    results: Optional[FrcSimulationResults] = observable_property(
+    results: Optional[FrcSimulationResults] = observable_field(
         "_results", default=None, signal_name="results_changed", emit_arg_name="results"
     )
 
-    inspected_multivalue_index: int = observable_property(  # -1 if no multivalue inspected
+    inspected_multivalue_index: int = observable_field(  # -1 if no multivalue inspected
         "_inspected_multivalue_index", default=-1, signal_name="inspected_multivalue_index_changed",
         emit_arg_name="inspected_multivalue_index"
     )
 
-    multivalue_value_indices: List[int] = observable_property(  # viewed multivalue value indices
-        "_multivalue_value_indices", default=[], signal_name="multivalue_value_index_changed",
+    multivalue_value_indices: List[int] = observable_field(  # viewed multivalue value indices
+        "_multivalue_value_indices", default=list, signal_name="multivalue_value_index_changed",
         emit_arg_name="multivalue_value_indices"
     )
 
-    threshold: float = observable_property(
+    threshold: float = observable_field(
         "_threshold", default=0.15, signal_name="threshold_changed", emit_arg_name="threshold"
     )
 
