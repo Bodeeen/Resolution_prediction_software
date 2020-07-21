@@ -66,7 +66,7 @@ class FluorophoreSettingsPresenter(BasePresenter[FluorophoreSettings]):
         if selectedItem is None:
             self._selectedResponse = None
         else:
-            self._selectedResponse = self.model.get_response(selectedItem.wavelengthStart)
+            self._selectedResponse = self.model.get_response(selectedItem.wavelength)
 
         self.widget.setSelectedResponse(self._selectedResponse)
 
@@ -92,4 +92,4 @@ class FluorophoreSettingsPresenter(BasePresenter[FluorophoreSettings]):
         )
 
         if confirmation_result == QMessageBox.Yes:
-            self.model.remove_response(self._selectedResponse.wavelength_start)
+            self.model.remove_response(self._selectedResponse.wavelength)

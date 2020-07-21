@@ -61,7 +61,11 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="ExtendedFreeFloatBox" name="editDuration" native="true"/>
+      <widget class="ExtendedFreeFloatBox" name="editDuration" native="true">
+       <property name="defaultScalarValue" stdset="0">
+        <double>1.000000000000000</double>
+       </property>
+      </widget>
      </item>
      <item row="2" column="0">
       <widget class="QLabel" name="lblMaxIntensity">
@@ -81,7 +85,7 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="ExtendedSpinBox" name="editWavelength" native="true"/>
+      <widget class="ExtendedFreeFloatBox" name="editWavelength" native="true"/>
      </item>
      <item row="3" column="1">
       <widget class="QWidget" name="editOrderContainer" native="true">

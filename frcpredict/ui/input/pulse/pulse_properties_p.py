@@ -44,7 +44,7 @@ class PulsePropertiesPresenter(BasePresenter[Pulse]):
         super().__init__(model, widget)
 
         # Prepare UI events
-        connectMulti(widget.wavelengthChanged, [int, Multivalue], self._uiWavelengthChange)
+        connectMulti(widget.wavelengthChanged, [float, Multivalue], self._uiWavelengthChange)
         connectMulti(widget.durationChanged, [float, Multivalue], self._uiDurationChange)
         connectMulti(widget.maxIntensityChanged, [float, Multivalue], self._uiMaxIntensityChange)
         widget.illuminationPatternChanged.connect(self._uiSetIlluminationPatternModel)
@@ -55,9 +55,9 @@ class PulsePropertiesPresenter(BasePresenter[Pulse]):
         self.widget.updateBasicFields(model)
 
     # UI event handling
-    @pyqtSlot(int)
+    @pyqtSlot(float)
     @pyqtSlot(Multivalue)
-    def _uiWavelengthChange(self, value: Union[int, Multivalue[int]]) -> None:
+    def _uiWavelengthChange(self, value: Union[float, Multivalue[float]]) -> None:
         self.model.wavelength = value
 
     @pyqtSlot(float)

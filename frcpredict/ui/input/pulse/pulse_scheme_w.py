@@ -48,7 +48,7 @@ class PulseSchemeWidget(BaseWidget):
         self.btnAddPulse.clicked.connect(self.addPulseClicked)
         self.btnRemovePulse.clicked.connect(self.removePulseClicked)
 
-        connectMulti(self.editProperties.wavelengthChangedByUser, [int, Multivalue],
+        connectMulti(self.editProperties.wavelengthChangedByUser, [float, Multivalue],
                      self.pulseWavelengthChangedByUser)
         connectMulti(self.editProperties.durationChangedByUser, [float, Multivalue],
                      self.pulseDurationChangedByUser)

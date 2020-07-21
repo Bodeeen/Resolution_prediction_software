@@ -20,7 +20,7 @@ class Pulse:
     A description of a laser pulse.
     """
 
-    wavelength: Union[int, Multivalue[int]] = multi_accepting_field(  # nanometres
+    wavelength: Union[float, Multivalue[float]] = multi_accepting_field(  # nanometres
         observable_property("_wavelength", default=0.0, signal_name="basic_field_changed")
     )
 

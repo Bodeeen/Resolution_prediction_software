@@ -12,8 +12,8 @@ class PulsePropertiesWidget(BaseWidget):
     """
 
     # Signals
-    wavelengthChanged = pyqtSignal([int], [Multivalue])
-    wavelengthChangedByUser = pyqtSignal([int], [Multivalue])
+    wavelengthChanged = pyqtSignal([float], [Multivalue])
+    wavelengthChangedByUser = pyqtSignal([float], [Multivalue])
     durationChanged = pyqtSignal([float], [Multivalue])
     durationChangedByUser = pyqtSignal([float], [Multivalue])
     maxIntensityChanged = pyqtSignal([float], [Multivalue])
@@ -33,9 +33,9 @@ class PulsePropertiesWidget(BaseWidget):
         )
         
         # Connect forwarded signals
-        connectMulti(self.editWavelength.valueChanged, [int, Multivalue],
+        connectMulti(self.editWavelength.valueChanged, [float, Multivalue],
                      self.wavelengthChanged)
-        connectMulti(self.editWavelength.valueChangedByUser, [int, Multivalue],
+        connectMulti(self.editWavelength.valueChangedByUser, [float, Multivalue],
                      self.wavelengthChangedByUser)
         connectMulti(self.editDuration.valueChanged, [float, Multivalue],
                      self.durationChanged)

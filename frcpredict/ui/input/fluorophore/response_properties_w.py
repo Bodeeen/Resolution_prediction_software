@@ -42,7 +42,7 @@ class ResponsePropertiesWidget(BaseWidget):
                                    visible=visible)
 
     def updateBasicFields(self, model: IlluminationResponse) -> None:
-        self.editWavelength.setValue(model.wavelength_start)
+        self.editWavelength.setValue(model.wavelength)
         self.editOffToOn.setValue(model.cross_section_off_to_on)
         self.editOnToOff.setValue(model.cross_section_on_to_off)
         self.editEmission.setValue(model.cross_section_emission)

@@ -13,7 +13,7 @@ class PulseCurveItem(PlotCurveItem):
         return self._pulseKey
 
     # Methods
-    def __init__(self, pulseKey: str, wavelength: int, startTime: float, duration: float,
+    def __init__(self, pulseKey: str, wavelength: float, startTime: float, duration: float,
                  plotEndTime: float = 0, *args, **kwargs) -> None:
         self._pulseKey = pulseKey
         self._startTime = startTime
