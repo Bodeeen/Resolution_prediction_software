@@ -38,11 +38,11 @@ class JsonContainer(Generic[DataType]):
 
         if self.program_name != frcpredict.__title__:
             warnings.append(
-                f"Data was created with program \"{self.program_name}\" which is different yours \"{frcpredict.__title__}\"")
+                f"Data was created with program \"{self.program_name}\" which is different from what you are using (\"{frcpredict.__title__}\")")
 
         if version.parse(self.program_version) > version.parse(frcpredict.__version__):
             warnings.append(
-                f"Data was created with program version \"{self.program_version}\" which is newer than yours \"{frcpredict.__version__}\"")
+                f"Data was created with program version \"{self.program_version}\" which is newer than what you are using (\"{frcpredict.__version__}\")")
 
         if self.data_type != type(self.data).__name__ and not isinstance(self.data, dict):
             warnings.append(
