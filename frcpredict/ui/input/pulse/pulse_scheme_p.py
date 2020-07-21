@@ -1,3 +1,5 @@
+from typing import Optional
+
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QMessageBox
 
@@ -51,9 +53,16 @@ class PulseSchemePresenter(BasePresenter[PulseScheme]):
         widget.plotClicked.connect(self._uiPlotClicked)
         widget.addPulseClicked.connect(self._uiClickAddPulse)
         widget.removePulseClicked.connect(self._uiClickRemovePulse)
+
+        widget.pulseWavelengthChangedByUser.connect(self._uiChangeWavelengthByUser)
         widget.pulseDurationChangedByUser.connect(self._uiChangeDurationByUser)
         widget.pulseMoveLeftClicked.connect(self._uiMovePulseLeft)
         widget.pulseMoveRightClicked.connect(self._uiMovePulseRight)
+
+    # Internal methods
+    def _updatePlotInWidget(self, keyOfPulseToHighlight: Optional[str]) -> None:
+        self.widget.updatePlot(self.model)
+        self.widget.highlightPulse(keyOfPulseToHighlight)
 
     # Model event handling
     def _onPulseAdded(self, *_args, **_kwargs) -> None:
@@ -62,12 +71,10 @@ class PulseSchemePresenter(BasePresenter[PulseScheme]):
             self.widget.setSelectedPulse(None)  # De-select currently selected pulse
 
     def _onPulseMoved(self, *_args, **_kwargs) -> None:
-        self.widget.updatePlot(self.model)
-        self.widget.highlightPulse(self._selectedPulseKey)  # Re-highlight currently selected pulse
+        self._updatePlotInWidget(self._selectedPulseKey)
 
     def _onPulseRemoved(self, *_args, **_kwargs) -> None:
-        self.widget.updatePlot(self.model)
-        self.widget.setSelectedPulse(None)
+        self._updatePlotInWidget(None)
 
     # UI event handling
     @pyqtSlot(PulseCurveItem)
@@ -108,9 +115,12 @@ class PulseSchemePresenter(BasePresenter[PulseScheme]):
             self.model.remove_pulse(self._selectedPulseKey)
 
     @pyqtSlot()
+    def _uiChangeWavelengthByUser(self) -> None:
+        self._updatePlotInWidget(self._selectedPulseKey)
+
+    @pyqtSlot()
     def _uiChangeDurationByUser(self) -> None:
-        self.widget.updatePlot(self.model)
-        self.widget.highlightPulse(self._selectedPulseKey)  # Re-highlight currently selected pulse
+        self._updatePlotInWidget(self._selectedPulseKey)
 
     @pyqtSlot()
     def _uiMovePulseLeft(self) -> None:

@@ -57,7 +57,7 @@ class FreeFloatBox(QLineEdit):
             strValue = "0"  # Assume empty string == 0
 
         try:
-            self._value = float(strValue.replace(",", ".").rstrip(".e+-"))
+            self._value = float(strValue.replace(",", "."))
             self._valid = True
 
             self.valueChanged.emit(self._value)
@@ -67,8 +67,11 @@ class FreeFloatBox(QLineEdit):
             self.setStyleSheet("")  # Remove red border if it was there
         except ValueError:
             self._valid = False
-            if self._shouldHighlightIfInvalid:
-                self.setStyleSheet("border: 1px solid red")  # Red border if invalid value
+            if self._shouldHighlightIfInvalid and strValue != "-":
+                try:
+                    float(strValue.replace(",", ".").rstrip(".e+-"))
+                except ValueError:
+                    self.setStyleSheet("border: 1px solid red")  # Red border if invalid value
 
     @pyqtSlot()
     def _onFinishEditing(self) -> None:

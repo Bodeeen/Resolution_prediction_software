@@ -13,6 +13,7 @@ class PulsePropertiesWidget(BaseWidget):
 
     # Signals
     wavelengthChanged = pyqtSignal([int], [Multivalue])
+    wavelengthChangedByUser = pyqtSignal([int], [Multivalue])
     durationChanged = pyqtSignal([float], [Multivalue])
     durationChangedByUser = pyqtSignal([float], [Multivalue])
     maxIntensityChanged = pyqtSignal([float], [Multivalue])
@@ -34,6 +35,8 @@ class PulsePropertiesWidget(BaseWidget):
         # Connect forwarded signals
         connectMulti(self.editWavelength.valueChanged, [int, Multivalue],
                      self.wavelengthChanged)
+        connectMulti(self.editWavelength.valueChangedByUser, [int, Multivalue],
+                     self.wavelengthChangedByUser)
         connectMulti(self.editDuration.valueChanged, [float, Multivalue],
                      self.durationChanged)
         connectMulti(self.editDuration.valueChangedByUser, [float, Multivalue],
@@ -48,11 +51,6 @@ class PulsePropertiesWidget(BaseWidget):
         # Initialize presenter
         self._presenter = PulsePropertiesPresenter(self)
 
-    def setEditWavelengthEnabled(self, enabled: bool) -> None:
-        """ Sets whether the field for editing the wavelength is enabled. """
-        self.editWavelength.setEnabled(enabled)
-        self.editWavelength.allowSetList = enabled
-    
     def setChangeOrderVisible(self, visible: bool) -> None:
         """
         Sets whether the buttons for changing the pulse's position in the scheme are visible.

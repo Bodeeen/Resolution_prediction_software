@@ -55,9 +55,22 @@ class BaseExtendedValueBox(BaseWidget, Generic[T]):
         if self.isUiLoaded():
             self._updateMultivalueButtons()
 
+    @pyqtProperty(float)
+    def defaultScalarValue(self) -> T:
+        return self._defaultScalarValue
+
+    @defaultScalarValue.setter
+    def defaultScalarValue(self, value: T) -> None:
+        self._defaultScalarValue = float(value) if self._containsFloatValue else int(value)
+
     @property
     @abstractmethod
     def valueChanged(self) -> pyqtBoundSignal:
+        pass
+
+    @property
+    @abstractmethod
+    def valueChangedByUser(self) -> pyqtBoundSignal:
         pass
 
     @property
@@ -73,10 +86,13 @@ class BaseExtendedValueBox(BaseWidget, Generic[T]):
         self._multivalue = None
         self._allowSetList = True
         self._allowSetRange = self._containsFloatValue
+        self._defaultScalarValue = 0.0 if self._containsFloatValue else 0
 
         self._innerBoxValueGetter = widgetValueGetter
         self._innerBoxValueSetter = widgetValueSetter
         self._innerBoxTextSetter = widgetTextSetter
+
+        self._innerBoxValueSetter(self._defaultScalarValue)
 
         super().__init__(__file__, *args, **kwargs)
         self.infoText = ""
@@ -97,13 +113,14 @@ class BaseExtendedValueBox(BaseWidget, Generic[T]):
 
     def setValue(self, value: Union[T, Multivalue[T]]) -> None:
         """ Sets the value of the field. """
+
         if type(value) is type(self.value()) and value == self.value():
             return
 
         valueIsMulti = isinstance(value, Multivalue)
 
         self._multivalue = value if valueIsMulti else None
-        if hasattr(self.editValue, "setReadOnly"):
+        if hasattr(self.editValue, "setReadOnly") and callable(self.editValue.setReadOnly):
             self.editValue.setReadOnly(valueIsMulti)
         else:
             self.editValue.setEnabled(not valueIsMulti)
@@ -154,6 +171,7 @@ class BaseExtendedValueBox(BaseWidget, Generic[T]):
 
         if okClicked:
             self.setValue(valueList)
+            self.valueChangedByUser[Multivalue].emit(valueList)
 
     @pyqtSlot()
     def _onClickSetRange(self) -> None:
@@ -165,16 +183,18 @@ class BaseExtendedValueBox(BaseWidget, Generic[T]):
         valueRange, okClicked = SetValueRangeDialog.getValueRange(self, initialValue=self.value())
         if okClicked:
             self.setValue(valueRange)
+            self.valueChangedByUser[Multivalue].emit(valueRange)
 
     @pyqtSlot()
     def _onClickResetToScalar(self) -> None:
         """ Resets the value to a scalar value. """
-        self.setValue(0.0 if self._containsFloatValue else 0)
+        valueToSet = self._defaultScalarValue
+        self.setValue(valueToSet)
+        self.valueChangedByUser[float if self._containsFloatValue else int].emit(valueToSet)
 
     @pyqtSlot()
     def _onClickInfo(self) -> None:
         """ Shows information about the field (e.g. an explanation of it). """
-
         infoBox = QMessageBox(QMessageBox.NoIcon, "Field Information", self._infoText, parent=self)
         infoBox.setAttribute(Qt.WA_DeleteOnClose)  # Prevent memory leak
         infoBox.exec_()

@@ -50,6 +50,9 @@ def connectMulti(signal: pyqtSignal, arg_types: List[type],
     """
 
     for arg_type in arg_types:
-        signal[arg_type].connect(
-            handler[arg_type] if isinstance(handler, pyqtBoundSignal) else handler
-        )
+        try:
+            signal[arg_type].connect(
+                handler[arg_type] if isinstance(handler, pyqtBoundSignal) else handler
+            )
+        except KeyError:
+            signal[arg_type].connect(handler)

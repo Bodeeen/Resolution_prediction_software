@@ -4,7 +4,7 @@ from PyQt5.QtCore import pyqtSignal
 
 from frcpredict.model import PulseScheme, Pulse, Pattern, Array2DPatternData, Multivalue
 from frcpredict.ui import BaseWidget
-from frcpredict.ui.util import UserFileDirs
+from frcpredict.ui.util import connectMulti, UserFileDirs
 from frcpredict.util import avg_value_if_multivalue
 from .pulse_scheme_p import PulseSchemePresenter
 from .pulse_curve_item import PulseCurveItem
@@ -23,6 +23,8 @@ class PulseSchemeWidget(BaseWidget):
     plotClicked = pyqtSignal(object)
     addPulseClicked = pyqtSignal()
     removePulseClicked = pyqtSignal()
+
+    pulseWavelengthChangedByUser = pyqtSignal()
     pulseDurationChangedByUser = pyqtSignal()
     pulseMoveLeftClicked = pyqtSignal()
     pulseMoveRightClicked = pyqtSignal()
@@ -36,8 +38,6 @@ class PulseSchemeWidget(BaseWidget):
         self.presetPicker.setStartDirectory(UserFileDirs.PulseScheme)
         self.presetPicker.setValueGetter(self.value)
         self.presetPicker.setValueSetter(self.setValue)
-        
-        self.editProperties.setEditWavelengthEnabled(False)
 
         self.plot.setMouseEnabled(x=False, y=False)
         self.plot.setMenuEnabled(False)
@@ -47,7 +47,11 @@ class PulseSchemeWidget(BaseWidget):
         self.plot.scene().sigMouseClicked.connect(self.plotClicked)
         self.btnAddPulse.clicked.connect(self.addPulseClicked)
         self.btnRemovePulse.clicked.connect(self.removePulseClicked)
-        self.editProperties.durationChangedByUser.connect(self.pulseDurationChangedByUser)
+
+        connectMulti(self.editProperties.wavelengthChangedByUser, [int, Multivalue],
+                     self.pulseWavelengthChangedByUser)
+        connectMulti(self.editProperties.durationChangedByUser, [float, Multivalue],
+                     self.pulseDurationChangedByUser)
         self.editProperties.moveLeftClicked.connect(self.pulseMoveLeftClicked)
         self.editProperties.moveRightClicked.connect(self.pulseMoveRightClicked)
 
@@ -108,15 +112,15 @@ class PulseSchemeWidget(BaseWidget):
         
         nextStartTime = 1
         for (key, pulse) in model._pulses.items():
-            curve = PulseCurveItem(
-                key, wavelength=int(round(avg_value_if_multivalue(pulse.wavelength))),
-                startTime=nextStartTime, duration=avg_value_if_multivalue(pulse.duration),
-                plotEndTime=plotEndTime
-            )
+            wavelength = avg_value_if_multivalue(pulse.wavelength)
+            duration = avg_value_if_multivalue(pulse.duration)
+
+            curve = PulseCurveItem(key, wavelength=wavelength, startTime=nextStartTime,
+                                   duration=duration, plotEndTime=plotEndTime)
 
             curve.sigClicked.connect(self._onCurveClicked)
             self.plot.addItem(curve)
-            nextStartTime += curve.duration + 1
+            nextStartTime += duration + 1
 
     # Internal methods
     def _onCurveClicked(self, curve) -> None:

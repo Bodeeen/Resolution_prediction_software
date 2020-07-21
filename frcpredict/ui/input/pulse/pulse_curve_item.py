@@ -9,16 +9,8 @@ from frcpredict.util import wavelength_to_rgb
 class PulseCurveItem(PlotCurveItem):
     # Properties
     @property
-    def pulseKey(self):
+    def pulseKey(self) -> str:
         return self._pulseKey
-
-    @property
-    def startTime(self):
-        return self._startTime
-
-    @property
-    def duration(self):
-        return self._duration
 
     # Methods
     def __init__(self, pulseKey: str, wavelength: int, startTime: float, duration: float,
@@ -34,18 +26,6 @@ class PulseCurveItem(PlotCurveItem):
 
         self.unhighlight()
 
-    def setTimeData(self, startTime: float = None, duration: float = None) -> None:
-        """ Updates start time and duration in plot. """
-
-        if startTime is not None:
-            self._startTime = startTime
-
-        if duration is not None:
-            self._duration = duration
-
-        x, y = self._getValues(startTime, duration)
-        self.setData(x, y)
-
     def highlight(self) -> None:
         """ Highlights the item by making the curve thicker and moving it to the front. """
         self.setPen(self._colour, width=4)
@@ -54,7 +34,7 @@ class PulseCurveItem(PlotCurveItem):
     def unhighlight(self) -> None:
         """ Un-highlights the item. """
         self.setPen(self._colour, width=2)
-        self.setZValue(self.startTime)
+        self.setZValue(self._startTime)
 
     # Internal methods
     def _getValues(self, startTime: float, duration: float) -> Tuple[np.ndarray, np.ndarray]:
