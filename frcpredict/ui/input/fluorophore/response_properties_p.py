@@ -41,12 +41,12 @@ class ResponsePropertiesPresenter(BasePresenter[IlluminationResponse]):
 
     # Model event handling
     def _onBasicFieldChange(self, model: IlluminationResponse) -> None:
-        """ Loads basic model fields (e.g. ints) into the widget. """
+        """ Loads basic model fields (e.g. float values) into the widget. """
         self.widget.updateBasicFields(model)
 
     # UI event handling
-    @pyqtSlot(int)
-    def _uiWavelengthChange(self, value: int) -> None:
+    @pyqtSlot(float)
+    def _uiWavelengthChange(self, value: float) -> None:
         self.model.wavelength = value
 
     @pyqtSlot(float)

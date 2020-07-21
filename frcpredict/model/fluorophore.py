@@ -20,7 +20,7 @@ class IlluminationResponse:
     A description of the illumination response of a fluorophore at a certain wavelength.
     """
 
-    wavelength: int = observable_property("_wavelength", default=0,
+    wavelength: float = observable_property("_wavelength", default=0.0,
                                           signal_name="basic_field_changed")  # nanometres
 
     cross_section_off_to_on: Union[float, Multivalue[float]] = multi_accepting_field(
@@ -79,7 +79,7 @@ class FluorophoreSettings:
         self.response_added.emit(response)
         return True
 
-    def remove_response(self, wavelength: int) -> None:
+    def remove_response(self, wavelength: float) -> None:
         """ Removes the response with the specified wavelength attributes. """
         removed_response = self._responses.pop(wavelength)
         self.response_removed.emit(removed_response)
