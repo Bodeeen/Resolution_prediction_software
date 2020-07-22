@@ -64,7 +64,8 @@ class ValueList(Multivalue[T]):
             self.remove(value)
 
     def as_array(self) -> np.ndarray:
-        return np.array(self.values)
+        sorted_values = sorted(self.values)
+        return np.array(sorted_values)
 
     def avg_value(self) -> float:
         return sum(self.values) / len(self.values)
@@ -73,8 +74,9 @@ class ValueList(Multivalue[T]):
         return len(self.values)
 
     def __str__(self) -> str:
-        valuesStringList = list(map(str, self.values))
-        return f"{{{', '.join(valuesStringList)}}}"
+        sorted_values = sorted(self.values)
+        values_string_list = list(map(str, sorted_values))
+        return f"{{{', '.join(values_string_list)}}}"
 
 
 class RangeType(Enum):

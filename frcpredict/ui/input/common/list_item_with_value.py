@@ -7,7 +7,7 @@ T = TypeVar("T")
 
 class ListItemWithValue(QListWidgetItem, Generic[T]):
     """
-    Custom QListWidgetItem that holds a value.
+    Custom QListWidgetItem that holds a value and can be sorted by it.
     """
 
     # Methods
@@ -17,3 +17,9 @@ class ListItemWithValue(QListWidgetItem, Generic[T]):
 
     def value(self) -> T:
         return self._value
+
+    def __lt__(self, other: QListWidgetItem) -> bool:
+        return self.value() < other.value()
+
+    def __gt__(self, other: QListWidgetItem) -> bool:
+        return self.value() > other.value()

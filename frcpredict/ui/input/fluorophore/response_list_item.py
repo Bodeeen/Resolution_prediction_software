@@ -2,12 +2,14 @@ from PyQt5.QtGui import QColor, QPixmap, QIcon
 from PyQt5.QtWidgets import QListWidgetItem
 
 from frcpredict.model import IlluminationResponse
+from frcpredict.ui import ListItemWithValue
 from frcpredict.util import wavelength_to_rgb
 
 
-class ResponseListItem(QListWidgetItem):
+class ResponseListItem(ListItemWithValue):
     """
-    Custom QListWidgetItem that can be initialized/updated with and sorted by wavelength.
+    Custom QListWidgetItem that can be initialized/updated with a fluorophore response and sorted by
+    wavelength, and displays an colour indicator that indicates the wavelength.
     """
 
     # Properties
@@ -17,16 +19,10 @@ class ResponseListItem(QListWidgetItem):
 
     # Methods
     def __init__(self, response: IlluminationResponse, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
         self._wavelength = response.wavelength
+
+        super().__init__(text=str(response), value=response.wavelength, *args, **kwargs)
         self.setIcon(self._generateIcon(response.wavelength))
-        self.setText(str(response))
-
-    def __lt__(self, other: QListWidgetItem) -> bool:
-        return self.wavelength < other.wavelength
-
-    def __gt__(self, other: QListWidgetItem) -> bool:
-        return self.wavelength > other.wavelength
 
     # Internal methods
     def _generateIcon(self, wavelength: float) -> QIcon:

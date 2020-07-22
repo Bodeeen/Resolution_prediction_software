@@ -8,6 +8,7 @@ from .window.main_window_w import MainWindow
 
 
 # Input
+from .input.common.list_item_with_value import ListItemWithValue
 from .input.common.preset_picker import PresetPickerWidget
 from .input.common.value_boxes.free_float_box import FreeFloatBox
 from .input.common.value_boxes.extended_free_float_box import ExtendedFreeFloatBox
