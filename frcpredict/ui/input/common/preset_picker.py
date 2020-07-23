@@ -7,7 +7,6 @@ from PyQt5.QtWidgets import QMessageBox, QFileDialog
 
 from frcpredict.model import JsonContainer
 from frcpredict.ui import BaseWidget
-import frcpredict.ui.resources
 
 
 class PresetPickerWidget(BaseWidget):

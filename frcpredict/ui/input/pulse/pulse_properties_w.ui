@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>315</width>
-    <height>84</height>
+    <height>81</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -106,17 +106,24 @@
          <number>0</number>
         </property>
         <item row="0" column="0">
-         <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0,1">
+         <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,0">
           <item>
-           <widget class="QPushButton" name="btnMoveLeft">
+           <widget class="QToolButton" name="btnMoveLeft">
             <property name="maximumSize">
              <size>
-              <width>24</width>
-              <height>24</height>
+              <width>16777215</width>
+              <height>20</height>
              </size>
             </property>
+            <property name="toolTip">
+             <string>Move left</string>
+            </property>
             <property name="text">
-             <string>&lt;</string>
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>:/left.svg</normaloff>:/left.svg</iconset>
             </property>
            </widget>
           </item>
@@ -134,15 +141,22 @@
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="btnMoveRight">
+           <widget class="QToolButton" name="btnMoveRight">
             <property name="maximumSize">
              <size>
-              <width>24</width>
-              <height>24</height>
+              <width>16777215</width>
+              <height>20</height>
              </size>
             </property>
+            <property name="toolTip">
+             <string>Move right</string>
+            </property>
             <property name="text">
-             <string>&gt;</string>
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>:/right.svg</normaloff>:/right.svg</iconset>
             </property>
            </widget>
           </item>
@@ -194,12 +208,6 @@
   </customwidget>
   <customwidget>
    <class>PatternFieldWidget</class>
-   <extends>QWidget</extends>
-   <header>frcpredict.ui</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>ExtendedSpinBox</class>
    <extends>QWidget</extends>
    <header>frcpredict.ui</header>
    <container>1</container>

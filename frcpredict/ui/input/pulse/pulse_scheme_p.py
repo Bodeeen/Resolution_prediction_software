@@ -3,7 +3,7 @@ from typing import Optional
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QMessageBox
 
-from frcpredict.model import PulseScheme
+from frcpredict.model import PulseScheme, Pulse
 from frcpredict.ui import BasePresenter
 from .add_pulse_dialog import AddPulseDialog
 from .pulse_curve_item import PulseCurveItem
@@ -29,7 +29,7 @@ class PulseSchemePresenter(BasePresenter[PulseScheme]):
         self._model = model
 
         # Trigger model change event handlers
-        self._onPulseAdded()
+        self.widget.updatePlot(model)
 
         # Prepare model events
         model.pulse_added.connect(self._onPulseAdded)
@@ -61,16 +61,20 @@ class PulseSchemePresenter(BasePresenter[PulseScheme]):
         self.widget.highlightPulse(keyOfPulseToHighlight)
 
     # Model event handling
-    def _onPulseAdded(self, *_args, **_kwargs) -> None:
+    def _onPulseAdded(self, key: str, pulse: Pulse) -> None:
         self.widget.updatePlot(self.model)
-        if self._selectedPulseKey is not None:
-            self.widget.setSelectedPulse(None)  # De-select currently selected pulse
 
-    def _onPulseMoved(self, *_args, **_kwargs) -> None:
+        self._selectedPulseKey = key
+        self.widget.setSelectedPulse(pulse)
+        self.widget.highlightPulse(key)
+
+    def _onPulseMoved(self, _key: str, _pulse: Pulse) -> None:
         self._updatePlotInWidget(self._selectedPulseKey)
 
-    def _onPulseRemoved(self, *_args, **_kwargs) -> None:
+    def _onPulseRemoved(self, _key: str, _pulse: Pulse) -> None:
         self._updatePlotInWidget(None)
+        self.widget.setSelectedPulse(None)
+        self.widget.clearPlotHighlighting()
 
     # UI event handling
     @pyqtSlot(PulseCurveItem)

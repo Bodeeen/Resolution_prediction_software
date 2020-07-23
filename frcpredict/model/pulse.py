@@ -118,3 +118,6 @@ class PulseScheme:
                 i += 1
 
         self.pulse_moved.emit(key, self._pulses[key])
+
+    def get_pulses_with_keys(self):
+        return self._pulses.items()

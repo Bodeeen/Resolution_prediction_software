@@ -1,3 +1,7 @@
+# Resources
+import frcpredict.ui.resources
+
+
 # Base
 from .base_widget import BaseWidget
 from .base_presenter import BasePresenter

@@ -1,8 +1,9 @@
-import functools
+from functools import reduce
+from typing import Optional
 
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, pyqtSlot
 
-from frcpredict.model import PulseScheme, Pulse, Pattern, Array2DPatternData, Multivalue
+from frcpredict.model import PulseScheme, Pulse, Multivalue
 from frcpredict.ui import BaseWidget
 from frcpredict.ui.util import connectMulti, UserFileDirs
 from frcpredict.util import avg_value_if_multivalue
@@ -43,6 +44,9 @@ class PulseSchemeWidget(BaseWidget):
         self.plot.setMenuEnabled(False)
         self.plot.getAxis("left").setTicks([[(0, "OFF"), (1, "ON")]])
 
+        # Connect own signal slots
+        self.presetPicker.dataLoaded.connect(self._onLoadPreset)
+
         # Connect forwarded signals
         self.plot.scene().sigMouseClicked.connect(self.plotClicked)
         self.btnAddPulse.clicked.connect(self.addPulseClicked)
@@ -68,7 +72,7 @@ class PulseSchemeWidget(BaseWidget):
         if emitSignal:
             self.valueChanged.emit(model)
 
-    def setSelectedPulse(self, pulse: Pulse) -> None:
+    def setSelectedPulse(self, pulse: Optional[Pulse]) -> None:
         """ Updates controls and pulse properties widget based on the current selection. """
 
         if pulse is not None:
@@ -76,7 +80,8 @@ class PulseSchemeWidget(BaseWidget):
             self.editProperties.setEnabled(True)
             self.btnRemovePulse.setEnabled(True)
         else:
-            self.editProperties.setValue(Pulse())  # Clear properties
+            # Clear properties
+            self.editProperties.setValue(Pulse())
             self.editProperties.setEnabled(False)
             self.btnRemovePulse.setEnabled(False)
 
@@ -97,23 +102,25 @@ class PulseSchemeWidget(BaseWidget):
         """ Redraws the pulse scheme plot based on the passed model. """
         self.plot.clear()
 
-        plotEndTime = functools.reduce(
+        plotEndTime = reduce(
             lambda current, pulse: 1 + current + avg_value_if_multivalue(pulse.duration),
             model._pulses.values(), 0
         )
         
         nextStartTime = 1
-        for (key, pulse) in model._pulses.items():
+        for (key, pulse) in model.get_pulses_with_keys():
             wavelength = avg_value_if_multivalue(pulse.wavelength)
             duration = avg_value_if_multivalue(pulse.duration)
 
             curve = PulseCurveItem(key, wavelength=wavelength, startTime=nextStartTime,
                                    duration=duration, plotEndTime=plotEndTime)
 
-            curve.sigClicked.connect(self._onCurveClicked)
+            curve.sigClicked.connect(lambda clickedCurve: self.pulseClicked.emit(clickedCurve))
             self.plot.addItem(curve)
             nextStartTime += duration + 1
 
-    # Internal methods
-    def _onCurveClicked(self, curve) -> None:
-        self.pulseClicked.emit(curve)
+    # Event handling
+    @pyqtSlot()
+    def _onLoadPreset(self) -> None:
+        self.setSelectedPulse(None)
+        self.clearPlotHighlighting()

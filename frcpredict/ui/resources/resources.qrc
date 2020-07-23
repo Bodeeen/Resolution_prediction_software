@@ -6,6 +6,8 @@
         <file alias="save_as.svg">breeze_icons/document-save-as.svg</file>
         <file alias="view_list_details.svg">breeze_icons/view-list-details.svg</file>
 
+        <file alias="left.svg">breeze_icons/derived/left.svg</file>
+        <file alias="right.svg">breeze_icons/derived/right.svg</file>
         <file alias="range.svg">breeze_icons/derived/range.svg</file>
     </qresource>
 </RCC>
