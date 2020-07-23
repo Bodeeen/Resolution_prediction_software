@@ -8,7 +8,6 @@ from frcpredict.model import Multivalue
 from frcpredict.ui import BaseWidget
 from .set_value_list_dialog_w import SetValueListDialog
 from .set_value_range_dialog import SetValueRangeDialog
-import frcpredict.ui.resources
 
 T = TypeVar("T")
 
@@ -55,14 +54,6 @@ class BaseExtendedValueBox(BaseWidget, Generic[T]):
         if self.isUiLoaded():
             self._updateMultivalueButtons()
 
-    @pyqtProperty(float)
-    def defaultScalarValue(self) -> T:
-        return self._defaultScalarValue
-
-    @defaultScalarValue.setter
-    def defaultScalarValue(self, value: T) -> None:
-        self._defaultScalarValue = float(value) if self._containsFloatValue else int(value)
-
     @property
     @abstractmethod
     def valueChanged(self) -> pyqtBoundSignal:
@@ -86,13 +77,10 @@ class BaseExtendedValueBox(BaseWidget, Generic[T]):
         self._multivalue = None
         self._allowSetList = True
         self._allowSetRange = self._containsFloatValue
-        self._defaultScalarValue = 0.0 if self._containsFloatValue else 0
 
         self._innerBoxValueGetter = widgetValueGetter
         self._innerBoxValueSetter = widgetValueSetter
         self._innerBoxTextSetter = widgetTextSetter
-
-        self._innerBoxValueSetter(self._defaultScalarValue)
 
         super().__init__(__file__, *args, **kwargs)
         self.infoText = ""
@@ -188,7 +176,14 @@ class BaseExtendedValueBox(BaseWidget, Generic[T]):
     @pyqtSlot()
     def _onClickResetToScalar(self) -> None:
         """ Resets the value to a scalar value. """
-        valueToSet = self._defaultScalarValue
+        valueToSet = 0.0
+
+        if isinstance(self.value(), Multivalue):
+            valueToSet = float("%#.4g" % self.value().avg_value())
+
+        if not self._containsFloatValue:
+            valueToSet = int(valueToSet)
+
         self.setValue(valueToSet)
         self.valueChangedByUser[float if self._containsFloatValue else int].emit(valueToSet)
 
