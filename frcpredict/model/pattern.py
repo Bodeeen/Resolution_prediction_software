@@ -5,7 +5,7 @@ import numpy as np
 from PySignal import Signal
 from typing import Optional, Union
 
-from frcpredict.util import dataclass_internal_attrs
+from frcpredict.util import dataclass_internal_attrs, extended_field
 from .pattern_data import (
     PatternData, Array2DPatternData,
     GaussianPatternData, DoughnutPatternData, AiryPatternData,
@@ -35,7 +35,8 @@ class Pattern:
     """
 
     pattern_type: PatternType = PatternType.array2d
-    pattern_data: Union[dict, PatternData] = Array2DPatternData()
+    pattern_data: Union[dict, PatternData] = extended_field(default_factory=Array2DPatternData,
+                                                            description="pattern data")
 
     # Properties
     @property

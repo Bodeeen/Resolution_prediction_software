@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QMessageBox, QFileDialog
 from frcpredict.model import FrcCurve, FrcSimulationResults, FrcSimulationResultsView, JsonContainer
 from frcpredict.ui import BasePresenter
 from frcpredict.ui.util import UserFileDirs
+from .label_utils import getLabelForMultivalue
 
 
 class FrcResultsPresenter(BasePresenter[FrcSimulationResultsView]):
@@ -85,7 +86,8 @@ class FrcResultsPresenter(BasePresenter[FrcSimulationResultsView]):
 
         if inspectedIndex > -1:
             numEvaluations = self.model.results.frc_curves.shape[inspectedIndex]
-            label = str(self.model.results.multivalue_paths[inspectedIndex][-1])
+            label = getLabelForMultivalue(self.model.results,
+                                          self.model.results.multivalue_paths[inspectedIndex])
 
             inspectedCurveX = np.zeros(numEvaluations)
             inspectedCurveY = np.zeros(numEvaluations)

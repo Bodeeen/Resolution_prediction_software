@@ -1,6 +1,6 @@
 from copy import deepcopy
-from dataclasses import field, fields, Field
-from typing import Any, Union, Tuple, List
+from dataclasses import field, fields, Field, MISSING
+from typing import Any, Optional, Union, Tuple, List, Dict
 
 from dataclasses_json import config as json_config
 import numpy as np
@@ -12,7 +12,8 @@ from .dataclass_extras import clear_signals
 FieldPath = List[Union[int, str]]
 
 
-def multi_accepting_field(default: Any) -> Field:
+def multi_accepting_field(default: Any = MISSING, *, default_factory: Any = MISSING,
+                          metadata: Optional[Dict[str, Any]] = None) -> Field:
     """
     A dataclass field that could be either a multivalue or a scalar (single) value. Multi-accepting
     fields must be initialized with this in order to be deserialized from JSON properly.
@@ -29,8 +30,9 @@ def multi_accepting_field(default: Any) -> Field:
 
     return field(
         default=default,
+        default_factory=default_factory,
         metadata=json_config(
-            {"multi_accepting": True},
+            metadata,
             decoder=decoder
         )
     )

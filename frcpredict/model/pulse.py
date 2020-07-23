@@ -1,20 +1,21 @@
 import uuid
 from collections import OrderedDict
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Union, List
 
 from PySignal import Signal
 from dataclasses_json import dataclass_json
 
 from frcpredict.util import (
-    dataclass_internal_attrs, dataclass_with_observables, observable_field, multi_accepting_field
+    dataclass_internal_attrs, dataclass_with_properties,
+    dataclass_property, observable_property, extended_field
 )
-from .pattern import Pattern, Array2DPatternData
+from .pattern import Pattern
 from .multivalue import Multivalue
 
 
 @dataclass_json
-@dataclass_with_observables
+@dataclass_with_properties
 @dataclass_internal_attrs(basic_field_changed=Signal)
 @dataclass
 class Pulse:
@@ -22,22 +23,27 @@ class Pulse:
     A description of a laser pulse.
     """
 
-    wavelength: Union[float, Multivalue[float]] = multi_accepting_field(  # nanometres
-        observable_field("_wavelength", default=0.0, signal_name="basic_field_changed")
+    wavelength: Union[float, Multivalue[float]] = extended_field(
+        observable_property("_wavelength", default=0.0, signal_name="basic_field_changed"),
+        description="wavelength [nm]", accept_multivalues=True
     )
 
-    duration: Union[float, Multivalue[float]] = multi_accepting_field(  # milliseconds
-        observable_field("_duration", default=0.0, signal_name="basic_field_changed")
+    duration: Union[float, Multivalue[float]] = extended_field(
+        observable_property("_duration", default=0.0, signal_name="basic_field_changed"),
+        description="duration [ms]", accept_multivalues=True
     )
 
-    max_intensity: Union[float, Multivalue[float]] = multi_accepting_field(  # kW/cm^2
-        observable_field("_max_intensity", default=0.0, signal_name="basic_field_changed")
+    max_intensity: Union[float, Multivalue[float]] = extended_field(
+        observable_property("_max_intensity", default=0.0, signal_name="basic_field_changed"),
+        description="max intensity [kW/cm²]", accept_multivalues=True
     )
 
-    illumination_pattern: Pattern = field(default_factory=Pattern)
+    illumination_pattern: Pattern = extended_field(default_factory=Pattern,
+                                                   description="illumination pattern")
 
 
 @dataclass_json
+@dataclass_with_properties
 @dataclass_internal_attrs(
     _pulses=OrderedDict, pulse_added=Signal, pulse_moved=Signal, pulse_removed=Signal
 )
@@ -47,21 +53,14 @@ class PulseScheme:
     A description of a laser pulse scheme.
     """
 
-    pulses: List[Pulse] = field(default_factory=list)
-
-    # Properties
-    @property
-    def pulses(self) -> List[Pulse]:
-        return [*self._pulses.values()]
-
-    @pulses.setter
-    def pulses(self, pulses: List[Pulse]) -> None:
-        if not isinstance(pulses, list):
-            return
-
-        self.clear_pulses()
-        for pulse in pulses:
-            self.add_pulse(pulse)
+    pulses: List[Pulse] = extended_field(
+        dataclass_property(
+            fget=lambda self: self._get_pulses(),
+            fset=lambda self, pulses: self._set_pulses(pulses),
+            default=list
+        ),
+        description=lambda _self, index: f"Pulse #{index + 1}"
+    )
 
     # Methods
     def add_pulse(self, pulse: Pulse) -> None:
@@ -121,3 +120,15 @@ class PulseScheme:
 
     def get_pulses_with_keys(self):
         return self._pulses.items()
+
+    # Internal methods
+    def _get_pulses(self) -> List[Pulse]:
+        return [*self._pulses.values()]
+
+    def _set_pulses(self, pulses: List[Pulse]) -> None:
+        if not isinstance(pulses, list):
+            return
+
+        self.clear_pulses()
+        for pulse in pulses:
+            self.add_pulse(pulse)

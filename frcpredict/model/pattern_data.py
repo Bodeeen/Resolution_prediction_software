@@ -9,7 +9,7 @@ from skimage.io import imread
 from skimage.transform import resize
 
 from frcpredict.util import (
-    get_canvas_params, multi_accepting_field,
+    get_canvas_params, extended_field,
     generate_gaussian, generate_doughnut, generate_airy,
     generate_digital_pinhole, generate_physical_pinhole
 )
@@ -92,12 +92,13 @@ class GaussianPatternData(PatternData):
     A description of the properties of a gaussian pattern.
     """
 
-    amplitude: Union[float, Multivalue[float]] = multi_accepting_field(default=1.0)
-    fwhm: Union[float, Multivalue[float]] = multi_accepting_field(default=480.0)  # nanometres
+    amplitude: Union[float, Multivalue[float]] = extended_field(1.0, description="amplitude")
+    fwhm: Union[float, Multivalue[float]] = extended_field(480.0, description="FWHM [nm]")
 
     # Methods
     def get_numpy_array(self, pixels_per_nm: float) -> np.ndarray:
-        return generate_gaussian(amplitude=self.amplitude, fwhm=self.fwhm, pixels_per_nm=pixels_per_nm)
+        return generate_gaussian(amplitude=self.amplitude, fwhm=self.fwhm,
+                                 pixels_per_nm=pixels_per_nm)
 
     def __str__(self) -> str:
         return f"Gaussian; amplitude = {self.amplitude}, FWHM = {self.fwhm} nm"
@@ -110,7 +111,8 @@ class DoughnutPatternData(PatternData):
     A description of the properties of a doughnut pattern.
     """
 
-    periodicity: Union[float, Multivalue[float]] = multi_accepting_field(default=540.0)  # nanometres
+    periodicity: Union[float, Multivalue[float]] = extended_field(540.0,
+                                                                  description="periodicity [nm]")
 
     # Methods
     def get_numpy_array(self, pixels_per_nm: float) -> np.ndarray:
@@ -127,8 +129,8 @@ class AiryPatternData(PatternData):
     A description of the properties of an airy pattern.
     """
 
-    amplitude: Union[float, Multivalue[float]] = multi_accepting_field(default=1.0)
-    fwhm: Union[float, Multivalue[float]] = multi_accepting_field(default=240.0)  # nanometres
+    amplitude: Union[float, Multivalue[float]] = extended_field(1.0, description="amplitude")
+    fwhm: Union[float, Multivalue[float]] = extended_field(240.0, description="FWHM [nm]")
 
     # Methods
     def get_numpy_array(self, pixels_per_nm: float) -> np.ndarray:
@@ -162,7 +164,7 @@ class PhysicalPinholePatternData(PatternData):
     A description of the properties of a physical pinhole pattern.
     """
 
-    radius: Union[float, Multivalue[float]] = multi_accepting_field(default=100.0)  # nanometres
+    radius: Union[float, Multivalue[float]] = extended_field(100.0, description="radius [nm]")
 
     # Methods
     def get_numpy_array(self, pixels_per_nm: float) -> np.ndarray:

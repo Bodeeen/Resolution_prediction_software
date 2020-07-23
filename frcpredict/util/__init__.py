@@ -1,7 +1,9 @@
 from .colour_utils import wavelength_to_rgb
 
 from .dataclass_extras import (
-    dataclass_internal_attrs, dataclass_with_observables, observable_field, clear_signals
+    dataclass_property, observable_property, extended_field, get_dataclass_field_description,
+    dataclass_internal_attrs, dataclass_with_properties,
+    clear_signals
 )
 
 from .pattern_utils import (

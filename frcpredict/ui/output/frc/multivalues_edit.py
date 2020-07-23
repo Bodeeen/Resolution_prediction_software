@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from functools import reduce
 from typing import Optional, List
 
 from PyQt5.QtCore import pyqtSignal, pyqtBoundSignal, Qt
@@ -9,6 +8,7 @@ from PyQt5.QtWidgets import QHBoxLayout, QLabel, QSlider, QCheckBox, QFrame
 from frcpredict.model import FrcSimulationResults
 from frcpredict.ui import BaseWidget
 from frcpredict.util import get_value_from_path
+from .label_utils import getLabelForMultivalue
 
 
 @dataclass
@@ -68,12 +68,7 @@ class MultivaluesEditWidget(BaseWidget):
         if results is not None:
             for multivaluePath in results.multivalue_paths:
                 # Field label
-                fieldName = reduce(
-                    lambda x, y: x + (f"[{y}]" if isinstance(y, int) else f" → {y}"),
-                    multivaluePath
-                )
-
-                fieldText = f"{fieldName}:"
+                fieldText = f"{getLabelForMultivalue(results, multivaluePath)}:"
 
                 fieldLabelFont = self.font()
                 while (QFontMetrics(fieldLabelFont).boundingRect(fieldText).width() >
