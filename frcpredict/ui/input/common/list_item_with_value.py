@@ -19,7 +19,13 @@ class ListItemWithValue(QListWidgetItem, Generic[T]):
         return self._value
 
     def __lt__(self, other: QListWidgetItem) -> bool:
-        return self.value() < other.value()
+        if isinstance(self.value(), (int, float)):
+            return self.value() < other.value()
+        else:
+            return super().__lt__(other)
 
     def __gt__(self, other: QListWidgetItem) -> bool:
-        return self.value() > other.value()
+        if isinstance(self.value(), (int, float)):
+            return self.value() > other.value()
+        else:
+            return super().__lt__(other)
