@@ -1,7 +1,8 @@
 from functools import reduce
 from typing import Optional
 
-from PyQt5.QtCore import pyqtSignal, pyqtSlot
+import pyqtgraph as pg
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, QPointF
 
 from frcpredict.model import PulseScheme, Pulse, Multivalue
 from frcpredict.ui import BaseWidget
@@ -61,6 +62,25 @@ class PulseSchemeWidget(BaseWidget):
 
         # Initialize presenter
         self._presenter = PulseSchemePresenter(self)
+
+    def getPulseCurveItemAtScenePos(self, scenePosition: QPointF) -> Optional[PulseCurveItem]:
+        """
+        Returns the pulse curve item at the given plot scene position, or None if there is no pulse
+        there.
+        """
+
+        viewBox = next(item for item in self.plot.items() if isinstance(item, pg.ViewBox))
+        viewPosition = viewBox.mapSceneToView(scenePosition)
+
+        if not(0 <= viewPosition.y() <= 1):
+            return None
+
+        pulseCurveItems = [item for item in self.plot.items() if isinstance(item, PulseCurveItem)]
+        for item in pulseCurveItems:
+            if item.startTime <= viewPosition.x() <= item.startTime + item.duration:
+                return item
+
+        return None
 
     def value(self) -> PulseScheme:
         return self._presenter.model

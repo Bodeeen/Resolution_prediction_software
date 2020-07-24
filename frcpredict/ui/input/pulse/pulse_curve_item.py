@@ -12,6 +12,14 @@ class PulseCurveItem(PlotCurveItem):
     def pulseKey(self) -> str:
         return self._pulseKey
 
+    @property
+    def startTime(self) -> float:
+        return self._startTime
+
+    @property
+    def duration(self) -> float:
+        return self._duration
+
     # Methods
     def __init__(self, pulseKey: str, wavelength: float, startTime: float, duration: float,
                  plotEndTime: float = 0, *args, **kwargs) -> None:
@@ -38,11 +46,14 @@ class PulseCurveItem(PlotCurveItem):
 
     # Internal methods
     def _getValues(self, startTime: float, duration: float) -> Tuple[np.ndarray, np.ndarray]:
-        x = np.linspace(0, self._plotEndTime + 1, 10000)
+        linspaceEnd = self._plotEndTime + 1
+        linspaceSteps = 10000
+
+        x = np.linspace(0, linspaceEnd, linspaceSteps)
         y = np.zeros(len(x))
 
         for i in range(0, len(y)):
-            if startTime <= x[i] < startTime + duration:
+            if startTime <= x[i] < startTime + max(duration, (linspaceEnd / linspaceSteps)):
                 y[i] = 1
 
         return x, y

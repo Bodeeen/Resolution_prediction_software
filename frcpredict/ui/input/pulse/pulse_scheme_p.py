@@ -87,8 +87,17 @@ class PulseSchemePresenter(BasePresenter[PulseScheme]):
 
     @pyqtSlot(object)
     def _uiPlotClicked(self, mouseClickEvent) -> None:
-        """ De-select pulse when the plot is right-clicked. """
-        if mouseClickEvent.button() == 2:
+        """
+        On left click, select the pulse that that the user clicked "inside" of if wasn't clicked
+        directly. When the plot is right-clicked, any selected pulses will be de-selected.
+        """
+
+        if mouseClickEvent.button() == 1:
+            if not isinstance(mouseClickEvent.currentItem, PulseCurveItem):
+                clickedCurve = self.widget.getPulseCurveItemAtScenePos(mouseClickEvent.scenePos())
+                if clickedCurve is not None:
+                    self._uiPulseClicked(clickedCurve)
+        elif mouseClickEvent.button() == 2:
             self.widget.setSelectedPulse(None)
             self.widget.clearPlotHighlighting()
 
