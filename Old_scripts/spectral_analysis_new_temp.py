@@ -192,10 +192,16 @@ def radial_profile(data, center):
 def simulate(run_instance, abort_signal: Optional[Signal] = None,
              preprocessing_finished_callback: Optional[Signal] = None,
              progress_updated_callback: Optional[Signal] = None):
-    aborting = False
-    completed_simulations = 0
+    # Input validation
+    if len(run_instance.fluorophore_settings.responses) < 1:
+        raise Exception("You have not set any fluorophore responses!")
+
+    if len(run_instance.pulse_scheme.pulses) < 1:
+        raise Exception("The pulse scheme is empty!")
 
     # Set up abort handling
+    aborting = False
+
     if abort_signal is not None:
         def abort_handler():
             nonlocal aborting
@@ -208,14 +214,15 @@ def simulate(run_instance, abort_signal: Optional[Signal] = None,
 
     # Expand run instances
     print(run_instance)
-    multivalue_paths, num_simulations = get_paths_of_multivalues(run_instance)
-    print(f"{num_simulations} simulations")
+    multivalue_paths, num_iterations = get_paths_of_multivalues(run_instance)
+    print(f"{num_iterations} iterations")
     expanded_run_instances = expand_multivalues(run_instance, multivalue_paths)
 
     if preprocessing_finished_callback is not None:
-        preprocessing_finished_callback.emit(num_simulations)
+        preprocessing_finished_callback.emit(num_iterations)
 
     # Run simulations
+    completed_simulations = 0
     def dynamic_simulate_single(data):
         if aborting:
             return None
@@ -226,7 +233,7 @@ def simulate(run_instance, abort_signal: Optional[Signal] = None,
         completed_simulations += 1
 
         if progress_updated_callback is not None:
-            progress_updated_callback.emit(completed_simulations / num_simulations)
+            progress_updated_callback.emit(completed_simulations / num_iterations)
         
         return result
 
