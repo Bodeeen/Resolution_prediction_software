@@ -25,12 +25,13 @@ class FluorophoreSettingsPresenter(BasePresenter[FluorophoreSettings]):
             pass
 
         # Set model
+        self._hasHandledNewModelRowChange = False
         self._model = model
 
         # Trigger model change event handlers
         self.widget.clearResponseList()
         for response in model.responses:
-            self.widget.addResponseToList(response)
+            self.widget.addResponseToList(response, select=False)
 
         self._uiResponseSelectionChange(None)
 
@@ -41,6 +42,7 @@ class FluorophoreSettingsPresenter(BasePresenter[FluorophoreSettings]):
     # Methods
     def __init__(self, widget) -> None:
         self._selectedResponse = None
+        self._hasHandledNewModelRowChange = True
         super().__init__(FluorophoreSettings(), widget)
 
         # Prepare UI events
@@ -59,6 +61,12 @@ class FluorophoreSettingsPresenter(BasePresenter[FluorophoreSettings]):
     @pyqtSlot(QListWidgetItem, QListWidgetItem)
     def _uiResponseSelectionChange(self, selectedItem: Optional[ResponseListItem], _=None) -> None:
         """ Updates state and response properties widget based on the current selection. """
+
+        if not self._hasHandledNewModelRowChange and selectedItem is not None:
+            # We do this to make sure no row is selected after loading a new model
+            self.widget.deselectSelectedRow()
+            self._hasHandledNewModelRowChange = True
+            return
 
         if selectedItem is None:
             self._selectedResponse = None

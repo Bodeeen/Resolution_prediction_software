@@ -1,3 +1,5 @@
+from typing import Optional
+
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt
 from PyQt5.QtWidgets import QListWidgetItem
 
@@ -42,11 +44,13 @@ class FluorophoreSettingsWidget(BaseWidget):
         # Initialize presenter
         self._presenter = FluorophoreSettingsPresenter(self)
 
-    def addResponseToList(self, response: IlluminationResponse) -> None:
+    def addResponseToList(self, response: IlluminationResponse, select: bool = True) -> None:
         """ Adds the specified response to the response list and selects it. """
         item = ResponseListItem(response)
         self.listResponses.addItem(item)
-        self.listResponses.setCurrentItem(item)
+
+        if select:
+            self.listResponses.setCurrentItem(item)
 
     def removeResponseFromList(self, response: IlluminationResponse) -> None:
         """ Removes the specified response from the response list and deselects it. """

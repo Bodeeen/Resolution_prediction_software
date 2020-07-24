@@ -68,6 +68,8 @@ class PulseSchemeWidget(BaseWidget):
     def setValue(self, model: PulseScheme, emitSignal: bool = True) -> None:
         self.presetPicker.setLoadedPath(None)
         self._presenter.model = model
+        self.setSelectedPulse(None)
+        self.clearPlotHighlighting()
 
         if emitSignal:
             self.valueChanged.emit(model)
