@@ -43,8 +43,8 @@ def generate_doughnut(periodicity: float, pixels_per_nm: float) -> np.ndarray:
 def generate_airy(amplitude: float, fwhm: float, pixels_per_nm: float) -> np.ndarray:
     """ Generates a 2D airy pattern. """
 
-    airy_radius = fwhm / pixels_per_nm * 0.353 / (0.61 / 2)  # TODO: Might not be correct
-    model = AiryDisk2D(amplitude=amplitude, radius=airy_radius)
+    radius = fwhm * 1.22 / pixels_per_nm
+    model = AiryDisk2D(amplitude=amplitude, radius=radius)
 
     x, y = _canvas_meshgrid(pixels_per_nm)
     result = model(x, y)
