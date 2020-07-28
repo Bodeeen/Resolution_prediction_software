@@ -1,0 +1,2 @@
+Mean: 0.039
+Variance: 0.038
