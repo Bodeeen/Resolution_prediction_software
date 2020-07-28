@@ -1,98 +1,100 @@
 from typing import Optional
 
-from PyQt5.QtCore import pyqtSlot, QObject
-from PyQt5.QtWidgets import QMessageBox, QInputDialog
+from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtWidgets import QListWidgetItem, QMessageBox
 
 from frcpredict.model import FluorophoreSettings, IlluminationResponse
+from frcpredict.ui import BasePresenter
+from .add_response_dialog import AddResponseDialog
+from .response_list_item import ResponseListItem
 
 
-class FluorophoreSettingsPresenter(QObject):
+class FluorophoreSettingsPresenter(BasePresenter[FluorophoreSettings]):
     """
     Presenter for the fluorophore settings widget.
     """
 
     # Properties
-    @property
-    def model(self) -> FluorophoreSettings:
-        return self._model
-
-    @model.setter
+    @BasePresenter.model.setter
     def model(self, model: FluorophoreSettings) -> None:
+        # Disconnect old model event handling
+        try:
+            self._model.response_added.disconnect(self._onResponseAdded)
+            self._model.response_removed.disconnect(self._onResponseRemoved)
+        except AttributeError:
+            pass
+
+        # Set model
+        self._hasHandledNewModelRowChange = self._selectedResponse is None
         self._model = model
 
-        # Update response list in widget
-        self._widget.clearResponseList()
-        for response in self.model.responses:
-            self._widget.addResponseToList(response.wavelength_start, response.wavelength_end)
+        # Trigger model change event handlers
+        self.widget.clearResponseList()
+        for response in model.responses:
+            self.widget.addResponseToList(response, select=False)
 
-        self._onResponseSelectionChange(-1)
+        self._uiResponseSelectionChange(None)
 
         # Prepare model events
         model.response_added.connect(self._onResponseAdded)
         model.response_removed.connect(self._onResponseRemoved)
 
-    # Functions
-    def __init__(self, widget, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self._widget = widget
+    # Methods
+    def __init__(self, widget) -> None:
         self._selectedResponse = None
+        self._hasHandledNewModelRowChange = True
+        super().__init__(FluorophoreSettings(), widget)
 
         # Prepare UI events
-        self._widget.listResponses.currentRowChanged.connect(self._onResponseSelectionChange)
-        self._widget.btnAddResponse.clicked.connect(self._onClickAddResponse)
-        self._widget.btnRemoveResponse.clicked.connect(self._onClickRemoveResponse)
-
-        # Init model
-        self.model = FluorophoreSettings(responses={})
+        widget.responseSelectionChanged.connect(self._uiResponseSelectionChange)
+        widget.addResponseClicked.connect(self._uiClickAddResponse)
+        widget.removeResponseClicked.connect(self._uiClickRemoveResponse)
 
     # Model event handling
     def _onResponseAdded(self, response: IlluminationResponse) -> None:
-        self._widget.addResponseToList(response)
+        self.widget.addResponseToList(response)
 
     def _onResponseRemoved(self, response: IlluminationResponse) -> None:
-        self._widget.removeResponseFromList(response)
+        self.widget.removeResponseFromList(response)
 
     # UI event handling
-    @pyqtSlot(int)
-    def _onResponseSelectionChange(self, selectedIndex: int) -> None:
+    @pyqtSlot(QListWidgetItem, QListWidgetItem)
+    def _uiResponseSelectionChange(self, selectedItem: Optional[ResponseListItem], _=None) -> None:
         """ Updates state and response properties widget based on the current selection. """
 
-        if selectedIndex < 0:
+        if not self._hasHandledNewModelRowChange and selectedItem is not None:
+            # We do this to make sure no row is selected after loading a new model
+            self.widget.deselectSelectedRow()
+            self._hasHandledNewModelRowChange = True
+            return
+
+        if selectedItem is None:
             self._selectedResponse = None
         else:
-            # TODO: Move item key logic so that we can get rid of this bad and buggy way of getting
-            #       the selected item
-            self._selectedResponse = sorted(self.model.responses,
-                                            key=lambda response: response.wavelength_start)[selectedIndex]
+            self._selectedResponse = self.model.get_response(selectedItem.wavelength)
 
-        self._widget.setSelectedResponse(self._selectedResponse)
+        self.widget.setSelectedResponse(self._selectedResponse)
 
     @pyqtSlot()
-    def _onClickAddResponse(self) -> None:
+    def _uiClickAddResponse(self) -> None:
         """
-        Adds a new response. A dialog will open for the user to enter the desired wavelength first.
-
-        TODO: Custom dialog where you can choose to enter a range, and maybe even set all
-              parameters (could just reuse response_properties with a couple of additional fields)
+        Adds a response. A dialog will open for the user to enter the properties first.
         """
 
-        wavelength, ok_pressed = QInputDialog.getInt(
-            self._widget, "Add Response", "Enter wavelength in nanometres:")
-
-        if ok_pressed:
-            self.model.add_response(IlluminationResponse(
-                wavelength_start=wavelength, wavelength_end=wavelength,
-                cross_section_off_to_on=0.5, cross_section_on_to_off=0.25, cross_section_emission=0.25
-            ))
+        response, okClicked = AddResponseDialog.getResponse(self.widget)
+        if okClicked:
+            self.model.add_response(response)
 
     @pyqtSlot()
-    def _onClickRemoveResponse(self) -> None:
+    def _uiClickRemoveResponse(self) -> None:
         """
-        Removes the currently selected response. A popup will open for the user to confirm first.
+        Removes the currently selected response. A dialog will open for the user to confirm first.
         """
 
         confirmation_result = QMessageBox.question(
-            self._widget, "Remove Response", "Remove the selected response?")
+            self.widget, "Remove Response",
+            f"Remove the selected response \"{self._selectedResponse}\"?"
+        )
 
         if confirmation_result == QMessageBox.Yes:
-            self.model.remove_response(self._selectedResponse.wavelength_start)
+            self.model.remove_response(self._selectedResponse.wavelength)

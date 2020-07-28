@@ -142,3 +142,6 @@ cython_debug/
 
 # Qt Creator autosaves
 *.autosave
+
+# frcpredict user files
+user_files/

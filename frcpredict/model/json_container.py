@@ -1,14 +1,17 @@
 from dataclasses import dataclass
+from typing import TypeVar, Generic, List
+
 from dataclasses_json import dataclass_json
 from packaging import version
-from typing import Any, Type
 
 import frcpredict
+
+DataType = TypeVar("DataType")
 
 
 @dataclass_json
 @dataclass
-class JsonContainer:
+class JsonContainer(Generic[DataType]):
     """
     This dataclass is intended to be a wrapper for objects imported/exported in JSON format. It
     contains the wrapped object itself, a name, the type of the object (for ensuring that the user
@@ -16,26 +19,59 @@ class JsonContainer:
     exported with (for checking compatibility).
     """
 
-    name: str
-    data: Any
+    data: DataType
     data_type: str
     program_name: str
     program_version: str
 
-    def __init__(self, name: str, data: Any) -> None:
-        self.name = name
+    def __init__(self, data: DataType, data_type: type = None,
+                 program_name: str = None, program_version: str = None) -> None:
         self.data = data
-        self.data_type = type(data).__name__
-        self.program_name = frcpredict.__title__
-        self.program_version = frcpredict.__version__
+        self.data_type = type(data).__name__ if data_type is None else data_type
+        self.program_name = frcpredict.__title__ if program_name is None else program_name
+        self.program_version = frcpredict.__version__ if program_version is None else program_version
 
-    def validate(self, expected_type: Type) -> bool:
+    def validate(self) -> List[str]:
+        """ Validates the loaded JSON file contents and returns a list of any issues found. """
+
+        warnings = []
+
+        if self.program_name != frcpredict.__title__:
+            warnings.append(
+                f"Data was created with program \"{self.program_name}\" which is different from what you are using (\"{frcpredict.__title__}\")")
+
+        if version.parse(self.program_version) > version.parse(frcpredict.__version__):
+            warnings.append(
+                f"Data was created with program version \"{self.program_version}\" which is newer than what you are using (\"{frcpredict.__version__}\")")
+
+        if self.data_type != type(self.data).__name__ and not isinstance(self.data, dict):
+            warnings.append(
+                f"Actual data type \"{type(self.data).__name__}\" did not match described data type \"{self.data_type}\"")
+
+        return warnings
+
+    @staticmethod
+    def from_json_with_converted_dicts(json: str, data_type: type):
         """
-        Returns true if and only if the data type in the file matches the expected type, the file
-        was generated with the same program as the one it's being run on, and the version of the
-        program that the file was generated with is not higher than the current program version.
+        Returns a model from JSON. Built upon the from_json function of the dataclasses-json
+        library, this method will properly handle the potential different types of data in the data
+        field; instead of returning it as a dict, it will be returned as an instance of its
+        corresponding dataclass.
         """
 
-        return (self.data_type == expected_type.__name__ and
-                self.program_name == frcpredict.__title__ and
-                version.parse(self.program_version) <= version.parse(frcpredict.__version__))
+        json_container = JsonContainer[data_type].from_json(json, infer_missing=True)
+
+        if json_container.data is None:
+            raise Exception("JSON does not contain data object.")
+
+        if isinstance(json_container.data, dict):
+            try:
+                json_container.data = data_type.from_dict(json_container.data)
+            except Exception as e:
+                if json_container.data_type != data_type.__name__:
+                    raise Exception(
+                        f"Described data type \"{json_container.data_type}\" did not match expected data type \"{data_type.__name__}\"")
+                else:
+                    raise e
+
+        return json_container

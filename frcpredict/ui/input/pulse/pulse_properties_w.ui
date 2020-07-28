@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>315</width>
+    <height>81</height>
+   </rect>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>16777215</width>
+    <height>16777215</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0">
+   <property name="spacing">
+    <number>12</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <layout class="QFormLayout" name="frmBasicProperties">
+     <property name="horizontalSpacing">
+      <number>9</number>
+     </property>
+     <property name="verticalSpacing">
+      <number>6</number>
+     </property>
+     <item row="0" column="0">
+      <widget class="QLabel" name="lblWavelength">
+       <property name="text">
+        <string>Wavelength [nm]:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="lblDuration">
+       <property name="text">
+        <string>Duration [ms]:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="ExtendedFreeFloatBox" name="editDuration" native="true"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="lblMaxIntensity">
+       <property name="text">
+        <string>Max intensity [kW/cm²]:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="ExtendedFreeFloatBox" name="editMaxIntensity" native="true"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="lblOrder">
+       <property name="text">
+        <string>Order:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="ExtendedFreeFloatBox" name="editWavelength" native="true"/>
+     </item>
+     <item row="3" column="1">
+      <widget class="QWidget" name="editOrderContainer" native="true">
+       <layout class="QGridLayout" name="gridLayout">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <item row="0" column="0">
+         <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,0">
+          <item>
+           <widget class="QToolButton" name="btnMoveLeft">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>20</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Move left</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>:/left.svg</normaloff>:/left.svg</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QToolButton" name="btnMoveRight">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>20</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Move right</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>:/right.svg</normaloff>:/right.svg</iconset>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
+     <property name="spacing">
+      <number>12</number>
+     </property>
+     <item alignment="Qt::AlignTop">
+      <widget class="QLabel" name="lblIlluminationPattern">
+       <property name="text">
+        <string>Illumination pattern:</string>
+       </property>
+      </widget>
+     </item>
+     <item alignment="Qt::AlignTop">
+      <widget class="PatternFieldWidget" name="editIlluminationPattern" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ExtendedFreeFloatBox</class>
+   <extends>QWidget</extends>
+   <header>frcpredict.ui</header>
+  </customwidget>
+  <customwidget>
+   <class>PatternFieldWidget</class>
+   <extends>QWidget</extends>
+   <header>frcpredict.ui</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>editWavelength</tabstop>
+  <tabstop>editDuration</tabstop>
+  <tabstop>editMaxIntensity</tabstop>
+  <tabstop>btnMoveLeft</tabstop>
+  <tabstop>btnMoveRight</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

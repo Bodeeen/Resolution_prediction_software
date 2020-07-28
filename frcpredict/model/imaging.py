@@ -1,64 +1,32 @@
-from dataclasses import dataclass, field
-from dataclasses_json import config, Exclude
-import numpy as np
-from osgeo import gdal_array
+from dataclasses import dataclass
+from typing import Union
+
 from PySignal import Signal
+from dataclasses_json import dataclass_json
 
-from frcpredict.util import observable_field
+from frcpredict.util import (
+    dataclass_internal_attrs, dataclass_with_properties, observable_property, extended_field
+)
+from .pattern import Pattern
+from .multivalue import Multivalue
 
 
+@dataclass_json
+@dataclass_with_properties
+@dataclass_internal_attrs(basic_field_changed=Signal)
 @dataclass
 class ImagingSystemSettings:
-    optical_psf: np.ndarray = observable_field(
-        "_optical_psf", default=None,
-        signal_name="optical_psf_changed", emit_arg_name="optical_psf"
+    """
+    A description of an imaging system.
+    """
+
+    optical_psf: Pattern = extended_field(default_factory=Pattern,
+                                          description="optical PSF")
+
+    pinhole_function: Pattern = extended_field(default_factory=Pattern,
+                                               description="pinhole function")
+
+    scanning_step_size: Union[float, Multivalue[float]] = extended_field(
+        observable_property("_scanning_step_size", default=20.0, signal_name="basic_field_changed"),
+        description="scanning step size [nm]", accept_multivalues=True
     )
-
-    pinhole_function: np.ndarray = observable_field(
-        "_pinhole_function", default=None,
-        signal_name="pinhole_function_changed", emit_arg_name="pinhole_function")
-
-    scanning_step_size: float = observable_field(
-        "_scanning_step_size", default=0.0,
-        signal_name="basic_field_changed"
-    )
-
-    # Signals
-    optical_psf_changed: Signal = field(
-        init=False, repr=False, default_factory=Signal, metadata=config(exclude=Exclude.ALWAYS))
-    pinhole_function_changed: Signal = field(
-        init=False, repr=False, default_factory=Signal, metadata=config(exclude=Exclude.ALWAYS))
-    basic_field_changed: Signal = field(
-        init=False, repr=False, default_factory=Signal, metadata=config(exclude=Exclude.ALWAYS))
-
-    # Functions
-    def load_optical_psf_npy(self, path: str) -> None:
-        """ Loads an optical PSF from an .npy file. """
-        self.optical_psf = np.load(path)
-
-    def load_optical_psf_image(self, path: str) -> None:
-        """ Loads an optical PSF from an image file. """
-        self.optical_psf = self._get_numpy_array_from_image(path)
-
-    def load_pinhole_function_npy(self, path: str) -> None:
-        """ Loads a pinhole function from an .npy file. """
-        self.pinhole_function = np.load(path)
-
-    def load_pinhole_function_image(self, path: str) -> None:
-        """ Loads an pinhole function from an image file. """
-        self.pinhole_function = self._get_numpy_array_from_image(path)
-
-    # Internal functions
-    def _get_numpy_array_from_image(self, path: str) -> np.ndarray:
-        """ Converts an image to a numpy array. """
-
-        raster_array = gdal_array.LoadFile(path)  # Load image as numpy array
-
-        if np.issubdtype(raster_array.dtype, np.integer):
-            raster_array = raster_array / 256.0  # Image has int values; normalise
-
-        if raster_array.ndim > 2:
-            # Image has multiple channels; average the values over the channels
-            raster_array = np.mean(raster_array, axis=0)
-
-        return raster_array

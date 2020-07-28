@@ -6,58 +6,104 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>236</width>
-    <height>90</height>
+    <width>243</width>
+    <height>77</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QFormLayout" name="formLayout">
+   <property name="horizontalSpacing">
+    <number>9</number>
+   </property>
+   <property name="verticalSpacing">
+    <number>6</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item row="0" column="0">
+    <widget class="QLabel" name="lblWavelength">
+     <property name="text">
+      <string>Wavelength [nm]:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="FreeFloatBox" name="editWavelength"/>
+   </item>
+   <item row="1" column="0">
     <widget class="QLabel" name="lblOffToOn">
      <property name="text">
       <string>ON cross section:</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="1">
-    <widget class="QDoubleSpinBox" name="editOffToOn">
-     <property name="maximum">
-      <double>100000.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
+   <item row="2" column="0">
     <widget class="QLabel" name="lblOnToOff">
      <property name="text">
       <string>OFF cross section:</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
-    <widget class="QDoubleSpinBox" name="editOnToOff">
-     <property name="maximum">
-      <double>100000.000000000000000</double>
+   <item row="3" column="0">
+    <widget class="QLabel" name="lblEmission">
+     <property name="text">
+      <string>Emission cross section:</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="lblEmission">
-     <property name="text">
-      <string>Fluorescence cross section:</string>
+   <item row="3" column="1">
+    <widget class="ExtendedFreeFloatBox" name="editEmission" native="true">
+     <property name="infoText" stdset="0">
+      <string>TODO: Add info text here.</string>
      </property>
     </widget>
    </item>
    <item row="2" column="1">
-    <widget class="QDoubleSpinBox" name="editEmission">
-     <property name="maximum">
-      <double>100000.000000000000000</double>
+    <widget class="ExtendedFreeFloatBox" name="editOnToOff" native="true">
+     <property name="infoText" stdset="0">
+      <string>TODO: Add info text here.</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="ExtendedFreeFloatBox" name="editOffToOn" native="true">
+     <property name="infoText" stdset="0">
+      <string>TODO: Add info text here.</string>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>FreeFloatBox</class>
+   <extends>QLineEdit</extends>
+   <header>frcpredict.ui</header>
+  </customwidget>
+  <customwidget>
+   <class>ExtendedFreeFloatBox</class>
+   <extends>QWidget</extends>
+   <header>frcpredict.ui</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>editWavelength</tabstop>
+  <tabstop>editOffToOn</tabstop>
+  <tabstop>editOnToOff</tabstop>
+  <tabstop>editEmission</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
