@@ -25,7 +25,7 @@ class FluorophoreSettingsPresenter(BasePresenter[FluorophoreSettings]):
             pass
 
         # Set model
-        self._hasHandledNewModelRowChange = False
+        self._hasHandledNewModelRowChange = self._selectedResponse is None
         self._model = model
 
         # Trigger model change event handlers
