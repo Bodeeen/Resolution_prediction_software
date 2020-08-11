@@ -16,7 +16,7 @@ class OutputDirectorWidget(BaseWidget):
     """
 
     # Signals
-    viewOptionsChanged = pyqtSignal(float, float, int, object, object, str)
+    viewOptionsChanged = pyqtSignal(float, float, int, object, object, object, str)
     kernelResultsChanged = pyqtSignal(object, object, bool)
     expectedImageChanged = pyqtSignal(object, object, bool)
 
@@ -80,9 +80,8 @@ class OutputDirectorWidget(BaseWidget):
         self._currentKernelResults = kernelResult
 
         if kernelResult is not None:
-            self.multivaluesEdit.updateMultivalueValues(
-                multivalueIndices, kernelResult.multivalue_values, inspectedIndex
-            )
+            self.multivaluesEdit.updateMultivalueValues(multivalueIndices,
+                                                        kernelResult.multivalue_values)
 
         self.btnExportResults.setEnabled(kernelResult is not None)
 
@@ -90,18 +89,21 @@ class OutputDirectorWidget(BaseWidget):
         self.kernelResultsChanged.emit(runInstance, kernelResult, initialDisplayOfData)
         self.expectedImageChanged.emit(runInstance, kernelResult, initialDisplayOfData)
 
-    def updateViewOptions(self, threshold: float, inspectedIndex: int,
+    def updateViewOptions(self, threshold: float, inspectedIndex: int, *,
                           inspectionCurveX: Optional[np.ndarray] = None,
                           inspectionCurveY: Optional[np.ndarray] = None,
+                          inspectionCurveIndex: Optional[int] = None,
                           inspectionLabel: str = "") -> None:
         """
         Updates the threshold and inspection state. If inspectedIndex is zero or greater,
         inspectionCurveX and inspectionCurveY must also be passed.
         """
 
-        if inspectedIndex > -1 and (inspectionCurveX is None or inspectionCurveY is None):
+        if inspectedIndex > -1 and (inspectionCurveX is None or inspectionCurveY is None
+                                    or inspectionCurveIndex is None):
             raise ValueError(
-                "inspectedIndex > -1, but inspectionCurveX and/or inspectionCurveY were not given."
+                "inspectedIndex > -1, but inspectionCurveX, inspectionCurveY and/or" +
+                " inspectionCurveIndex were not set."
             )
 
         # Update inspection
@@ -109,8 +111,7 @@ class OutputDirectorWidget(BaseWidget):
 
         # Update threshold
         valueAtThreshold = None
-        if (self._currentRunInstance is not None and self._currentKernelResults is not None
-                and inspectedIndex < 0):
+        if self._currentRunInstance is not None and self._currentKernelResults is not None:
             valueAtThreshold = self._currentKernelResults.resolution_at_threshold(
                 self._currentRunInstance, threshold
             )
@@ -118,5 +119,6 @@ class OutputDirectorWidget(BaseWidget):
         # Emit signal
         self.viewOptionsChanged.emit(
             threshold, valueAtThreshold if valueAtThreshold is not None else 0.0,
-            inspectedIndex, inspectionCurveX, inspectionCurveY, inspectionLabel
+            inspectedIndex, inspectionCurveX, inspectionCurveY, inspectionCurveIndex,
+            inspectionLabel
         )

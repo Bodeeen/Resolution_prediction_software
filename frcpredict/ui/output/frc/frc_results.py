@@ -18,6 +18,7 @@ class FrcResultsWidget(BaseWidget):
     def __init__(self, *args, **kwargs) -> None:
         self._outputDirector = None
         self._thresholdPlotItems = []
+        self._inspectionPlotItems = []
 
         super().__init__(__file__, *args, **kwargs)
 
@@ -71,10 +72,11 @@ class FrcResultsWidget(BaseWidget):
 
         self.editThreshold.setEnabled(kernelResult is not None)
 
-    @pyqtSlot(float, float, int, object, object, str)
+    @pyqtSlot(float, float, int, object, object, object, str)
     def _onViewOptionsChange(self, threshold: float, valueAtThreshold: float, inspectedIndex: int,
                              inspectionCurveX: Optional[np.ndarray] = None,
                              inspectionCurveY: Optional[np.ndarray] = None,
+                             inspectionCurveIndex: Optional[int] = None,
                              inspectionLabel: str = "") -> None:
         """
         Updates the threshold as well as the inspection plot. If inspectedIndex is zero or greater,
@@ -83,34 +85,68 @@ class FrcResultsWidget(BaseWidget):
 
         if inspectedIndex > -1 and (inspectionCurveX is None or inspectionCurveY is None):
             raise ValueError(
-                "inspectedIndex > -1, but inspectionCurveX and/or inspectionCurveY were not given."
+                "inspectedIndex > -1, but inspectionCurveX, inspectionCurveY and/or" +
+                " inspectionCurveIndex were not set."
             )
 
-        self._updateInspectionPlot(inspectedIndex, inspectionCurveX, inspectionCurveY, inspectionLabel)
-        self._updateThreshold(threshold, valueAtThreshold, inspectedIndex)
+        self._updateInspectionPlot(inspectedIndex, inspectionCurveX, inspectionCurveY,
+                                   inspectionCurveIndex, inspectionLabel)
+        self._updateThreshold(threshold, valueAtThreshold)
 
     # Internal methods
-    def _updateInspectionPlot(self, inspectedIndex: int, inspectionCurveX: Optional[np.ndarray] = None,
-                              inspectionCurveY: Optional[np.ndarray] = None, label: str = "") -> None:
+    def _updateInspectionPlot(self, inspectedIndex: int,
+                              inspectionCurveX: Optional[np.ndarray] = None,
+                              inspectionCurveY: Optional[np.ndarray] = None,
+                              inspectionCurveIndex: Optional[int] = None, label: str = "") -> None:
         """ Updates the inspection plot. """
 
         self.plotInspection.clear()
 
         if inspectedIndex > -1:
             if inspectionCurveX is not None and inspectionCurveY is not None:
+                # Update inspection plot curve
                 self.plotInspection.plot(inspectionCurveX, inspectionCurveY)
 
+                # Update inspection plot crosshair lines
+                for plotItem in self._inspectionPlotItems:
+                    self.plotInspection.removeItem(plotItem)
+
+                self._inspectionPlotItems = []
+
+                paddingX = (inspectionCurveX.max() - inspectionCurveX.min()) / 10
+                self._inspectionPlotItems.append(
+                    self.plotInspection.plot(
+                        [inspectionCurveX.min() - paddingX, inspectionCurveX.max() + paddingX],
+                        [inspectionCurveY[inspectionCurveIndex],
+                         inspectionCurveY[inspectionCurveIndex]],
+                        pen=pg.mkPen("r", style=Qt.DashLine)
+                    )
+                )
+
+                paddingY = (inspectionCurveY.max() - inspectionCurveY.min()) / 10
+                self._inspectionPlotItems.append(
+                    self.plotInspection.plot(
+                        [inspectionCurveX[inspectionCurveIndex],
+                         inspectionCurveX[inspectionCurveIndex]],
+                        [inspectionCurveY.min() - paddingY, inspectionCurveY.max() + paddingY],
+                        pen=pg.mkPen("r", style=Qt.DashLine)
+                    )
+                )
+
+            # Set label
             self.plotInspection.setLabel("bottom", label)
 
+            # Set visibility
             self.plotFrc.setVisible(False)
             self.plotInspection.setVisible(True)
         else:
             self.plotInspection.setVisible(False)
             self.plotFrc.setVisible(True)
 
-    def _updateThreshold(self, threshold: float, valueAtThreshold: float, inspectedIndex: int) -> None:
+    def _updateThreshold(self, threshold: float, valueAtThreshold: float) -> None:
         """ Updates the threshold-related values and draws threshold lines in the FRC plot. """
 
+        # Update FRC plot crosshair lines
         for plotItem in self._thresholdPlotItems:
             self.plotFrc.removeItem(plotItem)
 

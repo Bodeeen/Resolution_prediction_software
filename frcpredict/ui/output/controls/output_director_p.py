@@ -114,7 +114,10 @@ class OutputDirectorPresenter(BasePresenter[SimulationResultsView]):
                 )
 
             self.widget.updateViewOptions(
-                threshold, inspectedIndex, inspectedCurveX, inspectedCurveY, label
+                threshold, inspectedIndex,
+                inspectionCurveX=inspectedCurveX, inspectionCurveY=inspectedCurveY,
+                inspectionCurveIndex=self.model.multivalueValueIndices[inspectedIndex],
+                inspectionLabel=label
             )
         else:
             self.widget.updateViewOptions(threshold, inspectedIndex)

@@ -139,35 +139,28 @@ class MultivaluesEditWidget(BaseWidget):
     def updateInspection(self, inspectedIndex: int) -> None:
         """ Updates the inspection state. """
 
-        # Disable checkboxes and sliders of non-inspected multivalues if currently inspecting one
+        # Disable checkboxes of non-inspected multivalues if currently inspecting one
         for index, checkBox in enumerate(self._inspectionCheckBoxes):
             checkBox.setEnabled(inspectedIndex < 0 or inspectedIndex == index)
 
-        for index, slider in enumerate(self._multivalueSliders):
-            slider.setEnabled(inspectedIndex < 0 or inspectedIndex != index)
-
         # Update multivalue value labels
-        self._updateMultivalueValueLabels(inspectedIndex)
+        self._updateMultivalueValueLabels()
 
-    def updateMultivalueValues(self, multivalueIndices: List[int], multivalueValues: List[int],
-                               inspectedIndex: int) -> None:
+    def updateMultivalueValues(self, multivalueIndices: List[int], multivalueValues: List[int]) -> None:
         """ Updates the values for all multivalues in the list of multivalues. """
 
         for index, slider in enumerate(self._multivalueSliders):
             slider.setValue(multivalueIndices[index])
 
         self._currentMultivalueValues = multivalueValues
-        self._updateMultivalueValueLabels(inspectedIndex)
+        self._updateMultivalueValueLabels()
 
     # Internal methods
-    def _updateMultivalueValueLabels(self, inspectedIndex: int) -> None:
+    def _updateMultivalueValueLabels(self) -> None:
         """ Updates the value labels for all multivalues in the list of multivalues. """
 
         if self._currentMultivalueValues is None:
             return
 
         for index, label in enumerate(self._multivalueValueLabels):
-            if index != inspectedIndex:
-                label.setText("%#.4g" % self._currentMultivalueValues[index])
-            else:
-                label.setText("Inspecting")
+            label.setText("%#.4g" % self._currentMultivalueValues[index])
