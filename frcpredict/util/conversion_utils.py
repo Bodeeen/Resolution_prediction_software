@@ -20,7 +20,7 @@ def int_to_flux(intensity: float, wavelength: float) -> float:
     return fluxnm2ms
 
 
-def na_to_collection_efficiency(NA: float, refInd: float = 1.0) -> float:
-    alpha = np.arcsin(NA / refInd)
+def na_to_collection_efficiency(na: float, refractive_index: float) -> float:
+    alpha = np.arcsin(na / refractive_index)
     collection_efficiency = (1 - np.cos(alpha)) / 2
     return collection_efficiency

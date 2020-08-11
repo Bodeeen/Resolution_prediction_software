@@ -11,7 +11,7 @@ from .pattern_data import (
 from .multivalue import Multivalue, ValueList, RangeType, ValueRange
 
 from .fluorophore import FluorophoreSettings, IlluminationResponse
-from .imaging import ImagingSystemSettings
+from .imaging import ImagingSystemSettings, RefractiveIndex
 from .pulse import Pulse, PulseScheme
 from .sample import SampleProperties
 from .camera import CameraProperties

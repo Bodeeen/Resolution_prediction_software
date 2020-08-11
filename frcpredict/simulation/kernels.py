@@ -221,7 +221,8 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
 
     if isinstance(run_instance.imaging_system_settings.optical_psf.pattern_data, mdl.AiryNAPatternData):
         collection_efficiency = na_to_collection_efficiency(
-            run_instance.imaging_system_settings.optical_psf.pattern_data.na
+            run_instance.imaging_system_settings.optical_psf.pattern_data.na,
+            run_instance.imaging_system_settings.refractive_index
         )
     else:
         collection_efficiency = 0.3  # TODO: This is a temporary fallback

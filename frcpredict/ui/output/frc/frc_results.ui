@@ -155,7 +155,7 @@
       <item row="1" column="1">
        <widget class="QLabel" name="lblResolutionValue">
         <property name="text">
-         <string/>
+         <string>–</string>
         </property>
         <property name="indent">
          <number>2</number>

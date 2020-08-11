@@ -151,9 +151,9 @@ class AiryNAPatternData(PatternData):
     A description of the properties of an airy pattern.
     """
 
-    na: Union[float, Multivalue[float]] = extended_field(0.8, description="NA")
+    na: Union[float, Multivalue[float]] = extended_field(1.4, description="NA")
     emission_wavelength: Union[float, Multivalue[float]] = extended_field(
-        250.0, description="em. wavelength [nm]"
+        500.0, description="em. wavelength [nm]"
     )
 
     # Methods

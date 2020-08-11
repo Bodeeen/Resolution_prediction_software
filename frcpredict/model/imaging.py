@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from typing import Union
+from enum import Enum
+from typing import Optional, Union
 
 from PySignal import Signal
 from dataclasses_json import dataclass_json
@@ -9,6 +10,16 @@ from frcpredict.util import (
 )
 from .pattern import Pattern
 from .multivalue import Multivalue
+
+
+class RefractiveIndex(Enum):
+    """
+    Some predefined immersion types, with the value being the refractive index.
+    """
+
+    glycerol = 1.47
+    oil = 1.51
+    silicone = 1.40
 
 
 @dataclass_json
@@ -29,4 +40,8 @@ class ImagingSystemSettings:
     scanning_step_size: Union[float, Multivalue[float]] = extended_field(
         observable_property("_scanning_step_size", default=20.0, signal_name="basic_field_changed"),
         description="scanning step size [nm]", accept_multivalues=True
+    )
+
+    refractive_index: float = observable_property(
+        "_refractive_index", default=RefractiveIndex.oil.value, signal_name="basic_field_changed"
     )

@@ -41,6 +41,7 @@ class ImagingSystemSettingsPresenter(BasePresenter[ImagingSystemSettings]):
         widget.pinholeFunctionChanged.connect(self._uiSetPinholeFunctionModel)
         connectMulti(widget.scanningStepSizeChanged, [float, Multivalue],
                      self._uiScanningStepSizeChange)
+        widget.refractiveIndexChanged.connect(self._uiRefractiveIndexChange)
 
     # Model event handling
     def _onBasicFieldChange(self, model: ImagingSystemSettings) -> None:
@@ -60,3 +61,7 @@ class ImagingSystemSettingsPresenter(BasePresenter[ImagingSystemSettings]):
     @pyqtSlot(Multivalue)
     def _uiScanningStepSizeChange(self, value: Union[float, Multivalue[float]]) -> None:
         self.model.scanning_step_size = value
+
+    @pyqtSlot(float)
+    def _uiRefractiveIndexChange(self, value: float) -> None:
+        self.model.refractive_index = value

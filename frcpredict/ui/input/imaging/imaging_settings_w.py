@@ -1,8 +1,10 @@
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, pyqtSlot
 
-from frcpredict.model import ImagingSystemSettings, Pattern, PatternType, Multivalue
+from frcpredict.model import (
+    ImagingSystemSettings, RefractiveIndex, Pattern, PatternType, Multivalue
+)
 from frcpredict.ui import BaseWidget
-from frcpredict.ui.util import connectMulti, UserFileDirs
+from frcpredict.ui.util import connectMulti, getEnumEntryName, UserFileDirs
 from .imaging_settings_p import ImagingSystemSettingsPresenter
 
 
@@ -16,6 +18,7 @@ class ImagingSystemSettingsWidget(BaseWidget):
     opticalPsfChanged = pyqtSignal(Pattern)
     pinholeFunctionChanged = pyqtSignal(Pattern)
     scanningStepSizeChanged = pyqtSignal([float], [Multivalue])
+    refractiveIndexChanged = pyqtSignal(float)
 
     # Methods
     def __init__(self, *args, **kwargs) -> None:
@@ -39,11 +42,15 @@ class ImagingSystemSettingsWidget(BaseWidget):
             [PatternType.digital_pinhole, PatternType.physical_pinhole]
         )
 
+        for refractiveIndex in list(RefractiveIndex):
+            self.editImmersionType.addItem(getEnumEntryName(refractiveIndex), refractiveIndex.value)
+
         # Connect forwarded signals
         self.editOpticalPsf.valueChanged.connect(self.opticalPsfChanged)
         self.editPinholeFunction.valueChanged.connect(self.pinholeFunctionChanged)
         connectMulti(self.editScanningStepSize.valueChanged, [float, Multivalue],
                      self.scanningStepSizeChanged)
+        self.editImmersionType.currentIndexChanged.connect(self._onImmersionTypeChange)
 
         # Initialize presenter
         self._presenter = ImagingSystemSettingsPresenter(self)
@@ -66,3 +73,11 @@ class ImagingSystemSettingsWidget(BaseWidget):
 
     def updateBasicFields(self, model: ImagingSystemSettings) -> None:
         self.editScanningStepSize.setValue(model.scanning_step_size)
+
+        dataIndex = self.editImmersionType.findData(model.refractive_index)
+        self.editImmersionType.setCurrentIndex(dataIndex)
+
+    # Event handling
+    @pyqtSlot(int)
+    def _onImmersionTypeChange(self, index: int) -> None:
+        self.refractiveIndexChanged.emit(self.editImmersionType.itemData(index))
