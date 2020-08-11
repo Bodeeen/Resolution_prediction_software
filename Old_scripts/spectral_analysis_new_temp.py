@@ -290,21 +290,24 @@ def _simulate_single(data):
     """ Calculate ON-state probabilities after ON-switching illumination"""
     P_on = np.zeros(psf_kernel_rad_px)
     for pulse_index, pulse in enumerate(run_instance.pulse_scheme.pulses):
+        # TODO: This currently only extracts the radial profile
         illumination_pattern_rad = pulse.illumination_pattern.get_numpy_array(
             px_size_nm
-        )[psf_kernel_rad_px - 1][psf_kernel_rad_px - 1:]  # TODO: This currently only extracts the radial profile
+        )[psf_kernel_rad_px - 1][psf_kernel_rad_px - 1:]
 
         response = run_instance.fluorophore_settings.get_response(pulse.wavelength)
-        expected_photons = Int2Flux(pulse.max_intensity * 1000, pulse.wavelength) * px_size_nm**2
+        expected_photons = Int2Flux(pulse.max_intensity * 1000, pulse.wavelength) * px_size_nm ** 2
+        temp_scaling_factor = ((20 / px_size_nm) ** 2)  # Comes from the rate being defined per photon falling in a 20x20 nm area
+                                                        # TODO: Change
 
         if pulse_index < len(run_instance.pulse_scheme.pulses) - 1:
             P_on = expected_Pon(
                 P_on,
-                expected_photons * response.cross_section_off_to_on * illumination_pattern_rad,
-                expected_photons * response.cross_section_on_to_off * illumination_pattern_rad,
+                expected_photons * response.cross_section_off_to_on * temp_scaling_factor * illumination_pattern_rad,
+                expected_photons * response.cross_section_on_to_off * temp_scaling_factor * illumination_pattern_rad,
                 pulse.duration
             )
-        else:
+        else:  # Last pulse
             kernels, m, N_switches = make_kernels_detection(
                 500000,
                 run_instance.camera_properties.quantum_efficiency,
@@ -312,9 +315,9 @@ def _simulate_single(data):
                 P_on,
                 expected_photons,
                 illumination_pattern_rad,
-                response.cross_section_off_to_on,
-                response.cross_section_on_to_off,
-                response.cross_section_emission,
+                response.cross_section_off_to_on * temp_scaling_factor,
+                response.cross_section_on_to_off * temp_scaling_factor,
+                response.cross_section_emission * temp_scaling_factor,
                 pulse.duration
             )
 
