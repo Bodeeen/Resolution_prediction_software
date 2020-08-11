@@ -75,5 +75,15 @@ class PersistentContainer(Generic[DataType]):
                 else:
                     raise e
 
+        # Upgrade the data structure if this JSON was created by an previous version of the program.
+        # The data structure, which can be seen as a tree, is upgraded in a bottom-up manner.
+        parsed_json_version = version.parse(persistent_container.program_version)
+        if (persistent_container.program_name != frcpredict.__title__
+                and parsed_json_version < version.parse(frcpredict.__version__)):
+            for field_value in reversed(recursive_field_iter(persistent_container)):
+                if is_dataclass_instance(field_value):
+                    if hasattr(field_value, "upgrade") and callable(field_value.upgrade):
+                        field_value.upgrade(parsed_json_version)
+
         # Return
         return persistent_container
