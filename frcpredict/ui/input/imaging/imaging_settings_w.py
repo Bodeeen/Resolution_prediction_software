@@ -30,7 +30,7 @@ class ImagingSystemSettingsWidget(BaseWidget):
         self.editOpticalPsf.setFieldName("Optical PSF")
         self.editOpticalPsf.setAllowEditGenerationAmplitude(True)
         self.editOpticalPsf.setAvailableGenerationTypes(
-            [PatternType.gaussian, PatternType.airy]
+            [PatternType.airy_from_NA]
         )
 
         self.editPinholeFunction.setFieldName("Pinhole Function")

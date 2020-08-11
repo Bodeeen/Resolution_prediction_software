@@ -118,7 +118,8 @@ class PulseSchemePresenter(BasePresenter[PulseScheme]):
         """
 
         confirmation_result = QMessageBox.question(
-            self.widget, "Remove Pulse", "Remove the selected pulse?")
+            self.widget, "Remove Pulse", "Remove the selected pulse?",
+            defaultButton=QMessageBox.No)
 
         if confirmation_result == QMessageBox.Yes:
             self.model.remove_pulse(self._selectedPulseKey)

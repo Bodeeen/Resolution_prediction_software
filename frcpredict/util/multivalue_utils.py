@@ -1,6 +1,6 @@
 from copy import deepcopy
 from dataclasses import field, fields, Field, MISSING
-from typing import Any, Optional, Union, Tuple, List, Dict
+from typing import Any, Optional, Union, Tuple, List, Dict, TypeVar
 
 from dataclasses_json import config as json_config
 import numpy as np
@@ -8,6 +8,8 @@ import numpy as np
 import frcpredict.model
 from .dataclass_extras import clear_signals
 
+
+T = TypeVar("T")
 
 FieldPath = List[Union[int, str]]
 
@@ -122,6 +124,29 @@ def expand_multivalues(dataclass_instance: object, multivalue_paths: List[FieldP
 
     build_results(results, clear_signals(deepcopy(dataclass_instance)))
     return results
+
+
+def expand_with_multivalues(dataclass_instance: T, multivalue_paths: List[FieldPath],
+                            multivalue_values: List[Union[int, float]]) -> T:
+    """
+    Given a dataclass instance containing multivalues, a list of multivalue paths, and a list of
+    corresponding multivalue values, this function creates a copy of the dataclass instance with
+    cleared signals and the multivalue values set.
+    """
+
+    if len(multivalue_paths) != len(multivalue_values):
+        raise ValueError("multivalue_paths and multivalue_values must be of the same length")
+
+    result = clear_signals(deepcopy(dataclass_instance))
+
+    for path_index in range(len(multivalue_paths)):
+        setattr(
+            get_value_from_path(result, multivalue_paths[path_index][:-1]),
+            multivalue_paths[path_index][-1],
+            multivalue_values[path_index]
+        )
+
+    return result
 
 
 def avg_value_if_multivalue(multi_or_scalar_value) -> float:

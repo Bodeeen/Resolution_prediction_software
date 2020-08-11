@@ -1,9 +1,13 @@
-from dataclasses import field, fields, Field, MISSING
-from typing import Any, Optional, Union, Tuple, Callable
+from dataclasses import is_dataclass, field, fields, Field, MISSING
+from typing import Any, Optional, Union, Tuple, List, Callable, TypeVar
 
+import numpy as np
 from PySignal import Signal
 
 import frcpredict.util
+
+
+T = TypeVar("T")
 
 
 class dataclass_property(property):
@@ -162,24 +166,83 @@ def get_dataclass_field_description(dataclass_instance: Any,
         return description, True
 
 
-def clear_signals(dataclass_instance):
-    """ Clears all signals in the given dataclass instance and returns it. """
+def is_dataclass_instance(obj: object) -> bool:
+    return hasattr(obj, "__dataclass_fields__")
 
+
+def recursive_field_iter(dataclass_instance: object, include_root: bool = True) -> List[object]:
+    """
+    Returns an iterator that contains all dataclass instances that the given dataclass instance
+    contains, recursively.
+    """
+
+    result = [dataclass_instance] if include_root else []
     for attr_name in dir(dataclass_instance):
         if attr_name.startswith("__"):
             continue
 
         attr_value = getattr(dataclass_instance, attr_name)
 
-        if isinstance(attr_value, Signal):
-            attr_value.clear()
-        elif isinstance(attr_value, list):
+        if isinstance(attr_value, list):
             for list_item in attr_value:
-                clear_signals(list_item)
+                result += recursive_field_iter(list_item)
         elif isinstance(attr_value, dict):
             for dict_value in attr_value.values():
-                clear_signals(dict_value)
-        elif hasattr(attr_value, "__dataclass_fields__"):
-            clear_signals(attr_value)
+                result += recursive_field_iter(dict_value)
+        elif isinstance(attr_value, np.ndarray) and attr_value.dtype == np.object:
+            for array_element in np.nditer(attr_value, flags=["refs_ok"]):
+                result += recursive_field_iter(array_element.item())
+        elif is_dataclass_instance(attr_value):
+            result += recursive_field_iter(attr_value)
+        else:
+            result.append(attr_value)
+
+    return result
+
+
+def clear_signals(dataclass_instance: T) -> T:
+    """
+    Clears all signals in the given dataclass instance and returns it. This is done recursively.
+    """
+
+    for field_value in recursive_field_iter(dataclass_instance):
+        if isinstance(field_value, Signal):
+            field_value.clear()
 
     return dataclass_instance
+
+
+def rebuild_dataclass(dataclass_instance: T) -> T:
+    """
+    Effectively creates a copy of the given dataclass instance where only the formally defined
+    fields are included. This is done recursively.
+    """
+
+    if not is_dataclass(dataclass_instance):
+        return dataclass_instance
+
+    kwargs = {}
+
+    for field_info in fields(dataclass_instance):
+        field_name = field_info.name
+
+        if not hasattr(dataclass_instance, field_name):
+            continue
+
+        field_value = getattr(dataclass_instance, field_name)
+        if isinstance(field_value, list):
+            kwargs[field_name] = [None] * len(field_value)
+            for i in range(len(field_value)):
+                kwargs[field_name][i] = rebuild_dataclass(field_value[i])
+        if isinstance(field_value, dict):
+            kwargs[field_name] = {}
+            for (dict_key, dict_value) in field_value.items():
+                kwargs[field_name][dict_key] = rebuild_dataclass(dict_value)
+        elif isinstance(field_value, np.ndarray) and field_value.dtype == np.object:
+            kwargs[field_name] = np.frompyfunc(rebuild_dataclass, 1, 1)(field_value)
+        elif is_dataclass(field_value):
+            kwargs[field_name] = rebuild_dataclass(field_value)
+        else:
+            kwargs[field_name] = field_value
+
+    return type(dataclass_instance)(**kwargs)

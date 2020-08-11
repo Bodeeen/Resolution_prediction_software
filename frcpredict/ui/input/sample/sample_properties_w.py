@@ -17,6 +17,9 @@ class SamplePropertiesWidget(BaseWidget):
     labellingDensityChanged = pyqtSignal([float], [Multivalue])
     KOriginChanged = pyqtSignal([float], [Multivalue])
 
+    loadSampleStructureClicked = pyqtSignal()
+    unloadSampleStructureClicked = pyqtSignal()
+
     # Methods
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(__file__, *args, **kwargs)
@@ -26,7 +29,9 @@ class SamplePropertiesWidget(BaseWidget):
         self.presetPicker.setStartDirectory(UserFileDirs.SampleProperties)
         self.presetPicker.setValueGetter(self.value)
         self.presetPicker.setValueSetter(self.setValue)
-        
+
+        self.updatePresetLoaded(False)
+
         # Connect forwarded signals
         connectMulti(self.editSpectralPower.valueChanged, [float, Multivalue],
                      self.spectralPowerChanged)
@@ -34,6 +39,9 @@ class SamplePropertiesWidget(BaseWidget):
                      self.labellingDensityChanged)
         connectMulti(self.editKOrigin.valueChanged, [float, Multivalue],
                      self.KOriginChanged)
+
+        self.btnLoadSampleStructure.clicked.connect(self.loadSampleStructureClicked)
+        self.btnUnloadSampleStructure.clicked.connect(self.unloadSampleStructureClicked)
 
         # Initialize presenter
         self._presenter = SamplePropertiesPresenter(self)
@@ -52,3 +60,9 @@ class SamplePropertiesWidget(BaseWidget):
         self.editSpectralPower.setValue(model.spectral_power)
         self.editLabellingDensity.setValue(model.labelling_density)
         self.editKOrigin.setValue(model.K_origin)
+
+    def updatePresetLoaded(self, loaded: bool) -> None:
+        self.editSpectralPower.setEnabled(not loaded)
+        self.editKOrigin.setEnabled(not loaded)
+        self.btnLoadSampleStructure.setVisible(not loaded)
+        self.btnUnloadSampleStructure.setVisible(loaded)

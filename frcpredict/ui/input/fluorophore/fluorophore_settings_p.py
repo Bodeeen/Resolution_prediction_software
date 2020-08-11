@@ -93,7 +93,8 @@ class FluorophoreSettingsPresenter(BasePresenter[FluorophoreSettings]):
 
         confirmation_result = QMessageBox.question(
             self.widget, "Remove Response",
-            f"Remove the selected response \"{self._selectedResponse}\"?"
+            f"Remove the selected response \"{self._selectedResponse}\"?",
+            defaultButton=QMessageBox.No
         )
 
         if confirmation_result == QMessageBox.Yes:

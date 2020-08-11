@@ -1,2 +1,0 @@
-Mean: 4.88E-4
-Variance: 4.84E-4

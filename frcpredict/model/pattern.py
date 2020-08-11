@@ -8,7 +8,7 @@ from typing import Optional, Union
 from frcpredict.util import dataclass_internal_attrs, extended_field
 from .pattern_data import (
     PatternData, Array2DPatternData,
-    GaussianPatternData, DoughnutPatternData, AiryPatternData,
+    GaussianPatternData, DoughnutPatternData, AiryFWHMPatternData, AiryNAPatternData,
     DigitalPinholePatternData, PhysicalPinholePatternData
 )
 
@@ -18,10 +18,11 @@ class PatternType(Enum):
     All supported pattern types.
     """
 
-    array2d = "array2d"
+    array2D = "array2D"
     gaussian = "gaussian"
     doughnut = "doughnut"
-    airy = "airy"
+    airy_from_FWHM = "airy_from_FWHM"
+    airy_from_NA = "airy_from_NA"
     digital_pinhole = "digital_pinhole"
     physical_pinhole = "physical_pinhole"
 
@@ -34,7 +35,7 @@ class Pattern:
     A description of a pattern.
     """
 
-    pattern_type: PatternType = PatternType.array2d
+    pattern_type: PatternType = PatternType.array2D
     pattern_data: Union[dict, PatternData] = extended_field(default_factory=Array2DPatternData,
                                                             description="pattern data")
 
@@ -59,7 +60,7 @@ class Pattern:
     def __init__(self, pattern_type: Optional[PatternType] = None,
                  pattern_data: Optional[Union[dict, PatternData]] = None):
         if pattern_type is None and pattern_data is None:
-            self.pattern_type = PatternType.array2d
+            self.pattern_type = PatternType.array2D
             self.pattern_data = Array2DPatternData()
         elif pattern_data is not None:
             if isinstance(pattern_data, dict):
@@ -101,14 +102,16 @@ class Pattern:
 
     # Internal methods
     def _get_data_type_from_pattern_type(self, pattern_type: PatternType) -> type:
-        if pattern_type == PatternType.array2d:
+        if pattern_type == PatternType.array2D:
             return Array2DPatternData
         elif pattern_type == PatternType.gaussian:
             return GaussianPatternData
         elif pattern_type == PatternType.doughnut:
             return DoughnutPatternData
-        elif pattern_type == PatternType.airy:
-            return AiryPatternData
+        elif pattern_type == PatternType.airy_from_FWHM:
+            return AiryFWHMPatternData
+        elif pattern_type == PatternType.airy_from_NA:
+            return AiryNAPatternData
         elif pattern_type == PatternType.digital_pinhole:
             return DigitalPinholePatternData
         elif pattern_type == PatternType.physical_pinhole:
@@ -118,13 +121,15 @@ class Pattern:
 
     def _get_pattern_type_from_data(self, pattern_data: PatternData) -> PatternType:
         if type(pattern_data) is Array2DPatternData:
-            return PatternType.array2d
+            return PatternType.array2D
         elif type(pattern_data) is GaussianPatternData:
             return PatternType.gaussian
         elif type(pattern_data) is DoughnutPatternData:
             return PatternType.doughnut
-        elif type(pattern_data) is AiryPatternData:
-            return PatternType.airy
+        elif type(pattern_data) is AiryFWHMPatternData:
+            return PatternType.airy_from_FWHM
+        elif type(pattern_data) is AiryNAPatternData:
+            return PatternType.airy_from_NA
         elif type(pattern_data) is DigitalPinholePatternData:
             return PatternType.digital_pinhole
         elif type(pattern_data) is PhysicalPinholePatternData:

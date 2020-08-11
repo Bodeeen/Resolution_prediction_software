@@ -29,7 +29,7 @@ class PulsePropertiesWidget(BaseWidget):
         self.editIlluminationPattern.setFieldName("Illumination Pattern")
         self.editIlluminationPattern.setAllowEditGenerationAmplitude(False)
         self.editIlluminationPattern.setAvailableGenerationTypes(
-            [PatternType.gaussian, PatternType.doughnut, PatternType.airy]
+            [PatternType.gaussian, PatternType.doughnut, PatternType.airy_from_FWHM]
         )
         
         # Connect forwarded signals

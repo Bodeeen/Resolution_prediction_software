@@ -11,14 +11,16 @@ from .base_presenter import BasePresenter
 from .window.main_window_w import MainWindow
 
 
-# Input
-from .input.common.list_item_with_value import ListItemWithValue
-from .input.common.preset_picker import PresetPickerWidget
-from .input.common.value_boxes.free_float_box import FreeFloatBox
-from .input.common.value_boxes.extended_free_float_box import ExtendedFreeFloatBox
-from .input.common.value_boxes.extended_spin_box import ExtendedSpinBox
-from .input.common.pattern.pattern_field_w import PatternFieldWidget
+# Common
+from .common.list_item_with_value import ListItemWithValue
+from .common.preset_picker import PresetPickerWidget
+from .common.value_boxes.free_float_box import FreeFloatBox
+from .common.value_boxes.extended_free_float_box import ExtendedFreeFloatBox
+from .common.value_boxes.extended_spin_box import ExtendedSpinBox
+from .common.pattern.pattern_field_w import PatternFieldWidget
 
+
+# Input
 from .input.fluorophore.fluorophore_settings_w import FluorophoreSettingsWidget
 from .input.fluorophore.response_properties_w import ResponsePropertiesWidget
 
@@ -33,5 +35,8 @@ from .input.camera.camera_properties_w import CameraPropertiesWidget
 
 
 # Output
-from .output.frc.frc_results_w import FrcResultsWidget
-from .output.frc.multivalues_edit import MultivaluesEditWidget
+from .output.controls.output_director_w import OutputDirectorWidget
+from .output.controls.multivalues_edit import MultivaluesEditWidget
+
+from .output.frc.frc_results import FrcResultsWidget
+from .output.virtual_imaging.virtual_imaging_results_w import VirtualImagingResultsWidget

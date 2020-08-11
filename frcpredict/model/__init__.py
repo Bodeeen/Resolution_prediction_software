@@ -4,7 +4,8 @@ from .pattern_data import (
     Array2DPatternData,
     GaussianPatternData,
     DoughnutPatternData,
-    AiryPatternData,
+    AiryFWHMPatternData,
+    AiryNAPatternData,
     DigitalPinholePatternData
 )
 from .multivalue import Multivalue, ValueList, RangeType, ValueRange
@@ -15,6 +16,8 @@ from .pulse import Pulse, PulseScheme
 from .sample import SampleProperties
 from .camera import CameraProperties
 
+from .sample_structure import SampleStructure, SampleStructureProperties
+
 from .run_instance import RunInstance
-from .results import FrcCurve, FrcSimulationResults, FrcSimulationResultsView
-from .json_container import JsonContainer
+from .results import KernelSimulationResult, KernelSimulationResult, SimulationResults
+from .persistent_container import PersistentContainer

@@ -1,4 +1,4 @@
-from typing import Any, Union, List, Callable
+from typing import Union, List, Callable
 
 import numpy as np
 from PyQt5.QtCore import pyqtSignal, pyqtBoundSignal
@@ -6,13 +6,13 @@ from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QFormLayout, QWidget
 
 
-def getArrayPixmap(arr: np.ndarray, normalise: bool = False) -> QPixmap:
+def getArrayPixmap(arr: np.ndarray, normalize: bool = False) -> QPixmap:
     """
     Converts a numpy array to a QPixmap. The array is expected to be of the shape
     (width, height).
     """
 
-    if normalise:
+    if normalize:
         ptp = np.ptp(arr)
         arr = np.divide(arr - np.min(arr), ptp, out=np.zeros_like(arr), where=ptp != 0)
 

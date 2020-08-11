@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Optional, Tuple
 
 import numpy as np
 from astropy.modeling.functional_models import AiryDisk2D, Gaussian2D
@@ -15,7 +15,24 @@ def get_canvas_params(pixels_per_nm: float) -> Tuple[int, int]:
     return canvas_inner_radius_px, canvas_side_length_px
 
 
-def generate_gaussian(amplitude: float, fwhm: float, pixels_per_nm: float) -> np.ndarray:
+def radial_profile(data: np.ndarray, fftshift: bool = False) -> np.ndarray:
+    """ Calculates the radial profile of a 2D array. """
+
+    y, x = np.indices(data.shape)
+    center = np.floor(np.divide(data.shape, 2))
+    r = np.sqrt((x - center[0]) ** 2 + (y - center[1]) ** 2).astype(np.int)
+
+    if fftshift:
+        r = np.fft.fftshift(r)
+
+    tbin = np.bincount(r.ravel(), data.ravel())
+    nr = np.bincount(r.ravel())
+
+    result = tbin / nr
+    return result
+
+
+def generate_gaussian(*, amplitude: float, fwhm: float, pixels_per_nm: float) -> np.ndarray:
     """ Generates a 2D gaussian pattern. """
 
     stddev = fwhm / pixels_per_nm * gaussian_fwhm_to_sigma
@@ -27,7 +44,7 @@ def generate_gaussian(amplitude: float, fwhm: float, pixels_per_nm: float) -> np
     return result
 
 
-def generate_doughnut(periodicity: float, pixels_per_nm: float) -> np.ndarray:
+def generate_doughnut(*, periodicity: float, pixels_per_nm: float) -> np.ndarray:
     """ Generates a 2D doughnut pattern. """
 
     def Doughnut1D(radius: float) -> np.ndarray:
@@ -40,7 +57,7 @@ def generate_doughnut(periodicity: float, pixels_per_nm: float) -> np.ndarray:
     return Doughnut1D(_radial_to_2d(pixels_per_nm))
 
 
-def generate_airy(amplitude: float, fwhm: float, pixels_per_nm: float) -> np.ndarray:
+def generate_airy(*, amplitude: float, fwhm: float, pixels_per_nm: float) -> np.ndarray:
     """ Generates a 2D airy pattern. """
 
     radius = fwhm * 1.22 / pixels_per_nm
@@ -52,7 +69,7 @@ def generate_airy(amplitude: float, fwhm: float, pixels_per_nm: float) -> np.nda
     return result
 
 
-def generate_digital_pinhole(fwhm: float, pixels_per_nm: float) -> np.ndarray:
+def generate_digital_pinhole(*, fwhm: float, pixels_per_nm: float) -> np.ndarray:
     """ Generates a 2D digital pinhole pattern. """
 
     g_base = generate_gaussian(amplitude=1, fwhm=fwhm, pixels_per_nm=pixels_per_nm)
@@ -68,7 +85,7 @@ def generate_digital_pinhole(fwhm: float, pixels_per_nm: float) -> np.ndarray:
     return b_inv[:, 0].reshape(g_base.shape)
 
 
-def generate_physical_pinhole(radius: float, pixels_per_nm: float) -> np.ndarray:
+def generate_physical_pinhole(*, radius: float, pixels_per_nm: float) -> np.ndarray:
     """ Generates a 2D physical pinhole pattern. """
 
     def model(x: np.ndarray, y: np.ndarray) -> np.ndarray:

@@ -5,7 +5,7 @@ from typing import Optional
 from PySignal import Signal
 from dataclasses_json import dataclass_json
 
-from Old_scripts.spectral_analysis_new_temp import simulate  # TODO: Temp!
+from frcpredict.simulation import simulate
 from frcpredict.util import (
     dataclass_internal_attrs, dataclass_with_properties, observable_property, extended_field
 )
@@ -74,11 +74,13 @@ class RunInstance:
     )
 
     # Methods
-    def simulate_frc(self, preprocessing_finished_callback: Optional[Signal] = None,
-                     progress_updated_callback: Optional[Signal] = None):
-        """ Simulates FRC curves. """
-        return simulate(deepcopy(self), self._abort_signal,
-                        preprocessing_finished_callback, progress_updated_callback)
+    def simulate(self, preprocessing_finished_callback: Optional[Signal] = None,
+                 progress_updated_callback: Optional[Signal] = None):
+        """ Runs the simulation and returns the results. """
+        return simulate(deepcopy(self),
+                        abort_signal=self._abort_signal,
+                        preprocessing_finished_callback=preprocessing_finished_callback,
+                        progress_updated_callback=progress_updated_callback)
 
     def abort_running_simulations(self) -> None:
         """

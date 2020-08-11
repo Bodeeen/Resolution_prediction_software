@@ -21,6 +21,7 @@ class UserFileDirs:
 
     RunInstance: str = subdirOfUserFilesDir("run_instance")
     SavedResults: str = subdirOfUserFilesDir("saved_results")
+    SimulatedImages: str = subdirOfUserFilesDir("simulated_images")
 
     @staticmethod
     def list():

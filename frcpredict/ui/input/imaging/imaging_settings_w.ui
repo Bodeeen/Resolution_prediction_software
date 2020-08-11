@@ -52,7 +52,7 @@
        </item>
        <item row="1" column="1">
         <widget class="PatternFieldWidget" name="editPinholeFunction" native="true">
-         <property name="normaliseVisualisation" stdset="0">
+         <property name="normalizeVisualisation" stdset="0">
           <bool>true</bool>
          </property>
         </widget>

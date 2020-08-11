@@ -1,12 +1,13 @@
 from typing import Optional
 
-from PyQt5.QtCore import pyqtSignal, Qt, QRect
+from PyQt5.QtCore import pyqtSignal, Qt, QRect, QSettings
 from PyQt5.QtGui import QFontMetrics
 from PyQt5.QtWidgets import QMainWindow
 
+import frcpredict
 from frcpredict.model import (
     FluorophoreSettings, ImagingSystemSettings, PulseScheme, SampleProperties, CameraProperties,
-    RunInstance, FrcSimulationResults
+    RunInstance, SimulationResults
 )
 from frcpredict.ui import BaseWidget
 from frcpredict.ui.util import UserFileDirs
@@ -41,11 +42,24 @@ class MainWindow(QMainWindow, BaseWidget):
         )
         self.resize(
             min(screenGeometry.width() - 96, 1280 * (textSizeInfo.width() / 214) ** 0.5),
-            min(screenGeometry.height() - 96, 740 * (textSizeInfo.height() / 13) ** 0.5)
+            min(screenGeometry.height() - 96, 750 * (textSizeInfo.height() / 13) ** 0.5)
         )
 
+        self.defaultGeometry = self.saveGeometry()
+        self.defaultState = self.saveState()
+
         # Prepare UI elements
-        self.presetPicker.setFieldName("Global config")
+        self.setWindowTitle(frcpredict.__summary__)
+
+        self.tabifyDockWidget(self.dckInput, self.dckVirtualImagingResults)
+        self.takeCentralWidget()
+        self.dckInput.raise_()
+        self.resizeDocks([self.dckInput], [int(self.width() * 0.7)], Qt.Horizontal)
+
+        self.frcResults.setOutputDirector(self.outputDirector)
+        self.virtualImagingResults.setOutputDirector(self.outputDirector)
+
+        self.presetPicker.setFieldName("Full configuration")
         self.presetPicker.setModelType(RunInstance)
         self.presetPicker.setStartDirectory(UserFileDirs.RunInstance)
         self.presetPicker.setValueGetter(self.value)
@@ -53,6 +67,8 @@ class MainWindow(QMainWindow, BaseWidget):
 
         self.setSimulating(False)
         self.setAborting(False)
+
+        self._readSettings()
 
         # Connect forwarded signals
         self.fluorophoreSettings.valueChanged.connect(self.fluorophoreSettingsModelSet)
@@ -67,9 +83,9 @@ class MainWindow(QMainWindow, BaseWidget):
         # Initialize presenter
         self._presenter = MainWindowPresenter(self)
 
-    def setFrcSimulationResults(self, frcSimulationResults: FrcSimulationResults) -> None:
+    def setFrcSimulationResults(self, frcSimulationResults: SimulationResults) -> None:
         """ Sets FRC simulation results. """
-        self.frcResults.setValue(frcSimulationResults)
+        self.outputDirector.setValue(frcSimulationResults)
 
     def setSimulating(self, simulating: bool) -> None:
         """ Sets whether a simulation is currently in progress. """
@@ -117,7 +133,37 @@ class MainWindow(QMainWindow, BaseWidget):
         self.cameraProperties.setValue(cameraProperties, emitSignal=False)
 
     def updateSimulationProgress(self, progress: float) -> None:
-        if 0 < progress < 1:
-            self.pbProgress.setValue(progress * 100)
-        else:
-            self.pbProgress.setValue(0)
+        self.pbProgress.setValue(progress * 100 if 0 < progress < 1 else 0)
+
+    # Internal methods
+    def _readSettings(self) -> None:
+        settings = self._getSettings()
+        geometry = settings.value(_geometrySettingName)
+        state = settings.value(_stateSettingName)
+
+        if geometry is not None:
+            self.restoreGeometry(geometry)
+
+        if state is not None:
+            self.restoreState(state)
+
+    def _saveSettings(self) -> None:
+        settings = self._getSettings()
+        settings.setValue(_geometrySettingName, self.saveGeometry())
+        settings.setValue(_stateSettingName, self.saveState())
+
+    def _clearSettings(self) -> None:
+        settings = self._getSettings()
+        settings.remove(_geometrySettingName)
+        settings.remove(_stateSettingName)
+
+    def _getSettings(self) -> QSettings:
+        return QSettings(frcpredict.__author__, frcpredict.__title__)
+
+    # Event handling
+    def closeEvent(self, _) -> None:
+        self._saveSettings()
+
+
+_geometrySettingName: str = "geometry"
+_stateSettingName: str = "state"

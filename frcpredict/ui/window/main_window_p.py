@@ -4,9 +4,8 @@ from PyQt5.QtCore import pyqtSignal, pyqtSlot, QObject, QThreadPool, QRunnable, 
 from PyQt5.QtWidgets import QMessageBox
 
 from frcpredict.model import (
-    Pattern, Array2DPatternData,
     FluorophoreSettings, ImagingSystemSettings, PulseScheme, SampleProperties, CameraProperties,
-    RunInstance, FrcSimulationResults
+    RunInstance, SimulationResults
 )
 from frcpredict.ui import BasePresenter
 
@@ -133,8 +132,8 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
             self._currentWorker.abort()
 
     # Worker stuff
-    @pyqtSlot(FrcSimulationResults)
-    def _onWorkerDone(self, frcSimulationResults: FrcSimulationResults) -> None:
+    @pyqtSlot(SimulationResults)
+    def _onWorkerDone(self, frcSimulationResults: SimulationResults) -> None:
         try:
             self.widget.setFrcSimulationResults(frcSimulationResults)
         finally:
@@ -148,7 +147,7 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
     @pyqtSlot(str)
     def _onWorkerError(self, message: str) -> None:
         try:
-            QMessageBox.critical(self.widget, "FRC simulation error", message)
+            QMessageBox.critical(self.widget, "Simulation error", message)
         finally:
             self._doPostSimulationReset()
             self.widget.updateSimulationProgress(0)
@@ -171,7 +170,7 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
 
         def run(self) -> None:
             try:
-                results = self._runInstance.simulate_frc(
+                results = self._runInstance.simulate(
                     self.signals.preprocessingFinished, self.signals.progressUpdated
                 )
 
@@ -192,7 +191,7 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
             return self._hasFinished
 
         class Signals(QObject):
-            done = pyqtSignal(FrcSimulationResults)
+            done = pyqtSignal(SimulationResults)
             aborted = pyqtSignal()
             error = pyqtSignal(str)
 
