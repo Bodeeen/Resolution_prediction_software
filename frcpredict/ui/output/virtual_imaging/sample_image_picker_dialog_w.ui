@@ -222,6 +222,12 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>rdoSample</tabstop>
+  <tabstop>listSample</tabstop>
+  <tabstop>rdoFile</tabstop>
+  <tabstop>btnLoadFile</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

@@ -2,7 +2,7 @@ from traceback import format_exc
 from typing import Any, Optional, Callable
 import os
 
-from PyQt5.QtCore import pyqtSignal, pyqtSlot
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt
 from PyQt5.QtWidgets import QMessageBox, QFileDialog
 
 from frcpredict.model import PersistentContainer
@@ -31,7 +31,10 @@ class PresetPickerWidget(BaseWidget):
         self.setLoadedPath(None)
         self.setFieldName("Config")
 
+        # Prepare UI elements
         self.scrLoadedConfigName.setMaximumHeight(self.lblLoadedConfigName.height())
+        self.setFocusPolicy(Qt.TabFocus)
+        self.setFocusProxy(self.btnLoadFile)
 
         # Connect signals
         self.btnLoadFile.clicked.connect(self._onClickLoadFile)

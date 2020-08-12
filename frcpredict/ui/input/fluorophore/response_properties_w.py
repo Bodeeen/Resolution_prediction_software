@@ -2,7 +2,7 @@ from PyQt5.QtCore import pyqtSignal
 
 from frcpredict.model import IlluminationResponse, Multivalue
 from frcpredict.ui import BaseWidget
-from frcpredict.ui.util import setFormLayoutRowVisibility, connectMulti
+from frcpredict.ui.util import setFormLayoutRowVisibility, setTabOrderForChildren, connectMulti
 from .response_properties_p import ResponsePropertiesPresenter
 
 
@@ -20,6 +20,10 @@ class ResponsePropertiesWidget(BaseWidget):
     # Methods
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(__file__, *args, **kwargs)
+
+        # Prepare UI elements
+        setTabOrderForChildren(self, [self.editWavelength, self.editOffToOn,
+                                      self.editOnToOff, self.editEmission])
 
         # Connect forwarded signals
         self.editWavelength.valueChanged.connect(self.wavelengthChanged)

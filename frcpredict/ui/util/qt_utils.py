@@ -42,6 +42,16 @@ def setFormLayoutRowVisibility(formLayout: QFormLayout, rowNumber: int, labelWid
             formLayout.removeWidget(valueWidget)
 
 
+def setTabOrderForChildren(parentWidget: QWidget, childWidgetOrder: List[QWidget]) -> None:
+    """
+    Sets the given parent widget's tab order to follow the order of the widgets in the given child
+    widget list.
+    """
+
+    for i in range(0, len(childWidgetOrder) - 1):
+        parentWidget.setTabOrder(childWidgetOrder[i], childWidgetOrder[i + 1])
+
+
 def connectMulti(signal: pyqtSignal, arg_types: List[type],
                  handler: Union[Callable, pyqtBoundSignal]) -> None:
     """

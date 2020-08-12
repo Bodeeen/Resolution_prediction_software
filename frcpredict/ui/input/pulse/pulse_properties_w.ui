@@ -209,13 +209,6 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <tabstops>
-  <tabstop>editWavelength</tabstop>
-  <tabstop>editDuration</tabstop>
-  <tabstop>editMaxIntensity</tabstop>
-  <tabstop>btnMoveLeft</tabstop>
-  <tabstop>btnMoveRight</tabstop>
- </tabstops>
  <resources/>
  <connections/>
 </ui>

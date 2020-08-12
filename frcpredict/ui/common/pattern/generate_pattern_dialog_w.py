@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QWidget, QDialog, QDialogButtonBox
 
 from frcpredict.model import Pattern, PatternType
 from frcpredict.ui import BaseWidget
-from frcpredict.ui.util import getEnumEntryName, setFormLayoutRowVisibility
+from frcpredict.ui.util import getEnumEntryName, setFormLayoutRowVisibility, setTabOrderForChildren
 from frcpredict.util import clear_signals
 from ..list_item_with_value import ListItemWithValue
 from .generate_pattern_dialog_p import GeneratePatternPresenter
@@ -35,9 +35,15 @@ class GeneratePatternDialog(QDialog, BaseWidget):
         self._hasHandledInitialRowChange = False
 
         super().__init__(__file__, parent, Qt.WindowSystemMenuHint | Qt.WindowTitleHint)
+
+        # Prepare UI elements
         self.setWindowTitle(title)
         self.setAvailableTypes(availableTypes)
         self._updateOKButton()
+
+        setTabOrderForChildren(self, [self.listType, self.editAmplitude, self.editRadius,
+                                      self.editFwhm, self.editPeriodicity, self.editNa,
+                                      self.editEmissionWavelength])
 
         # Connect own signal slots
         self.listType.currentRowChanged.connect(self._onTypeListRowChange)

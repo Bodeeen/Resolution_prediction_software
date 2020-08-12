@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QHBoxLayout, QLabel, QSlider, QCheckBox, QFrame
 
 from frcpredict.model import SimulationResults
 from frcpredict.ui import BaseWidget
+from frcpredict.ui.util import setTabOrderForChildren
 from frcpredict.util import get_value_from_path
 from ui.util.label_utils import getLabelForMultivalue
 
@@ -38,6 +39,7 @@ class MultivaluesEditWidget(BaseWidget):
 
         # Prepare UI elements
         self.btnOptimize.setVisible(False)
+        self.setFocusPolicy(Qt.TabFocus)
 
         # Connect forwarded signals
         self.btnOptimize.clicked.connect(self.optimizeClicked)
@@ -126,6 +128,13 @@ class MultivaluesEditWidget(BaseWidget):
                 QHBoxLayout()
             )
             self.btnOptimize.setVisible(False)
+
+        if len(inspectionCheckBoxes) > 0:
+            self.setFocusProxy(inspectionCheckBoxes[0])
+
+        setTabOrderForChildren(self,
+                               [j for i in zip(inspectionCheckBoxes, sliders) for j in i]
+                               + [self.btnOptimize])
 
         self._inspectionCheckBoxes = inspectionCheckBoxes
         self._multivalueSliders = sliders

@@ -4,7 +4,7 @@ from frcpredict.model import (
     ImagingSystemSettings, RefractiveIndex, Pattern, PatternType, Multivalue
 )
 from frcpredict.ui import BaseWidget
-from frcpredict.ui.util import connectMulti, getEnumEntryName, UserFileDirs
+from frcpredict.ui.util import setTabOrderForChildren, connectMulti, getEnumEntryName, UserFileDirs
 from .imaging_settings_p import ImagingSystemSettingsPresenter
 
 
@@ -44,6 +44,10 @@ class ImagingSystemSettingsWidget(BaseWidget):
 
         for refractiveIndex in list(RefractiveIndex):
             self.editImmersionType.addItem(getEnumEntryName(refractiveIndex), refractiveIndex.value)
+
+        setTabOrderForChildren(self, [self.presetPicker, self.editOpticalPsf,
+                                      self.editPinholeFunction, self.editScanningStepSize,
+                                      self.editImmersionType])
 
         # Connect forwarded signals
         self.editOpticalPsf.valueChanged.connect(self.opticalPsfChanged)

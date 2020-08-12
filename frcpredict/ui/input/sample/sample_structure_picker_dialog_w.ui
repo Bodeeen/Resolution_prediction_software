@@ -111,6 +111,9 @@
               </item>
               <item>
                <widget class="QScrollArea" name="scrollArea">
+                <property name="focusPolicy">
+                 <enum>Qt::NoFocus</enum>
+                </property>
                 <property name="frameShape">
                  <enum>QFrame::Box</enum>
                 </property>
@@ -156,6 +159,9 @@
                       <property name="enabled">
                        <bool>false</bool>
                       </property>
+                      <property name="focusPolicy">
+                       <enum>Qt::NoFocus</enum>
+                      </property>
                       <property name="readOnly">
                        <bool>true</bool>
                       </property>
@@ -172,6 +178,9 @@
                      <widget class="FreeFloatBox" name="editKOrigin">
                       <property name="enabled">
                        <bool>false</bool>
+                      </property>
+                      <property name="focusPolicy">
+                       <enum>Qt::NoFocus</enum>
                       </property>
                       <property name="readOnly">
                        <bool>true</bool>
@@ -269,6 +278,12 @@
    <header>frcpredict.ui</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>listSample</tabstop>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>editSpectralPower</tabstop>
+  <tabstop>editKOrigin</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

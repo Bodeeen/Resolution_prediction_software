@@ -2,7 +2,7 @@ from PyQt5.QtCore import pyqtSignal
 
 from frcpredict.model import Pulse, Pattern, PatternType, Multivalue
 from frcpredict.ui import BaseWidget
-from frcpredict.ui.util import setFormLayoutRowVisibility, connectMulti
+from frcpredict.ui.util import setFormLayoutRowVisibility, setTabOrderForChildren, connectMulti
 from .pulse_properties_p import PulsePropertiesPresenter
 
 
@@ -26,11 +26,17 @@ class PulsePropertiesWidget(BaseWidget):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(__file__, *args, **kwargs)
 
+        # Prepare UI elements
         self.editIlluminationPattern.setFieldName("Illumination Pattern")
         self.editIlluminationPattern.setAllowEditGenerationAmplitude(False)
         self.editIlluminationPattern.setAvailableGenerationTypes(
             [PatternType.gaussian, PatternType.doughnut, PatternType.airy_from_FWHM]
         )
+
+        # Prepare UI elements
+        setTabOrderForChildren(self, [self.editWavelength, self.editDuration,
+                                      self.editMaxIntensity, self.btnMoveLeft,
+                                      self.btnMoveRight, self.editIlluminationPattern])
         
         # Connect forwarded signals
         connectMulti(self.editWavelength.valueChanged, [float, Multivalue],

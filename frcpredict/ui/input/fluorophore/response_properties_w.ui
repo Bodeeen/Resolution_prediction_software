@@ -98,12 +98,6 @@
    <header>frcpredict.ui</header>
   </customwidget>
  </customwidgets>
- <tabstops>
-  <tabstop>editWavelength</tabstop>
-  <tabstop>editOffToOn</tabstop>
-  <tabstop>editOnToOff</tabstop>
-  <tabstop>editEmission</tabstop>
- </tabstops>
  <resources/>
  <connections/>
 </ui>

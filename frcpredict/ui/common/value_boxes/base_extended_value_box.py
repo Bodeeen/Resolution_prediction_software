@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QWidget, QMessageBox, QMenu
 
 from frcpredict.model import Multivalue
 from frcpredict.ui import BaseWidget
+from frcpredict.ui.util import setTabOrderForChildren
 from .set_value_list_dialog_w import SetValueListDialog
 from .set_value_range_dialog import SetValueRangeDialog
 
@@ -89,6 +90,12 @@ class BaseExtendedValueBox(BaseWidget, Generic[T]):
         # Prepare UI elements
         self.editValue.parent().layout().replaceWidget(self.editValue, valueWidgetToWrap)
         self.editValue = valueWidgetToWrap
+
+        self.setFocusPolicy(Qt.TabFocus)
+        self.setFocusProxy(self.editValue)
+
+        setTabOrderForChildren(self,
+                               [self.editValue, self.btnInfo, self.btnSetList, self.btnSetRange])
 
         # Connect own signal slots
         self.btnSetList.clicked.connect(self._onClickSetList)

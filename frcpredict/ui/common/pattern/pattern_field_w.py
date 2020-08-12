@@ -1,6 +1,6 @@
 from typing import List
 
-from PyQt5.QtCore import pyqtSignal, pyqtProperty
+from PyQt5.QtCore import pyqtSignal, pyqtProperty, Qt
 from PyQt5.QtGui import QPixmap
 
 from frcpredict.model import Pattern, PatternType
@@ -42,9 +42,13 @@ class PatternFieldWidget(BaseWidget):
         self._availableGenerationTypes = []
         self._fieldName = "Pattern"
 
+        # Prepare UI elements
+        self.setFocusPolicy(Qt.TabFocus)
+        self.setFocusProxy(self.btnGenerate)
+
         # Connect forwarded signals
-        self.btnLoadFile.clicked.connect(self.loadFileClicked)
         self.btnGenerate.clicked.connect(self.generateClicked)
+        self.btnLoadFile.clicked.connect(self.loadFileClicked)
 
         # Initialize presenter
         self._presenter = PatternFieldPresenter(self)
