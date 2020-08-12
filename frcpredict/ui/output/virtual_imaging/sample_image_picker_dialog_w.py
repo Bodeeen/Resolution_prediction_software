@@ -64,7 +64,7 @@ class SampleImagePickerDialog(QDialog, BaseWidget):
         if loadedSampleIndex > -1:
             self.listSample.setCurrentRow(loadedSampleIndex)
             self.lblInfo.setText("Note: FRC/resolution output data will not be accurate when" +
-                                 " picking anything other than the loaded sample structure image.")
+                                 " picking anything other than the loaded sample structure.")
         else:
             self.lblInfo.setText("Note: FRC/resolution output data will not be accurate, since" +
                                  " the simulation was run without any loaded sample structure.")

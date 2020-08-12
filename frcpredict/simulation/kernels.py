@@ -135,7 +135,7 @@ def simulate(run_instance: "mdl.RunInstance", *,
 
     # Input validation
     if len(run_instance.fluorophore_settings.responses) < 1:
-        raise Exception("You have not set any fluorophore responses!")
+        raise Exception("Input didn't contain any fluorophore responses!")
 
     if len(run_instance.pulse_scheme.pulses) < 1:
         raise Exception("The pulse scheme is empty!")
@@ -227,7 +227,7 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
     else:
         collection_efficiency = 0.3  # TODO: This is a temporary fallback
 
-    """ Calculate ON-state probabilities after ON-switching illumination"""
+    # Calculate ON-state probabilities after ON-switching illumination
     P_on = np.zeros(psf_kernel_rad_px)
     for pulse_index, pulse in enumerate(run_instance.pulse_scheme.pulses):
         # TODO: This does currently not create radial profile from an average
@@ -270,4 +270,4 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
 
             return exp_kernel, var_kernel
 
-    raise Exception("Run instance didn't have a readout pulse!")
+    raise Exception("Input didn't contain a readout pulse!")

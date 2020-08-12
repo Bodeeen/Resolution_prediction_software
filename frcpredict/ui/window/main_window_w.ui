@@ -88,7 +88,7 @@
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>320</height>
+         <height>300</height>
         </size>
        </property>
       </widget>
@@ -100,7 +100,7 @@
    <property name="minimumSize">
     <size>
      <width>60</width>
-     <height>60</height>
+     <height>118</height>
     </size>
    </property>
    <property name="features">
@@ -134,7 +134,7 @@
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>180</height>
+         <height>60</height>
         </size>
        </property>
       </widget>
@@ -590,7 +590,7 @@
   </action>
   <action name="actionResetUI">
    <property name="text">
-    <string>Reset User Interface</string>
+    <string>Reset Interface</string>
    </property>
   </action>
  </widget>
