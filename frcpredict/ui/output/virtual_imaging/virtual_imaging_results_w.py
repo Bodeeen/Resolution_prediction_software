@@ -24,10 +24,10 @@ class VirtualImagingResultsWidget(BaseWidget):
     exportImageClicked = pyqtSignal()
 
     panZoomResetClicked = pyqtSignal()
-    panZoomAutoResetChanged = pyqtSignal(int)
+    panZoomAutoResetToggled = pyqtSignal(int)
 
     autoLevelClicked = pyqtSignal()
-    autoLevelAutoPerformChanged = pyqtSignal(int)
+    autoLevelAutoPerformToggled = pyqtSignal(int)
     autoLevelLowerCutoffChanged = pyqtSignal(float)
 
     # Methods
@@ -46,10 +46,10 @@ class VirtualImagingResultsWidget(BaseWidget):
         self.btnExportImage.clicked.connect(self.exportImageClicked)
 
         self.btnResetPanZoom.clicked.connect(self.panZoomResetClicked)
-        self.chkPanZoomAutoReset.stateChanged.connect(self.panZoomAutoResetChanged)
+        self.chkPanZoomAutoReset.stateChanged.connect(self.panZoomAutoResetToggled)
 
         self.btnAutoLevel.clicked.connect(self.autoLevelClicked)
-        self.chkAutoLevelAutoPerform.stateChanged.connect(self.autoLevelAutoPerformChanged)
+        self.chkAutoLevelAutoPerform.stateChanged.connect(self.autoLevelAutoPerformToggled)
         self.editAutoLevelLowerCutoff.valueChanged.connect(self.autoLevelLowerCutoffChanged)
 
         # Initialize presenter

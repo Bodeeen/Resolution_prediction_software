@@ -41,10 +41,10 @@ class VirtualImagingResultsPresenter(BasePresenter[VirtualImagingResultsModel]):
         widget.exportImageClicked.connect(self._uiClickExportImage)
 
         widget.panZoomResetClicked.connect(self._uiClickPanZoomReset)
-        widget.panZoomAutoResetChanged.connect(self._uiPanZoomAutoResetChange)
+        widget.panZoomAutoResetToggled.connect(self._uiPanZoomAutoResetChange)
 
         widget.autoLevelClicked.connect(self._uiClickAutoLevel)
-        widget.autoLevelAutoPerformChanged.connect(self._uiAutoLevelAutoPerformChange)
+        widget.autoLevelAutoPerformToggled.connect(self._uiAutoLevelAutoPerformChange)
         widget.autoLevelLowerCutoffChanged.connect(self._uiAutoLevelLowerCutoffChange)
 
     # UI event handling

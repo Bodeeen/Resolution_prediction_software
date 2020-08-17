@@ -8,5 +8,7 @@ class VirtualImagingResultsModel:
     """
 
     panZoomAutoReset: bool = False
+
     autoLevelAutoPerform: bool = True
+
     autoLevelLowerCutoff: float = 0.0
