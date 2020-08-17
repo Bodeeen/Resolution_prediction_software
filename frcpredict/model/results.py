@@ -54,7 +54,7 @@ class KernelSimulationResult:
         # Prevent issues when the curve crosses the threshold at multiple points, by creating a
         # copy of the y value array and modifying it so that it doesn't happen
         y = np.copy(y)
-        for i in range(1, len(y)):
+        for i in reversed(range(1, len(y))):
             if y[i] > y[i - 1]:
                 y[i] = y[i - 1]
 
@@ -82,7 +82,6 @@ class KernelSimulationResult:
             self._cached_frc_curve_x, self._cached_frc_curve_y = get_frc_curve_from_kernels2d(
                 self._cached_kernels2d, run_instance
             )
-            self._post_caching_cleanup()
 
     def cache_expected_image(self, run_instance: RunInstance, sample_id: str,
                              sample_image_arr: np.ndarray) -> None:
@@ -97,7 +96,6 @@ class KernelSimulationResult:
                 self._cached_kernels2d, sample_image_arr
             )
             self._cached_expected_image_sample_id = sample_id
-            self._post_caching_cleanup()
 
     # Internal methods
     def _cache_kernels2d(self, run_instance: RunInstance) -> None:
@@ -107,12 +105,6 @@ class KernelSimulationResult:
                 self.exp_kernel, self.var_kernel,
                 pixels_per_nm=run_instance.imaging_system_settings.scanning_step_size
             )
-
-    def _post_caching_cleanup(self) -> None:
-        """ Cleans up memory if possible, intended to be run after caching. """
-        if (self._cached_frc_curve_x is not None and self._cached_frc_curve_y is not None
-                and self._cached_expected_image is not None):
-            self._cached_kernels2d = None
 
 
 @dataclass_json
@@ -141,7 +133,7 @@ class SimulationResults:
 
     # Methods
     def cache_all(self, sample_id: Optional[str], sample_image_arr: Optional[np.ndarray]) -> None:
-        """ Caches all FRC curves and expected images. """
+        """ Pre-caches all FRC curves and expected images. """
 
         for kernel_result in np.nditer(self.kernel_results, flags=["refs_ok"]):
             kernel_result_item = kernel_result.item()
