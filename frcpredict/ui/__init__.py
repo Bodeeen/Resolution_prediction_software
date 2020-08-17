@@ -38,5 +38,5 @@ from .input.camera.camera_properties_w import CameraPropertiesWidget
 from .output.controls.output_director_w import OutputDirectorWidget
 from .output.controls.multivalues_edit import MultivaluesEditWidget
 
-from .output.frc.frc_results import FrcResultsWidget
+from .output.frc.frc_results_w import FrcResultsWidget
 from .output.virtual_imaging.virtual_imaging_results_w import VirtualImagingResultsWidget

@@ -19,6 +19,36 @@ class SampleImage:
     imageArr: np.ndarray = np.zeros((1, 1))
 
 
+@dataclass
+class InspectionDetails:
+    """
+    A description of a parameter inspection.
+    """
+
+    curveX: np.ndarray  # inspection curve X values
+
+    curveY: np.ndarray  # inspection curve Y values
+
+    curveIndex: int  # the index of the current value in the inspection curve
+
+    label: str  # what's being inspected
+
+
+@dataclass
+class ViewOptions:
+    """
+    A description of the options of a view of a simulation.
+    """
+
+    threshold: float = 0.15
+
+    valueAtThreshold: float = 0
+
+    inspectedMultivalueIndex: int = -1  # -1 if no multivalue inspected
+
+    inspectionDetails: Optional[InspectionDetails] = None
+
+
 @dataclass_with_properties
 @dataclass_internal_attrs(
     resultsChanged=Signal, inspectedMultivalueIndexChanged=Signal,

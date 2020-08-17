@@ -12,7 +12,7 @@ from frcpredict.model import SimulationResults, PersistentContainer
 from frcpredict.ui import BasePresenter
 from frcpredict.ui.util import UserFileDirs, getLabelForMultivalue
 from frcpredict.util import clear_signals, rebuild_dataclass, expand_with_multivalues
-from .output_director_m import SimulationResultsView, SampleImage
+from .output_director_m import SimulationResultsView, SampleImage, ViewOptions, InspectionDetails
 
 
 class OutputDirectorPresenter(BasePresenter[SimulationResultsView]):
@@ -52,6 +52,9 @@ class OutputDirectorPresenter(BasePresenter[SimulationResultsView]):
 
     # Methods
     def __init__(self, widget) -> None:
+        self._currentRunInstance = None
+        self._currentKernelResult = None
+
         super().__init__(SimulationResultsView(), widget)
 
         # Prepare UI events
@@ -66,20 +69,22 @@ class OutputDirectorPresenter(BasePresenter[SimulationResultsView]):
         """ Updates the widget to show the current kernel simulation result and view options. """
 
         if self.model.results is not None and len(self.model.results.kernel_results) > 0:
-            kernelResult = self.model.results.kernel_results[
+            self._currentKernelResult = self.model.results.kernel_results[
                 tuple(self.model.multivalueValueIndices)
             ]
 
-            runInstance = expand_with_multivalues(self.model.results.run_instance,
-                                                  self.model.results.multivalue_paths,
-                                                  kernelResult.multivalue_values)
+            self._currentRunInstance = expand_with_multivalues(
+                self.model.results.run_instance,
+                self.model.results.multivalue_paths,
+                self._currentKernelResult.multivalue_values
+            )
         else:
-            kernelResult = None
-            runInstance = None
+            self._currentKernelResult = None
+            self._currentRunInstance = None
 
         self.widget.updateDisplayedKernelResult(
-            runInstance=runInstance,
-            kernelResult=kernelResult,
+            runInstance=self._currentRunInstance,
+            kernelResult=self._currentKernelResult,
             multivalueIndices=self.model.multivalueValueIndices,
             inspectedIndex=self.model.inspectedMultivalueIndex,
             initialDisplayOfData=initialDisplayOfData
@@ -92,9 +97,16 @@ class OutputDirectorPresenter(BasePresenter[SimulationResultsView]):
         inspection).
         """
 
+        # Threshold
         threshold = self.model.threshold
-        inspectedIndex = self.model.inspectedMultivalueIndex
+        valueAtThreshold = None
+        if self._currentRunInstance is not None and self._currentKernelResult is not None:
+            valueAtThreshold = self._currentKernelResult.resolution_at_threshold(
+                self._currentRunInstance, threshold
+            )
 
+        # Inspection
+        inspectedIndex = self.model.inspectedMultivalueIndex
         if inspectedIndex > -1:
             numEvaluations = self.model.results.kernel_results.shape[inspectedIndex]
             label = getLabelForMultivalue(self.model.results,
@@ -114,13 +126,20 @@ class OutputDirectorPresenter(BasePresenter[SimulationResultsView]):
                 )
 
             self.widget.updateViewOptions(
-                threshold, inspectedIndex,
-                inspectionCurveX=inspectedCurveX, inspectionCurveY=inspectedCurveY,
-                inspectionCurveIndex=self.model.multivalueValueIndices[inspectedIndex],
-                inspectionLabel=label
+                ViewOptions(
+                    threshold=threshold, valueAtThreshold=valueAtThreshold,
+                    inspectedMultivalueIndex=inspectedIndex, inspectionDetails=InspectionDetails(
+                        curveX=inspectedCurveX, curveY=inspectedCurveY,
+                        curveIndex=self.model.multivalueValueIndices[inspectedIndex],
+                        label=label
+                    )
+                )
             )
         else:
-            self.widget.updateViewOptions(threshold, inspectedIndex)
+            self.widget.updateViewOptions(
+                ViewOptions(threshold=threshold, valueAtThreshold=valueAtThreshold,
+                            inspectedMultivalueIndex=inspectedIndex)
+            )
 
     # Model event handling
     def _onResultsChange(self, results: Optional[SimulationResults]) -> None:

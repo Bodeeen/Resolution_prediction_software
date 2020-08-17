@@ -6,7 +6,7 @@ from PyQt5.QtCore import pyqtSignal
 from frcpredict.model import  RunInstance, KernelSimulationResult, SimulationResults
 from frcpredict.ui import BaseWidget
 from .multivalues_edit import MultivalueListSignals
-from .output_director_m import SimulationResultsView
+from .output_director_m import SimulationResultsView, ViewOptions
 from .output_director_p import OutputDirectorPresenter
 
 
@@ -16,8 +16,8 @@ class OutputDirectorWidget(BaseWidget):
     """
 
     # Signals
-    viewOptionsChanged = pyqtSignal(float, float, int, object, object, object, str)
-    kernelResultsChanged = pyqtSignal(object, object, bool)
+    viewOptionsChanged = pyqtSignal(ViewOptions)
+    kernelResultChanged = pyqtSignal(object, object, bool)
     expectedImageChanged = pyqtSignal(object, object, bool)
 
     sampleImageChanged = pyqtSignal(object, object)
@@ -28,8 +28,6 @@ class OutputDirectorWidget(BaseWidget):
 
     # Methods
     def __init__(self, *args, **kwargs) -> None:
-        self._currentRunInstance = None
-        self._currentKernelResults = None
 
         super().__init__(__file__, *args, **kwargs)
 
@@ -76,9 +74,6 @@ class OutputDirectorWidget(BaseWidget):
         kernel result has been updated.
         """
 
-        self._currentRunInstance = runInstance
-        self._currentKernelResults = kernelResult
-
         if kernelResult is not None:
             self.multivaluesEdit.updateMultivalueValues(multivalueIndices,
                                                         kernelResult.multivalue_values)
@@ -86,39 +81,20 @@ class OutputDirectorWidget(BaseWidget):
         self.btnExportResults.setEnabled(kernelResult is not None)
 
         # Emit signals
-        self.kernelResultsChanged.emit(runInstance, kernelResult, initialDisplayOfData)
+        self.kernelResultChanged.emit(runInstance, kernelResult, initialDisplayOfData)
         self.expectedImageChanged.emit(runInstance, kernelResult, initialDisplayOfData)
 
-    def updateViewOptions(self, threshold: float, inspectedIndex: int, *,
-                          inspectionCurveX: Optional[np.ndarray] = None,
-                          inspectionCurveY: Optional[np.ndarray] = None,
-                          inspectionCurveIndex: Optional[int] = None,
-                          inspectionLabel: str = "") -> None:
+    def updateViewOptions(self, viewOptions: ViewOptions) -> None:
         """
         Updates the threshold and inspection state. If inspectedIndex is zero or greater,
         inspectionCurveX and inspectionCurveY must also be passed.
         """
 
-        if inspectedIndex > -1 and (inspectionCurveX is None or inspectionCurveY is None
-                                    or inspectionCurveIndex is None):
-            raise ValueError(
-                "inspectedIndex > -1, but inspectionCurveX, inspectionCurveY and/or" +
-                " inspectionCurveIndex were not set."
-            )
+        if viewOptions.inspectedMultivalueIndex > -1 and viewOptions.inspectionDetails is None:
+            raise ValueError("inspectedIndex > -1, but inspectionDetails was not set.")
 
         # Update inspection
-        self.multivaluesEdit.updateInspection(inspectedIndex)
-
-        # Update threshold
-        valueAtThreshold = None
-        if self._currentRunInstance is not None and self._currentKernelResults is not None:
-            valueAtThreshold = self._currentKernelResults.resolution_at_threshold(
-                self._currentRunInstance, threshold
-            )
+        self.multivaluesEdit.updateInspection(viewOptions.inspectedMultivalueIndex)
 
         # Emit signal
-        self.viewOptionsChanged.emit(
-            threshold, valueAtThreshold if valueAtThreshold is not None else 0.0,
-            inspectedIndex, inspectionCurveX, inspectionCurveY, inspectionCurveIndex,
-            inspectionLabel
-        )
+        self.viewOptionsChanged.emit(viewOptions)

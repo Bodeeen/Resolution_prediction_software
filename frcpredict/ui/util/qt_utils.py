@@ -2,7 +2,7 @@ from typing import Union, List, Callable
 
 import numpy as np
 from PyQt5.QtCore import pyqtSignal, pyqtBoundSignal
-from PyQt5.QtGui import QImage, QPixmap
+from PyQt5.QtGui import QImage, QPixmap, QGuiApplication, QCursor
 from PyQt5.QtWidgets import QFormLayout, QWidget
 
 
@@ -66,3 +66,11 @@ def connectMulti(signal: pyqtSignal, arg_types: List[type],
             )
         except KeyError:
             signal[arg_type].connect(handler)
+
+
+def centerWindow(window: QWidget) -> None:
+    """ Centers the given window in the screen. """
+    screen = QGuiApplication.screenAt(QCursor().pos())
+    frameGeometry = window.frameGeometry()
+    frameGeometry.moveCenter(screen.availableGeometry().center())
+    window.move(frameGeometry.topLeft())

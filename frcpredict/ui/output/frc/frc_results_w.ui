@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
    <property name="spacing">
     <number>9</number>
    </property>
@@ -109,12 +109,15 @@
    </item>
    <item>
     <widget class="QGroupBox" name="grpData">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="title">
       <string>Data</string>
      </property>
      <layout class="QFormLayout" name="formLayout_4">
       <property name="verticalSpacing">
-       <number>12</number>
+       <number>9</number>
       </property>
       <property name="leftMargin">
        <number>18</number>
@@ -137,9 +140,6 @@
       </item>
       <item row="0" column="1">
        <widget class="FreeFloatBox" name="editThreshold">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
         <property name="text">
          <string/>
         </property>
@@ -153,17 +153,97 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLabel" name="lblResolutionValue">
-        <property name="text">
-         <string>–</string>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <property name="spacing">
+         <number>6</number>
         </property>
-        <property name="indent">
-         <number>2</number>
-        </property>
-       </widget>
+        <item>
+         <widget class="QLabel" name="lblResolutionValue">
+          <property name="minimumSize">
+           <size>
+            <width>80</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>–</string>
+          </property>
+          <property name="indent">
+           <number>2</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="Line" name="line">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="chkCrosshair">
+          <property name="text">
+           <string>Crosshair</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnExportValues">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Export values…</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnExportGraph">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Export graph…</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
