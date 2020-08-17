@@ -18,7 +18,7 @@
     <number>9</number>
    </property>
    <item>
-    <widget class="PresetPickerWidget" name="presetPicker" native="true"/>
+    <widget class="ConfigPanelWidget" name="configPanel" native="true"/>
    </item>
    <item>
     <widget class="Line" name="line">
@@ -111,7 +111,7 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>PresetPickerWidget</class>
+   <class>ConfigPanelWidget</class>
    <extends>QWidget</extends>
    <header>frcpredict.ui</header>
    <container>1</container>

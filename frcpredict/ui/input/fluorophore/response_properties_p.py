@@ -4,7 +4,7 @@ from PyQt5.QtCore import pyqtSlot
 
 from frcpredict.model import IlluminationResponse, Multivalue
 from frcpredict.ui import BasePresenter
-from frcpredict.ui.util import connectMulti
+from frcpredict.ui.util import connectMulti, connectModelToSignal, disconnectModelFromSignal
 
 
 class ResponsePropertiesPresenter(BasePresenter[IlluminationResponse]):
@@ -15,6 +15,14 @@ class ResponsePropertiesPresenter(BasePresenter[IlluminationResponse]):
     # Properties
     @BasePresenter.model.setter
     def model(self, model: IlluminationResponse) -> None:
+        # Disconnect old model event handling
+        try:
+            self._model.basic_field_changed.disconnect(self._onBasicFieldChange)
+            disconnectModelFromSignal(self.model, self._modifiedFlagSlotFunc)
+        except AttributeError:
+            pass
+
+        # Set model
         self._model = model
 
         # Trigger model change event handlers
@@ -22,6 +30,7 @@ class ResponsePropertiesPresenter(BasePresenter[IlluminationResponse]):
 
         # Connect new model events
         model.basic_field_changed.connect(self._onBasicFieldChange)
+        self._modifiedFlagSlotFunc = connectModelToSignal(self.model, self.widget.modifiedFlagSet)
 
     # Methods
     def __init__(self, widget) -> None:

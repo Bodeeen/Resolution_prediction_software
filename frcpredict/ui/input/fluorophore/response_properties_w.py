@@ -12,6 +12,8 @@ class ResponsePropertiesWidget(BaseWidget):
     """
 
     # Signals
+    modifiedFlagSet = pyqtSignal()
+
     wavelengthChanged = pyqtSignal(float)
     offToOnChanged = pyqtSignal([float], [Multivalue])
     onToOffChanged = pyqtSignal([float], [Multivalue])

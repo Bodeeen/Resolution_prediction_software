@@ -24,13 +24,17 @@ class PersistentContainer(Generic[DataType]):
     data_type: str
     program_name: str
     program_version: str
+    name: Optional[str]
 
+    # Methods
     def __init__(self, data: DataType, data_type: Optional[type] = None,
-                 program_name: Optional[str] = None, program_version: Optional[str] = None) -> None:
+                 program_name: Optional[str] = None, program_version: Optional[str] = None,
+                 name: Optional[str] = None) -> None:
         self.data = data
         self.data_type = type(data).__name__ if data_type is None else data_type
         self.program_name = frcpredict.__title__ if program_name is None else program_name
         self.program_version = frcpredict.__version__ if program_version is None else program_version
+        self.name = name
 
     def validate(self) -> List[str]:
         """ Validates the loaded JSON file contents and returns a list of any issues found. """
@@ -39,17 +43,35 @@ class PersistentContainer(Generic[DataType]):
 
         if self.program_name != frcpredict.__title__:
             warnings.append(
-                f"Data was created with program \"{self.program_name}\" which is different from what you are using (\"{frcpredict.__title__}\")")
+                f"Data was created with program \"{self.program_name}\" which is different from" +
+                f" what you are using (\"{frcpredict.__title__}\")")
 
         if version.parse(self.program_version) > version.parse(frcpredict.__version__):
             warnings.append(
-                f"Data was created with program version \"{self.program_version}\" which is newer than what you are using (\"{frcpredict.__version__}\")")
+                f"Data was created with program version \"{self.program_version}\" which is newer" +
+                f" than what you are using (\"{frcpredict.__version__}\")")
 
         if self.data_type != type(self.data).__name__ and not isinstance(self.data, dict):
             warnings.append(
-                f"Actual data type \"{type(self.data).__name__}\" did not match described data type \"{self.data_type}\"")
+                f"Actual data type \"{type(self.data).__name__}\" did not match described data" +
+                f" type \"{self.data_type}\"")
 
         return warnings
+
+    # Internal methods
+    def _upgrade(self) -> None:
+        """
+        Upgrade the data structure if this JSON was created by an previous version of the program.
+        The data structure, which can be seen as a tree, is upgraded in a bottom-up manner.
+        """
+
+        parsed_json_version = version.parse(self.program_version)
+        if (self.program_name != frcpredict.__title__
+                and parsed_json_version < version.parse(frcpredict.__version__)):
+            for field_value in reversed(recursive_field_iter(self)):
+                if is_dataclass_instance(field_value):
+                    if hasattr(field_value, "upgrade") and callable(field_value.upgrade):
+                        field_value.upgrade(parsed_json_version)
 
     @staticmethod
     def from_json_with_converted_dicts(json: str, data_type: type):
@@ -71,19 +93,13 @@ class PersistentContainer(Generic[DataType]):
             except Exception as e:
                 if persistent_container.data_type != data_type.__name__:
                     raise Exception(
-                        f"Incompatible JSON: Described data type \"{persistent_container.data_type}\" did not match expected data type \"{data_type.__name__}\"")
+                        f"Incompatible JSON: Described data type" +
+                        f" \"{persistent_container.data_type}\" did not match expected data type" +
+                        f" \"{data_type.__name__}\"")
                 else:
                     raise e
 
-        # Upgrade the data structure if this JSON was created by an previous version of the program.
-        # The data structure, which can be seen as a tree, is upgraded in a bottom-up manner.
-        parsed_json_version = version.parse(persistent_container.program_version)
-        if (persistent_container.program_name != frcpredict.__title__
-                and parsed_json_version < version.parse(frcpredict.__version__)):
-            for field_value in reversed(recursive_field_iter(persistent_container)):
-                if is_dataclass_instance(field_value):
-                    if hasattr(field_value, "upgrade") and callable(field_value.upgrade):
-                        field_value.upgrade(parsed_json_version)
+        persistent_container._upgrade()
 
         # Return
         return persistent_container

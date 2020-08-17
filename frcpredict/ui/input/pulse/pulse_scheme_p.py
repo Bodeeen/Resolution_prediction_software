@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QMessageBox
 
 from frcpredict.model import PulseScheme, Pulse
 from frcpredict.ui import BasePresenter
+from frcpredict.ui.util import connectModelToSignal, disconnectModelFromSignal
 from .add_pulse_dialog import AddPulseDialog
 from .pulse_curve_item import PulseCurveItem
 
@@ -22,6 +23,7 @@ class PulseSchemePresenter(BasePresenter[PulseScheme]):
             self._model.pulse_added.disconnect(self._onPulseAdded)
             self._model.pulse_moved.disconnect(self._onPulseMoved)
             self._model.pulse_removed.disconnect(self._onPulseRemoved)
+            disconnectModelFromSignal(self.model, self._modifiedFlagSlotFunc)
         except AttributeError:
             pass
 
@@ -35,6 +37,7 @@ class PulseSchemePresenter(BasePresenter[PulseScheme]):
         model.pulse_added.connect(self._onPulseAdded)
         model.pulse_moved.connect(self._onPulseMoved)
         model.pulse_removed.connect(self._onPulseRemoved)
+        self._modifiedFlagSlotFunc = connectModelToSignal(self.model, self.widget.modifiedFlagSet)
 
     # Methods
     def __init__(self, widget) -> None:

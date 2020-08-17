@@ -13,7 +13,7 @@ from .main.main_window_w import MainWindow
 
 # Common
 from .common.list_item_with_value import ListItemWithValue
-from .common.preset_picker import PresetPickerWidget
+from .common.config_panel import ConfigPanelWidget
 from .common.value_boxes.free_float_box import FreeFloatBox
 from .common.value_boxes.extended_free_float_box import ExtendedFreeFloatBox
 from .common.value_boxes.extended_spin_box import ExtendedSpinBox

@@ -1,11 +1,9 @@
-from typing import Optional
-
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt
 from PyQt5.QtWidgets import QListWidgetItem
 
 from frcpredict.model import FluorophoreSettings, IlluminationResponse
 from frcpredict.ui import BaseWidget
-from frcpredict.ui.util import UserFileDirs
+from frcpredict.ui.util import PresetFileDirs, UserFileDirs
 from .fluorophore_settings_p import FluorophoreSettingsPresenter
 from .response_list_item import ResponseListItem
 
@@ -17,6 +15,8 @@ class FluorophoreSettingsWidget(BaseWidget):
 
     # Signals
     valueChanged = pyqtSignal(FluorophoreSettings)
+    modifiedFlagSet = pyqtSignal()
+
     responseSelectionChanged = pyqtSignal(QListWidgetItem, QListWidgetItem)
     addResponseClicked = pyqtSignal()
     removeResponseClicked = pyqtSignal()
@@ -26,15 +26,18 @@ class FluorophoreSettingsWidget(BaseWidget):
         super().__init__(__file__, *args, **kwargs)
 
         # Prepare UI elements
-        self.presetPicker.setModelType(FluorophoreSettings)
-        self.presetPicker.setStartDirectory(UserFileDirs.FluorophoreSettings)
-        self.presetPicker.setValueGetter(self.value)
-        self.presetPicker.setValueSetter(self.setValue)
+        self.configPanel.setModelType(FluorophoreSettings)
+        self.configPanel.setPresetsDirectory(PresetFileDirs.FluorophoreSettings)
+        self.configPanel.setStartDirectory(UserFileDirs.FluorophoreSettings)
+        self.configPanel.setValueGetter(self.value)
+        self.configPanel.setValueSetter(self.setValue)
 
         self.editProperties.setWavelengthVisible(False)
 
         # Connect own signal slots
-        self.presetPicker.dataLoaded.connect(self._onLoadPreset)
+        self.modifiedFlagSet.connect(self._onModifiedFlagSet)
+        self.editProperties.modifiedFlagSet.connect(self._onModifiedFlagSet)
+        self.configPanel.dataLoaded.connect(self._onLoadConfig)
         
         # Connect forwarded signals
         self.listResponses.currentItemChanged.connect(self.responseSelectionChanged)
@@ -88,14 +91,18 @@ class FluorophoreSettingsWidget(BaseWidget):
         return self._presenter.model
 
     def setValue(self, model: FluorophoreSettings, emitSignal: bool = True) -> None:
-        self.presetPicker.setLoadedPath(None)
+        self.configPanel.setLoadedPath(None)
         self._presenter.model = model
         self.deselectSelectedRow()
 
         if emitSignal:
             self.valueChanged.emit(model)
-    
+
     # Event handling
     @pyqtSlot()
-    def _onLoadPreset(self) -> None:
+    def _onModifiedFlagSet(self, *_args, **_kwargs) -> None:
+        self.configPanel.setModifiedFlag()
+
+    @pyqtSlot()
+    def _onLoadConfig(self) -> None:
         self.deselectSelectedRow()

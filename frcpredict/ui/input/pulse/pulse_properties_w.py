@@ -12,6 +12,8 @@ class PulsePropertiesWidget(BaseWidget):
     """
 
     # Signals
+    modifiedFlagSet = pyqtSignal()
+
     wavelengthChanged = pyqtSignal([float], [Multivalue])
     wavelengthChangedByUser = pyqtSignal([float], [Multivalue])
     durationChanged = pyqtSignal([float], [Multivalue])

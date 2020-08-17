@@ -2,9 +2,9 @@ from typing import Union
 
 from PyQt5.QtCore import pyqtSlot
 
-from frcpredict.model import Pulse, Pattern, Array2DPatternData, Multivalue
+from frcpredict.model import Pulse, Pattern, Multivalue
 from frcpredict.ui import BasePresenter
-from frcpredict.ui.util import connectMulti
+from frcpredict.ui.util import connectMulti, connectModelToSignal, disconnectModelFromSignal
 
 
 class PulsePropertiesPresenter(BasePresenter[Pulse]):
@@ -18,6 +18,7 @@ class PulsePropertiesPresenter(BasePresenter[Pulse]):
         # Disconnect old model event handling
         try:
             self._model.basic_field_changed.disconnect(self._onBasicFieldChange)
+            disconnectModelFromSignal(self.model, self._modifiedFlagSlotFunc)
         except AttributeError:
             pass
 
@@ -30,6 +31,7 @@ class PulsePropertiesPresenter(BasePresenter[Pulse]):
 
         # Prepare model events
         model.basic_field_changed.connect(self._onBasicFieldChange)
+        self._modifiedFlagSlotFunc = connectModelToSignal(self.model, self.widget.modifiedFlagSet)
 
     # Methods
     def __init__(self, widget) -> None:

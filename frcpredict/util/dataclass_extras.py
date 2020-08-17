@@ -40,10 +40,15 @@ class observable_property(dataclass_property):
             return getattr(self_, internal_name)
 
         def setter(self_, value: Any):
+            try:
+                should_emit = not hasattr(self_, internal_name) or getter(self_) != value
+            except ValueError:
+                should_emit = True
+
             setattr(self_, internal_name, value)
 
             signal = getattr(self_, signal_name)
-            if signal:
+            if signal and should_emit:
                 if emit_arg_name is not None:
                     emit_arg = getattr(self_, emit_arg_name)
                     signal.emit(emit_arg)

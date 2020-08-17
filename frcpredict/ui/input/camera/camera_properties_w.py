@@ -1,8 +1,8 @@
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, pyqtSlot
 
 from frcpredict.model import CameraProperties, Multivalue
 from frcpredict.ui import BaseWidget
-from frcpredict.ui.util import connectMulti, UserFileDirs
+from frcpredict.ui.util import connectMulti, PresetFileDirs, UserFileDirs
 from .camera_properties_p import CameraPropertiesPresenter
 
 
@@ -13,6 +13,8 @@ class CameraPropertiesWidget(BaseWidget):
 
     # Signals
     valueChanged = pyqtSignal(CameraProperties)
+    modifiedFlagSet = pyqtSignal()
+
     readoutNoiseChanged = pyqtSignal([float], [Multivalue])
     quantumEfficiencyChanged = pyqtSignal([float], [Multivalue])
 
@@ -21,10 +23,14 @@ class CameraPropertiesWidget(BaseWidget):
         super().__init__(__file__, *args, **kwargs)
 
         # Prepare UI elements
-        self.presetPicker.setModelType(CameraProperties)
-        self.presetPicker.setStartDirectory(UserFileDirs.CameraProperties)
-        self.presetPicker.setValueGetter(self.value)
-        self.presetPicker.setValueSetter(self.setValue)
+        self.configPanel.setModelType(CameraProperties)
+        self.configPanel.setPresetsDirectory(PresetFileDirs.CameraProperties)
+        self.configPanel.setStartDirectory(UserFileDirs.CameraProperties)
+        self.configPanel.setValueGetter(self.value)
+        self.configPanel.setValueSetter(self.setValue)
+
+        # Connect own signal slots
+        self.modifiedFlagSet.connect(self._onModifiedFlagSet)
         
         # Connect forwarded signals
         connectMulti(self.editReadoutNoise.valueChanged, [float, Multivalue],
@@ -39,7 +45,7 @@ class CameraPropertiesWidget(BaseWidget):
         return self._presenter.model
 
     def setValue(self, model: CameraProperties, emitSignal: bool = True) -> None:
-        self.presetPicker.setLoadedPath(None)
+        self.configPanel.setLoadedPath(None)
         self._presenter.model = model
 
         if emitSignal:
@@ -48,3 +54,8 @@ class CameraPropertiesWidget(BaseWidget):
     def updateBasicFields(self, model: CameraProperties) -> None:
         self.editReadoutNoise.setValue(model.readout_noise)
         self.editQuantumEfficiency.setValue(model.quantum_efficiency)
+
+    # Event handling
+    @pyqtSlot()
+    def _onModifiedFlagSet(self, *_args, **_kwargs) -> None:
+        self.configPanel.setModifiedFlag()

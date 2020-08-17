@@ -4,7 +4,9 @@ from frcpredict.model import (
     ImagingSystemSettings, RefractiveIndex, Pattern, PatternType, Multivalue
 )
 from frcpredict.ui import BaseWidget
-from frcpredict.ui.util import setTabOrderForChildren, connectMulti, getEnumEntryName, UserFileDirs
+from frcpredict.ui.util import (
+    setTabOrderForChildren, connectMulti, getEnumEntryName, PresetFileDirs, UserFileDirs
+)
 from .imaging_settings_p import ImagingSystemSettingsPresenter
 
 
@@ -15,6 +17,8 @@ class ImagingSystemSettingsWidget(BaseWidget):
 
     # Signals
     valueChanged = pyqtSignal(ImagingSystemSettings)
+    modifiedFlagSet = pyqtSignal()
+
     opticalPsfChanged = pyqtSignal(Pattern)
     pinholeFunctionChanged = pyqtSignal(Pattern)
     scanningStepSizeChanged = pyqtSignal([float], [Multivalue])
@@ -25,10 +29,11 @@ class ImagingSystemSettingsWidget(BaseWidget):
         super().__init__(__file__, *args, **kwargs)
 
         # Prepare UI elements
-        self.presetPicker.setModelType(ImagingSystemSettings)
-        self.presetPicker.setStartDirectory(UserFileDirs.ImagingSystemSettings)
-        self.presetPicker.setValueGetter(self.value)
-        self.presetPicker.setValueSetter(self.setValue)
+        self.configPanel.setModelType(ImagingSystemSettings)
+        self.configPanel.setPresetsDirectory(PresetFileDirs.ImagingSystemSettings)
+        self.configPanel.setStartDirectory(UserFileDirs.ImagingSystemSettings)
+        self.configPanel.setValueGetter(self.value)
+        self.configPanel.setValueSetter(self.setValue)
 
         self.editOpticalPsf.setFieldName("Optical PSF")
         self.editOpticalPsf.setAllowEditGenerationAmplitude(True)
@@ -45,16 +50,19 @@ class ImagingSystemSettingsWidget(BaseWidget):
         for refractiveIndex in list(RefractiveIndex):
             self.editImmersionType.addItem(getEnumEntryName(refractiveIndex), refractiveIndex.value)
 
-        setTabOrderForChildren(self, [self.presetPicker, self.editOpticalPsf,
+        setTabOrderForChildren(self, [self.configPanel, self.editOpticalPsf,
                                       self.editPinholeFunction, self.editScanningStepSize,
                                       self.editImmersionType])
+
+        # Connect own signal slots
+        self.modifiedFlagSet.connect(self._onModifiedFlagSet)
+        self.editImmersionType.currentIndexChanged.connect(self._onImmersionTypeChange)
 
         # Connect forwarded signals
         self.editOpticalPsf.valueChanged.connect(self.opticalPsfChanged)
         self.editPinholeFunction.valueChanged.connect(self.pinholeFunctionChanged)
         connectMulti(self.editScanningStepSize.valueChanged, [float, Multivalue],
                      self.scanningStepSizeChanged)
-        self.editImmersionType.currentIndexChanged.connect(self._onImmersionTypeChange)
 
         # Initialize presenter
         self._presenter = ImagingSystemSettingsPresenter(self)
@@ -63,7 +71,7 @@ class ImagingSystemSettingsWidget(BaseWidget):
         return self._presenter.model
 
     def setValue(self, model: ImagingSystemSettings, emitSignal: bool = True) -> None:
-        self.presetPicker.setLoadedPath(None)
+        self.configPanel.setLoadedPath(None)
         self._presenter.model = model
 
         if emitSignal:
@@ -82,6 +90,10 @@ class ImagingSystemSettingsWidget(BaseWidget):
         self.editImmersionType.setCurrentIndex(dataIndex)
 
     # Event handling
+    @pyqtSlot()
+    def _onModifiedFlagSet(self, *_args, **_kwargs) -> None:
+        self.configPanel.setModifiedFlag()
+
     @pyqtSlot(int)
     def _onImmersionTypeChange(self, index: int) -> None:
         self.refractiveIndexChanged.emit(self.editImmersionType.itemData(index))

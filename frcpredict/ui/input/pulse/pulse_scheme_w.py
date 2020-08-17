@@ -6,7 +6,7 @@ from PyQt5.QtCore import pyqtSignal, pyqtSlot, QPointF
 
 from frcpredict.model import PulseScheme, Pulse, Multivalue
 from frcpredict.ui import BaseWidget
-from frcpredict.ui.util import connectMulti, UserFileDirs
+from frcpredict.ui.util import connectMulti, PresetFileDirs, UserFileDirs
 from frcpredict.util import avg_value_if_multivalue
 from .pulse_scheme_p import PulseSchemePresenter
 from .pulse_curve_item import PulseCurveItem
@@ -21,6 +21,8 @@ class PulseSchemeWidget(BaseWidget):
 
     # Signals
     valueChanged = pyqtSignal(PulseScheme)
+    modifiedFlagSet = pyqtSignal()
+
     pulseClicked = pyqtSignal(PulseCurveItem)
     plotClicked = pyqtSignal(object)
     addPulseClicked = pyqtSignal()
@@ -36,17 +38,20 @@ class PulseSchemeWidget(BaseWidget):
         super().__init__(__file__, *args, **kwargs)
 
         # Prepare UI elements 
-        self.presetPicker.setModelType(PulseScheme)
-        self.presetPicker.setStartDirectory(UserFileDirs.PulseScheme)
-        self.presetPicker.setValueGetter(self.value)
-        self.presetPicker.setValueSetter(self.setValue)
+        self.configPanel.setModelType(PulseScheme)
+        self.configPanel.setPresetsDirectory(PresetFileDirs.PulseScheme)
+        self.configPanel.setStartDirectory(UserFileDirs.PulseScheme)
+        self.configPanel.setValueGetter(self.value)
+        self.configPanel.setValueSetter(self.setValue)
 
         self.plot.setMouseEnabled(x=False, y=False)
         self.plot.setMenuEnabled(False)
         self.plot.getAxis("left").setTicks([[(0, "OFF"), (1, "ON")]])
 
         # Connect own signal slots
-        self.presetPicker.dataLoaded.connect(self._onLoadPreset)
+        self.modifiedFlagSet.connect(self._onModifiedFlagSet)
+        self.editProperties.modifiedFlagSet.connect(self._onModifiedFlagSet)
+        self.configPanel.dataLoaded.connect(self._onLoadConfig)
 
         # Connect forwarded signals
         self.plot.scene().sigMouseClicked.connect(self.plotClicked)
@@ -86,7 +91,7 @@ class PulseSchemeWidget(BaseWidget):
         return self._presenter.model
 
     def setValue(self, model: PulseScheme, emitSignal: bool = True) -> None:
-        self.presetPicker.setLoadedPath(None)
+        self.configPanel.setLoadedPath(None)
         self._presenter.model = model
         self.setSelectedPulse(None)
         self.clearPlotHighlighting()
@@ -143,6 +148,10 @@ class PulseSchemeWidget(BaseWidget):
 
     # Event handling
     @pyqtSlot()
-    def _onLoadPreset(self) -> None:
+    def _onModifiedFlagSet(self, *_args, **_kwargs) -> None:
+        self.configPanel.setModifiedFlag()
+
+    @pyqtSlot()
+    def _onLoadConfig(self) -> None:
         self.setSelectedPulse(None)
         self.clearPlotHighlighting()

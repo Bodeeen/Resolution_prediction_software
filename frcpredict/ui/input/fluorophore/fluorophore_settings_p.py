@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QListWidgetItem, QMessageBox
 
 from frcpredict.model import FluorophoreSettings, IlluminationResponse
 from frcpredict.ui import BasePresenter
+from frcpredict.ui.util import connectModelToSignal, disconnectModelFromSignal
 from .add_response_dialog import AddResponseDialog
 from .response_list_item import ResponseListItem
 
@@ -21,6 +22,7 @@ class FluorophoreSettingsPresenter(BasePresenter[FluorophoreSettings]):
         try:
             self._model.response_added.disconnect(self._onResponseAdded)
             self._model.response_removed.disconnect(self._onResponseRemoved)
+            disconnectModelFromSignal(self.model, self._modifiedFlagSlotFunc)
         except AttributeError:
             pass
 
@@ -38,6 +40,7 @@ class FluorophoreSettingsPresenter(BasePresenter[FluorophoreSettings]):
         # Prepare model events
         model.response_added.connect(self._onResponseAdded)
         model.response_removed.connect(self._onResponseRemoved)
+        self._modifiedFlagSlotFunc = connectModelToSignal(self.model, self.widget.modifiedFlagSet)
 
     # Methods
     def __init__(self, widget) -> None:

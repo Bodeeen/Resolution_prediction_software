@@ -4,7 +4,7 @@ from PyQt5.QtCore import pyqtSlot
 
 from frcpredict.model import Multivalue, SampleProperties
 from frcpredict.ui import BasePresenter
-from frcpredict.ui.util import connectMulti
+from frcpredict.ui.util import connectMulti, connectModelToSignal, disconnectModelFromSignal
 from .sample_structure_picker_dialog_w import SampleStructurePickerDialog
 
 
@@ -20,6 +20,7 @@ class SamplePropertiesPresenter(BasePresenter[SampleProperties]):
         try:
             self._model.basic_field_changed.disconnect(self._onBasicFieldChange)
             self._model.loaded_structure_id_changed.disconnect(self._onPresetNameChange)
+            disconnectModelFromSignal(self.model, self._modifiedFlagSlotFunc)
         except AttributeError:
             pass
 
@@ -33,6 +34,7 @@ class SamplePropertiesPresenter(BasePresenter[SampleProperties]):
         # Prepare model events
         model.basic_field_changed.connect(self._onBasicFieldChange)
         model.loaded_structure_id_changed.connect(self._onPresetNameChange)
+        self._modifiedFlagSlotFunc = connectModelToSignal(self.model, self.widget.modifiedFlagSet)
 
     # Methods
     def __init__(self, widget) -> None:

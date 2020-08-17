@@ -4,7 +4,7 @@ from PyQt5.QtCore import pyqtSlot
 
 from frcpredict.model import Multivalue, CameraProperties
 from frcpredict.ui import BasePresenter
-from frcpredict.ui.util import connectMulti
+from frcpredict.ui.util import connectMulti, connectModelToSignal, disconnectModelFromSignal
 
 
 class CameraPropertiesPresenter(BasePresenter[CameraProperties]):
@@ -18,6 +18,7 @@ class CameraPropertiesPresenter(BasePresenter[CameraProperties]):
         # Disconnect old model event handling
         try:
             self._model.basic_field_changed.disconnect(self._onBasicFieldChange)
+            disconnectModelFromSignal(self.model, self._modifiedFlagSlotFunc)
         except AttributeError:
             pass
 
@@ -29,6 +30,7 @@ class CameraPropertiesPresenter(BasePresenter[CameraProperties]):
 
         # Prepare model events
         model.basic_field_changed.connect(self._onBasicFieldChange)
+        self._modifiedFlagSlotFunc = connectModelToSignal(self.model, self.widget.modifiedFlagSet)
 
     # Methods
     def __init__(self, widget) -> None:

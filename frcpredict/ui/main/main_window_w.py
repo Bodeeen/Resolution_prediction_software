@@ -10,7 +10,7 @@ from frcpredict.model import (
     RunInstance, SimulationResults, KernelSimulationResult
 )
 from frcpredict.ui import BaseWidget
-from frcpredict.ui.util import centerWindow, UserFileDirs
+from frcpredict.ui.util import centerWindow, PresetFileDirs, UserFileDirs
 from .main_window_p import MainWindowPresenter
 
 
@@ -62,11 +62,12 @@ class MainWindow(QMainWindow, BaseWidget):
         self.frcResults.setOutputDirector(self.outputDirector)
         self.virtualImagingResults.setOutputDirector(self.outputDirector)
 
-        self.presetPicker.setFieldName("Full configuration")
-        self.presetPicker.setModelType(RunInstance)
-        self.presetPicker.setStartDirectory(UserFileDirs.RunInstance)
-        self.presetPicker.setValueGetter(self.value)
-        self.presetPicker.setValueSetter(self.setValue)
+        self.configPanel.setFieldName("Full configuration")
+        self.configPanel.setModelType(RunInstance)
+        self.configPanel.setPresetsDirectory(PresetFileDirs.RunInstance)
+        self.configPanel.setStartDirectory(UserFileDirs.RunInstance)
+        self.configPanel.setValueGetter(self.value)
+        self.configPanel.setValueSetter(self.setValue)
 
         self.setSimulating(False)
         self.setAborting(False)
@@ -77,6 +78,12 @@ class MainWindow(QMainWindow, BaseWidget):
         self.dckInput.raise_()  # Always show input dock on start
 
         # Connect own signal slots
+        self.fluorophoreSettings.modifiedFlagSet.connect(self._onModifiedFlagSet)
+        self.imagingSystemSettings.modifiedFlagSet.connect(self._onModifiedFlagSet)
+        self.pulseScheme.modifiedFlagSet.connect(self._onModifiedFlagSet)
+        self.sampleProperties.modifiedFlagSet.connect(self._onModifiedFlagSet)
+        self.cameraProperties.modifiedFlagSet.connect(self._onModifiedFlagSet)
+
         self.outputDirector.kernelResultChanged.connect(self._onKernelResultChange)
         self.actionExit.triggered.connect(self.close)
         self.actionResetInterface.triggered.connect(self._resetWindowSettings)
@@ -197,6 +204,10 @@ class MainWindow(QMainWindow, BaseWidget):
         return QSettings(frcpredict.__author__, frcpredict.__title__)
 
     # Event handling
+    @pyqtSlot()
+    def _onModifiedFlagSet(self, *_args, **_kwargs) -> None:
+        self.configPanel.setModifiedFlag()
+
     @pyqtSlot(object, object, bool)
     def _onKernelResultChange(self, _, kernelResult: Optional[KernelSimulationResult], __) -> None:
         self.menuExportSimulation.setEnabled(kernelResult is not None)
