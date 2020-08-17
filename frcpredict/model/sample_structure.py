@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from typing import Optional
 
 from dataclasses_json import dataclass_json
 
@@ -16,6 +17,8 @@ class SampleStructureProperties:
     spectral_power: float
 
     K_origin: float
+
+    name: Optional[str] = None
 
 
 @dataclass_json

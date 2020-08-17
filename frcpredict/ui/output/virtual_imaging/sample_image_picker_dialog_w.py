@@ -52,7 +52,7 @@ class SampleImagePickerDialog(QDialog, BaseWidget):
 
         self.listSample.clear()
         for sampleStructureIndex, sampleStructure in enumerate(samples):
-            listItemText = snakeCaseToName(sampleStructure.id)
+            listItemText = sampleStructure.properties.name or snakeCaseToName(sampleStructure.id)
             if sampleStructure.id == self._loadedSampleStructureId:
                 listItemText += " (loaded)"  # Indicate that this is the loaded sample structure
                 loadedSampleIndex = sampleStructureIndex

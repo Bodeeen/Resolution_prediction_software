@@ -1,4 +1,5 @@
 {
   "spectral_power": 0.038,
-  "K_origin": 0.039
+  "K_origin": 0.039,
+  "name": "Dense random emitters"
 }

@@ -38,8 +38,8 @@ class SampleStructurePickerDialog(QDialog, BaseWidget):
         self.listSample.clear()
         for structure in structures:
             self.listSample.addItem(
-                ListItemWithValue(text=snakeCaseToName(structure.id), value=structure,
-                                  tag=structure.id)
+                ListItemWithValue(text=structure.properties.name or snakeCaseToName(structure.id),
+                                  value=structure, tag=structure.id)
             )
 
     def value(self) -> SampleStructure:
