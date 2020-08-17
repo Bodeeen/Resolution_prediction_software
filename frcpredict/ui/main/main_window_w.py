@@ -1,16 +1,16 @@
 from typing import Optional
 
-from PyQt5.QtCore import pyqtSignal, Qt, QRect, QSettings
-from PyQt5.QtGui import QFontMetrics
-from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt, QRect, QSettings
+from PyQt5.QtGui import QFontMetrics, QCloseEvent
+from PyQt5.QtWidgets import QMessageBox, QMainWindow
 
 import frcpredict
 from frcpredict.model import (
     FluorophoreSettings, ImagingSystemSettings, PulseScheme, SampleProperties, CameraProperties,
-    RunInstance, SimulationResults
+    RunInstance, SimulationResults, KernelSimulationResult
 )
 from frcpredict.ui import BaseWidget
-from frcpredict.ui.util import UserFileDirs
+from frcpredict.ui.util import centerWindow, UserFileDirs
 from .main_window_p import MainWindowPresenter
 
 
@@ -29,6 +29,12 @@ class MainWindow(QMainWindow, BaseWidget):
     simulateFrcClicked = pyqtSignal()
     abortClicked = pyqtSignal()
 
+    loadSimulationClicked = pyqtSignal()
+    exportJsonClicked = pyqtSignal()
+    exportBinaryClicked = pyqtSignal()
+    preferencesClicked = pyqtSignal()
+    aboutClicked = pyqtSignal()
+
     # Methods
     def __init__(self, screenGeometry: Optional[QRect] = None) -> None:
         super().__init__(__file__)
@@ -42,11 +48,8 @@ class MainWindow(QMainWindow, BaseWidget):
         )
         self.resize(
             min(screenGeometry.width() - 96, 1280 * (textSizeInfo.width() / 214) ** 0.5),
-            min(screenGeometry.height() - 96, 750 * (textSizeInfo.height() / 13) ** 0.5)
+            min(screenGeometry.height() - 96, 780 * (textSizeInfo.height() / 13) ** 0.5)
         )
-
-        self.defaultGeometry = self.saveGeometry()
-        self.defaultState = self.saveState()
 
         # Prepare UI elements
         self.setWindowTitle(frcpredict.__summary__)
@@ -68,7 +71,15 @@ class MainWindow(QMainWindow, BaseWidget):
         self.setSimulating(False)
         self.setAborting(False)
 
-        self._readSettings()
+        self._defaultGeometry = self.saveGeometry()
+        self._defaultState = self.saveState()
+        self._loadWindowSettings()
+        self.dckInput.raise_()  # Always show input dock on start
+
+        # Connect own signal slots
+        self.outputDirector.kernelResultChanged.connect(self._onKernelResultChange)
+        self.actionExit.triggered.connect(self.close)
+        self.actionResetInterface.triggered.connect(self._resetWindowSettings)
 
         # Connect forwarded signals
         self.fluorophoreSettings.valueChanged.connect(self.fluorophoreSettingsModelSet)
@@ -80,12 +91,33 @@ class MainWindow(QMainWindow, BaseWidget):
         self.btnSimulateFrc.clicked.connect(self.simulateFrcClicked)
         self.btnAbort.clicked.connect(self.abortClicked)
 
+        self.actionLoadSimulation.triggered.connect(self.loadSimulationClicked)
+        self.actionExportJson.triggered.connect(self.exportJsonClicked)
+        self.actionExportBinary.triggered.connect(self.exportBinaryClicked)
+        self.actionPreferences.triggered.connect(self.preferencesClicked)
+        self.actionAbout.triggered.connect(self.aboutClicked)
+
         # Initialize presenter
         self._presenter = MainWindowPresenter(self)
 
-    def setFrcSimulationResults(self, frcSimulationResults: SimulationResults) -> None:
+    def cacheAllSimulationResults(self) -> None:
+        """ Pre-caches all results from the currently loaded simulation. """
+        self.outputDirector.cacheAllResults()
+
+    def setFullSimulation(self, model: SimulationResults) -> None:
+        """
+        Sets the input parameters and the output data at the same time, from a simulation results
+        object.
+        """
+        self.setValue(model.run_instance)
+        self.setSimulationResults(model)
+
+    def simulationResults(self) -> SimulationResults:
+        return self.outputDirector.simulationResults()
+
+    def setSimulationResults(self, simulationResults: SimulationResults) -> None:
         """ Sets FRC simulation results. """
-        self.outputDirector.setValue(frcSimulationResults)
+        self.outputDirector.setSimulationResults(simulationResults)
 
     def setSimulating(self, simulating: bool) -> None:
         """ Sets whether a simulation is currently in progress. """
@@ -136,7 +168,7 @@ class MainWindow(QMainWindow, BaseWidget):
         self.pbProgress.setValue(progress * 100 if 0 < progress < 1 else 0)
 
     # Internal methods
-    def _readSettings(self) -> None:
+    def _loadWindowSettings(self) -> None:
         settings = self._getSettings()
         geometry = settings.value(_geometrySettingName)
         state = settings.value(_stateSettingName)
@@ -147,22 +179,42 @@ class MainWindow(QMainWindow, BaseWidget):
         if state is not None:
             self.restoreState(state)
 
-    def _saveSettings(self) -> None:
+    def _saveWindowSettings(self) -> None:
         settings = self._getSettings()
         settings.setValue(_geometrySettingName, self.saveGeometry())
         settings.setValue(_stateSettingName, self.saveState())
 
-    def _clearSettings(self) -> None:
+    def _resetWindowSettings(self) -> None:
         settings = self._getSettings()
         settings.remove(_geometrySettingName)
         settings.remove(_stateSettingName)
+
+        self.restoreGeometry(self._defaultGeometry)
+        self.restoreState(self._defaultState)
+        centerWindow(self)
 
     def _getSettings(self) -> QSettings:
         return QSettings(frcpredict.__author__, frcpredict.__title__)
 
     # Event handling
-    def closeEvent(self, _) -> None:
-        self._saveSettings()
+    @pyqtSlot(object, object, bool)
+    def _onKernelResultChange(self, _, kernelResult: Optional[KernelSimulationResult], __) -> None:
+        self.menuExportSimulation.setEnabled(kernelResult is not None)
+        self.actionExportJson.setEnabled(kernelResult is not None)
+        self.actionExportBinary.setEnabled(kernelResult is not None)
+
+    def closeEvent(self, event: QCloseEvent) -> None:
+        confirmation_result = QMessageBox.question(
+            self, "Exit?",
+            f"Exit the program? All unsaved input parameters and results will be lost.",
+            defaultButton=QMessageBox.No
+        )
+
+        if confirmation_result != QMessageBox.Yes:
+            event.ignore()
+            return
+
+        self._saveWindowSettings()
 
 
 _geometrySettingName: str = "geometry"

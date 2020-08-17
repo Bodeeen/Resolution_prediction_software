@@ -60,7 +60,7 @@ class PatternFieldPresenter(BasePresenter[Pattern]):
 
         path, _ = QFileDialog.getOpenFileName(
             self.widget,
-            caption=f"Open {self.widget.fieldName()} file",
+            caption=f"Open {self.widget.fieldName()} File",
             filter="Supported files (*.npy;*.tif;*.tiff;*.png)"
         )
 

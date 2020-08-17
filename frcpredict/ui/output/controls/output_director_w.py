@@ -23,8 +23,6 @@ class OutputDirectorWidget(BaseWidget):
     sampleImageChanged = pyqtSignal(object, object)
     thresholdChanged = pyqtSignal(float)
     optimizeClicked = pyqtSignal()
-    importResultsClicked = pyqtSignal()
-    exportResultsClicked = pyqtSignal()
 
     # Methods
     def __init__(self, *args, **kwargs) -> None:
@@ -33,11 +31,13 @@ class OutputDirectorWidget(BaseWidget):
 
         # Connect forwarded signals
         self.multivaluesEdit.optimizeClicked.connect(self.optimizeClicked)
-        self.btnImportResults.clicked.connect(self.importResultsClicked)
-        self.btnExportResults.clicked.connect(self.exportResultsClicked)
 
         # Initialize presenter
         self._presenter = OutputDirectorPresenter(self)
+
+    def cacheAllResults(self) -> None:
+        """ Pre-caches all results from the currently loaded simulation. """
+        self.value().cacheAllResults()
 
     def setThreshold(self, threshold: float) -> None:
         self.thresholdChanged.emit(threshold)
@@ -48,10 +48,18 @@ class OutputDirectorWidget(BaseWidget):
     def clearSampleImage(self) -> None:
         self.sampleImageChanged.emit(None, None)
 
+    def simulationResults(self) -> SimulationResults:
+        """ Returns the currently loaded simulation results. """
+        return self._presenter.model.results
+
+    def setSimulationResults(self, simulationResults: SimulationResults) -> None:
+        """ Loads the given simulation results. """
+        self._presenter.model = simulationResults
+
     def value(self) -> SimulationResultsView:
         return self._presenter.model
 
-    def setValue(self, value: Union[SimulationResults, SimulationResultsView]) -> None:
+    def setValue(self, value: SimulationResultsView) -> None:
         self._presenter.model = value
 
     def updateMultivaluesEditWidgets(self,
@@ -77,8 +85,6 @@ class OutputDirectorWidget(BaseWidget):
         if kernelResult is not None:
             self.multivaluesEdit.updateMultivalueValues(multivalueIndices,
                                                         kernelResult.multivalue_values)
-
-        self.btnExportResults.setEnabled(kernelResult is not None)
 
         # Emit signals
         self.kernelResultChanged.emit(runInstance, kernelResult, initialDisplayOfData)

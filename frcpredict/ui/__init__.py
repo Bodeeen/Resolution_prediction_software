@@ -8,7 +8,7 @@ from .base_presenter import BasePresenter
 
 
 # Windows
-from .window.main_window_w import MainWindow
+from .main.main_window_w import MainWindow
 
 
 # Common

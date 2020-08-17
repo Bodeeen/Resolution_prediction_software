@@ -82,6 +82,14 @@ class SimulationResultsView:
         "_threshold", default=0.15, signal_name="thresholdChanged", emit_arg_name="threshold"
     )
 
+    def cacheAllResults(self) -> None:
+        """ Pre-caches all results from the simulation. """
+        if self.results is not None:
+            self.results.cache_all(
+                self.sampleImage.id if self.sampleImage is not None else None,
+                self.sampleImage.imageArr if self.sampleImage is not None else None
+            )
+
     def setMultivalueValue(self, indexOfMultivalue: int, indexInMultivalue: int) -> None:
         """
         Sets which index in the list of possible values (indexInMultivalue) should be used when

@@ -1,17 +1,13 @@
 import math
-import pickle
-from copy import deepcopy
-from traceback import format_exc
 from typing import Optional, Union
 
 import numpy as np
 from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtWidgets import QMessageBox, QFileDialog
 
-from frcpredict.model import SimulationResults, PersistentContainer
+from frcpredict.model import SimulationResults
 from frcpredict.ui import BasePresenter
-from frcpredict.ui.util import UserFileDirs, getLabelForMultivalue
-from frcpredict.util import clear_signals, rebuild_dataclass, expand_with_multivalues
+from frcpredict.ui.util import getLabelForMultivalue
+from frcpredict.util import expand_with_multivalues
 from .output_director_m import SimulationResultsView, SampleImage, ViewOptions, InspectionDetails
 
 
@@ -61,13 +57,10 @@ class OutputDirectorPresenter(BasePresenter[SimulationResultsView]):
         widget.sampleImageChanged.connect(self._uiSampleImageChange)
         widget.thresholdChanged.connect(self._uiThresholdChange)
         widget.optimizeClicked.connect(self._uiClickOptimize)
-        widget.importResultsClicked.connect(self._uiClickImportResults)
-        widget.exportResultsClicked.connect(self._uiClickExportResults)
 
     # Internal methods
     def _updateDataInWidget(self, initialDisplayOfData: bool = False) -> None:
         """ Updates the widget to show the current kernel simulation result and view options. """
-
         if self.model.results is not None and len(self.model.results.kernel_results) > 0:
             self._currentKernelResult = self.model.results.kernel_results[
                 tuple(self.model.multivalueValueIndices)
@@ -227,84 +220,3 @@ class OutputDirectorPresenter(BasePresenter[SimulationResultsView]):
                 bestResolution = resolutionForKernelResult
 
         self.model.multivalueValueIndices = bestMultivalueIndices
-
-    @pyqtSlot()
-    def _uiClickImportResults(self) -> None:
-        """ Imports previously saved simulation results from a user-picked file. """
-
-        path, _ = QFileDialog.getOpenFileName(
-            self.widget,
-            caption="Open results file",
-            filter="All compatible files (*.json;*.bin);;JSON files (*.json);;Binary files (*.bin)",
-            directory=UserFileDirs.SavedResults
-        )
-
-        if path:  # Check whether a file was picked
-            try:
-                if path.endswith(".bin"):
-                    # Open binary pickle file
-                    confirmation_result = QMessageBox.warning(
-                        self.widget, "Security Warning",
-                        "You're about to open a simulation stored in binary format. Since" +
-                        " data from this type of file can execute arbitrary code and thus is" +
-                        " a security risk, it is highly recommended that you only proceed if" +
-                        " you created the file yourself, or if it comes from a source that"
-                        " you trust." +
-                        "\n\nContinue loading the file?",
-                        QMessageBox.Yes | QMessageBox.No, defaultButton=QMessageBox.No)
-
-                    if confirmation_result != QMessageBox.Yes:
-                        return
-
-                    with open(path, "rb") as pickleFile:
-                        persistentContainer = rebuild_dataclass(pickle.load(pickleFile))
-                else:
-                    # Open JSON file
-                    with open(path, "r") as jsonFile:
-                        json = jsonFile.read()
-
-                    persistentContainer = PersistentContainer[
-                        SimulationResults
-                    ].from_json_with_converted_dicts(
-                        json, SimulationResults
-                    )
-
-                for warning in persistentContainer.validate():
-                    QMessageBox.warning(self.widget, "Results load warning", warning)
-
-                self.model = persistentContainer.data
-            except Exception as e:
-                print(format_exc())
-                QMessageBox.critical(self.widget, "Results load error", str(e))
-
-    @pyqtSlot()
-    def _uiClickExportResults(self) -> None:
-        """ Exports the current simulation results to a user-picked file. """
-
-        path, _ = QFileDialog.getSaveFileName(
-            self.widget,
-            caption="Save results file",
-            filter="JSON files (*.json);;Binary files (*.bin)",
-            directory=UserFileDirs.SavedResults
-        )
-
-        if path:  # Check whether a file was picked
-            if path.endswith(".bin"):
-                # Cache all simulations and save binary pickle file
-                sampleImage = self.model.sampleImage
-                self.model.results.cache_all(
-                    sampleImage.id if sampleImage is not None else None,
-                    sampleImage.imageArr if sampleImage is not None else None
-                )
-
-                persistentContainer = PersistentContainer(
-                    clear_signals(deepcopy(self.model.results))
-                )
-                with open(path, "wb") as pickleFile:
-                    pickle.dump(persistentContainer, pickleFile, pickle.HIGHEST_PROTOCOL)
-            else:
-                # Save JSON file
-                persistentContainer = PersistentContainer(self.model.results)
-
-                with open(path, "w") as jsonFile:
-                    jsonFile.write(persistentContainer.to_json())

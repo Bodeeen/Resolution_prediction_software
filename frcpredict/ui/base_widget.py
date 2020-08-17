@@ -13,6 +13,7 @@ class BaseWidget(QWidget):
 
     # Methods
     def __init__(self, pyFilePath: str, *args, **kwargs) -> None:
+        self._uiLoaded = False
         super().__init__(*args, **kwargs)
 
         # Load UI from file
@@ -25,7 +26,4 @@ class BaseWidget(QWidget):
         self._uiLoaded = True
 
     def isUiLoaded(self) -> bool:
-        try:
-            return self._uiLoaded
-        except AttributeError:
-            return False  # UI loaded flag not yet set, which means the UI isn't loaded
+        return self._uiLoaded
