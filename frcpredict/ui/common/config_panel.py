@@ -90,6 +90,15 @@ class ConfigPanelWidget(BaseWidget):
         self.lblLoadedConfigName.setText(f"*{self.lblLoadedConfigName.text()}")
         self._modified = True
 
+    def clearModifiedFlag(self) -> None:
+        """ Unsets that the current configuration has been modified since it was loaded. """
+
+        if not self._modified:
+            return
+
+        self.setLoadedPath(self.loadedPath())
+        self._modified = False
+
     def presetsDirectory(self) -> Optional[str]:
         """
         Returns the directory that contains the presets that are available to load from the panel.

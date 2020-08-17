@@ -121,6 +121,7 @@ class MainWindow(QMainWindow, BaseWidget):
         object.
         """
         self.setValue(model.run_instance)
+        self.configPanel.clearModifiedFlag()
         self.setSimulationResults(model)
 
     def simulationResults(self) -> SimulationResults:
