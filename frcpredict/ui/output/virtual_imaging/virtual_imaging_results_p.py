@@ -90,7 +90,7 @@ class VirtualImagingResultsPresenter(BasePresenter[VirtualImagingResultsModel]):
         )
 
         if okClicked:
-            imageArr = imageData.image.get_numpy_array()
+            imageArr = imageData.getImageWithScaledValues()
 
             if not imageData.fromFile:
                 imageId = imageData.sampleStructureId

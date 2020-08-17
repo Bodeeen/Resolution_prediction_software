@@ -22,6 +22,7 @@ class SampleImagePickerDialog(QDialog, BaseWidget):
     fromSampleSelected = pyqtSignal()
     fromFileSelected = pyqtSignal()
     loadFileClicked = pyqtSignal()
+    fluorophoresPerUnitChanged = pyqtSignal(float)
 
     # Methods
     def __init__(self, parent: Optional[QWidget] = None,
@@ -38,6 +39,7 @@ class SampleImagePickerDialog(QDialog, BaseWidget):
         self.rdoSample.clicked.connect(self.fromSampleSelected)
         self.rdoFile.clicked.connect(self.fromFileSelected)
         self.btnLoadFile.clicked.connect(self.loadFileClicked)
+        self.editFluorophoresPerUnit.valueChanged.connect(self.fluorophoresPerUnitChanged)
 
         # Initialize presenter
         self._presenter = SampleImagePickerPresenter(self)
@@ -90,6 +92,7 @@ class SampleImagePickerDialog(QDialog, BaseWidget):
         self.rdoFile.setChecked(willLoadFromFile)
         self.listSample.setEnabled(not willLoadFromFile)
         self.btnLoadFile.setEnabled(willLoadFromFile)
+        self.editFluorophoresPerUnit.setEnabled(willLoadFromFile)
 
         self.listSample.blockSignals(True)
         try:
@@ -101,6 +104,9 @@ class SampleImagePickerDialog(QDialog, BaseWidget):
             self.listSample.setCurrentRow(-1)  # Unselect if no match found in sample list
         finally:
             self.listSample.blockSignals(False)
+
+    def updateFluorophoresPerUnit(self, fluorophoresPerUnit: float) -> None:
+        self.editFluorophoresPerUnit.setValue(fluorophoresPerUnit)
 
     @staticmethod
     def getImageData(parent: Optional[QWidget] = None,

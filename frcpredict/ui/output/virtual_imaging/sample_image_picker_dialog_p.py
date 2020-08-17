@@ -18,8 +18,20 @@ class SampleImagePickerPresenter(BasePresenter[SampleImagePickerModel]):
     # Properties
     @BasePresenter.model.setter
     def model(self, model: SampleImagePickerModel) -> None:
+        # Disconnect old model event handling
+        try:
+            self._model.fluorophoresPerUnitChanged.disconnect(self._onFluorophoresPerUnitChange)
+        except AttributeError:
+            pass
+
         self._model = model
+
+        # Trigger model change event handlers (only model event, since it in turn also triggers the
+        # others)
         self._onModelSet(model)
+
+        # Prepare model events
+        model.fluorophoresPerUnitChanged.connect(self._onFluorophoresPerUnitChange)
 
     # Methods
     def __init__(self, widget) -> None:
@@ -30,6 +42,7 @@ class SampleImagePickerPresenter(BasePresenter[SampleImagePickerModel]):
         widget.fromSampleSelected.connect(self._uiFromSampleSelect)
         widget.fromFileSelected.connect(self._uiFromFileSelect)
         widget.loadFileClicked.connect(self._uiClickLoadFile)
+        widget.fluorophoresPerUnitChanged.connect(self._uiFluorophoresPerUnitChange)
 
         # Load sample structures
         self._loadSampleStructures()
@@ -52,6 +65,11 @@ class SampleImagePickerPresenter(BasePresenter[SampleImagePickerModel]):
             getArrayPixmap(model.image.get_numpy_array())
         )
 
+        self._onFluorophoresPerUnitChange(model.fluorophoresPerUnit)
+
+    def _onFluorophoresPerUnitChange(self, fluorophoresPerUnit: float) -> None:
+        self.widget.updateFluorophoresPerUnit(fluorophoresPerUnit)
+
     # UI event handling
     @pyqtSlot(object)
     def _uiSampleStructurePick(self, sample: Optional[SampleStructure] = None) -> None:
@@ -59,26 +77,29 @@ class SampleImagePickerPresenter(BasePresenter[SampleImagePickerModel]):
             return
 
         self.model = SampleImagePickerModel(
-            image=sample.image, sampleStructureId=sample.id, fromFile=False
+            image=sample.image, sampleStructureId=sample.id,
+            fluorophoresPerUnit=1.0, fromFile=False
         )
 
     @pyqtSlot()
     def _uiFromSampleSelect(self) -> None:
         self.model = SampleImagePickerModel(
-            image=Array2DPatternData(), sampleStructureId=None, fromFile=False
+            image=Array2DPatternData(), sampleStructureId=None,
+            fluorophoresPerUnit=1.0, fromFile=False
         )
 
     @pyqtSlot()
     def _uiFromFileSelect(self) -> None:
         self.model = SampleImagePickerModel(
-            image=Array2DPatternData(), sampleStructureId=None, fromFile=True
+            image=Array2DPatternData(), sampleStructureId=None,
+            fluorophoresPerUnit=1.0, fromFile=True
         )
 
     @pyqtSlot()
     def _uiClickLoadFile(self) -> None:
         path, _ = QFileDialog.getOpenFileName(
             self.widget,
-            caption=f"Open sample image file",
+            caption=f"Open Sample Image File",
             filter="Supported files (*.npy;*.tif;*.tiff;*.png)"
         )
 
@@ -89,5 +110,10 @@ class SampleImagePickerPresenter(BasePresenter[SampleImagePickerModel]):
                 image = Array2DPatternData.from_image_file(path)
 
             self.model = SampleImagePickerModel(
-                image=image, sampleStructureId=None, fromFile=True
+                image=image, sampleStructureId=None,
+                fluorophoresPerUnit=self.model.fluorophoresPerUnit, fromFile=True
             )
+
+    @pyqtSlot(float)
+    def _uiFluorophoresPerUnitChange(self, fluorophoresPerUnit: float) -> None:
+        self.model.fluorophoresPerUnit = fluorophoresPerUnit

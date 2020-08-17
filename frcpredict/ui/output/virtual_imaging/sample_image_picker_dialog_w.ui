@@ -50,7 +50,7 @@
       <number>18</number>
      </property>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0">
+      <layout class="QVBoxLayout" name="verticalLayout_5">
        <property name="spacing">
         <number>12</number>
        </property>
@@ -62,50 +62,87 @@
         </widget>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout_5">
+        <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0">
          <property name="spacing">
-          <number>6</number>
+          <number>32</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
          </property>
          <item>
-          <widget class="QRadioButton" name="rdoSample">
-           <property name="text">
-            <string>Image of sample structure</string>
+          <layout class="QVBoxLayout" name="verticalLayout_6">
+           <property name="spacing">
+            <number>6</number>
            </property>
-          </widget>
+           <item>
+            <widget class="QRadioButton" name="rdoSample">
+             <property name="text">
+              <string>Image of sample structure</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QListWidget" name="listSample"/>
+           </item>
+          </layout>
          </item>
          <item>
-          <widget class="QListWidget" name="listSample"/>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <item>
-          <widget class="QRadioButton" name="rdoFile">
-           <property name="text">
-            <string>Image from file</string>
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <property name="spacing">
+            <number>6</number>
            </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QPushButton" name="btnLoadFile">
-           <property name="text">
-            <string>Load file…</string>
-           </property>
-          </widget>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <property name="spacing">
+              <number>6</number>
+             </property>
+             <item>
+              <widget class="QRadioButton" name="rdoFile">
+               <property name="text">
+                <string>Image from file</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btnLoadFile">
+               <property name="text">
+                <string>Load file…</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <property name="spacing">
+              <number>6</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="label">
+               <property name="text">
+                <string>Fluorophores per unit:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="FreeFloatBox" name="editFluorophoresPerUnit"/>
+             </item>
+            </layout>
+           </item>
+          </layout>
          </item>
         </layout>
        </item>
@@ -222,9 +259,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>FreeFloatBox</class>
+   <extends>QLineEdit</extends>
+   <header>frcpredict.ui</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
-  <tabstop>rdoSample</tabstop>
-  <tabstop>listSample</tabstop>
   <tabstop>rdoFile</tabstop>
   <tabstop>btnLoadFile</tabstop>
  </tabstops>
