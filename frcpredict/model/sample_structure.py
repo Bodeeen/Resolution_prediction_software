@@ -38,6 +38,8 @@ class SampleStructure:
 
     @classmethod
     def from_sample_data_directory_name(cls, dir_name: str) -> "SampleStructure":
+        """ Loads a sample structure from the data in the given directory. """
+
         properties_file_path, image_file_path = get_sample_structure_data_file_paths(dir_name)
 
         with open(properties_file_path, "r") as jsonFile:

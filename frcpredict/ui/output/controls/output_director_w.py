@@ -40,12 +40,18 @@ class OutputDirectorWidget(BaseWidget):
         self.value().cacheAllResults()
 
     def setThreshold(self, threshold: float) -> None:
+        """ Sets the FRC threshold to the given value. """
         self.thresholdChanged.emit(threshold)
 
     def setSampleImage(self, image: np.ndarray, imageId: str) -> None:
+        """
+        Sets the loaded sample image. An ID unique to the image must be supplied, for caching
+        purposes.
+        """
         self.sampleImageChanged.emit(image, imageId)
 
     def clearSampleImage(self) -> None:
+        """ Unloads any loaded sample image. """
         self.sampleImageChanged.emit(None, None)
 
     def simulationResults(self) -> SimulationResults:
