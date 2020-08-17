@@ -118,7 +118,7 @@ class VirtualImagingResultsPresenter(BasePresenter[VirtualImagingResultsModel]):
 
         path, _ = QFileDialog.getSaveFileName(
             self.widget,
-            caption="Export expected image",
+            caption="Export Expected Image",
             filter="TIFF files (*.tiff)",
             directory=UserFileDirs.SimulatedImages
         )
