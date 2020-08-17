@@ -16,8 +16,9 @@ from frcpredict.util import (
 from .telegraph import make_random_telegraph_data
 
 
-def expected_ONtime(P_on, Ron, Roff, T_obs):  # Eq. 6
-    """ Funcition calculating the expected time a fluorophore is ON
+def expected_ON_time(P_on: np.ndarray, Ron: np.ndarray, Roff: np.ndarray,
+                     T_obs: float) -> np.ndarray:
+    """ Eq. 6. Funcition calculating the expected time a fluorophore is ON
     during an observation time T_obs
 
     - P_on: Probability of fluorophore being ON at start
@@ -37,8 +38,9 @@ def expected_ONtime(P_on, Ron, Roff, T_obs):  # Eq. 6
     return exp_ONt
 
 
-def expected_Pon(P_pre, Ron, Roff, T_exp):  # Eq. 5
-    """ Function for calculating the probability of a fluorophore
+def expected_Pon(P_pre: np.ndarray, Ron: np.ndarray, Roff: np.ndarray,
+                 T_exp: float) -> np.ndarray:
+    """ Eq. 5. Function for calculating the probability of a fluorophore
     being in the ON-state after some observation time.
 
     - P_pre: Probability of fluorophore being ON at start
@@ -60,7 +62,8 @@ def expected_Pon(P_pre, Ron, Roff, T_exp):  # Eq. 5
     return P_post
 
 
-def variance_Detection(N, Ron, Roff, alpha, T_exp, Pon):
+def variance_detection(N: int, Ron: np.ndarray, Roff: np.ndarray, alpha: np.ndarray,
+                       T_exp: float, Pon: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """ Function to calculate/estimate the variance of emitted photons
     for a single fluorophore observer for a certain observation time. Ron, Roff
     and alpha are given as arrays of "paired" values. Outputs are also arrays.
@@ -97,8 +100,10 @@ def variance_Detection(N, Ron, Roff, alpha, T_exp, Pon):
     return v, m, Ns
 
 
-def make_kernels_detection(N, QE, det_eff, PonStart, E_p_RO, RO_ill, Ponswitch, Poffswitch, Pfl,
-                           T_obs):
+def make_kernels_detection(N: int, QE: float, det_eff: float,
+                           PonStart: np.ndarray, E_p_RO: float, RO_ill: np.ndarray,
+                           Ponswitch: float, Poffswitch: float, Pfl: float,
+                           T_obs: float) -> Tuple[np.ndarray, np.ndarray]:
     """ Function to create the expeced emission and variance of emission
     "kernels".
 
@@ -117,13 +122,13 @@ def make_kernels_detection(N, QE, det_eff, PonStart, E_p_RO, RO_ill, Ponswitch, 
     assert PonStart.shape == RO_ill.shape, 'Not the same shapes'
 
     alpha = QE * det_eff * E_p_RO * RO_ill * Pfl
-    expONt = expected_ONtime(PonStart, E_p_RO * RO_ill * Ponswitch, E_p_RO * RO_ill * Poffswitch,
-                             T_obs)
+    expONt = expected_ON_time(PonStart, E_p_RO * RO_ill * Ponswitch, E_p_RO * RO_ill * Poffswitch,
+                              T_obs)
     expDet = np.multiply(alpha, expONt)  # Comparable to eq (1) i publication
-    varDet, mean, N_switches = variance_Detection(
+    varDet, mean, N_switches = variance_detection(
         N, E_p_RO * RO_ill * Ponswitch, E_p_RO * RO_ill * Poffswitch, alpha, T_obs, PonStart)
 
-    return expDet, varDet, mean, N_switches  # mean is just for confirmation
+    return expDet, varDet  # mean is just for confirmation
 
 
 def simulate(run_instance: "mdl.RunInstance", *,
@@ -209,9 +214,7 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
     # Radius in pixels of all 2D patterns (PSF, illumination patterns, pinholes etc.) (inside the square)
     psf_kernel_rad_px = np.int(psf_kernel_rad_nm / px_size_nm)
 
-    """ Calculate G(x,y), the convolution of the detection PSF and the pinhole fcn 
-    This section is messy beacuse we played around with some different ways of 
-    generating the pinhole function P. """
+    # Calculate G(x,y), the convolution of the detection PSF and the pinhole function
     PSF = run_instance.imaging_system_settings.optical_psf.get_numpy_array(px_size_nm)
     P = run_instance.imaging_system_settings.pinhole_function.get_numpy_array(px_size_nm)
     G2D = fftconvolve(P, PSF, mode="same")
@@ -251,7 +254,7 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
                 pulse.duration
             )
         else:  # Last pulse (readout pulse)
-            exp_kernel, var_kernel, m, N_switches = make_kernels_detection(
+            exp_kernel, var_kernel = make_kernels_detection(
                 500000,
                 run_instance.camera_properties.quantum_efficiency,
                 collection_efficiency,
