@@ -155,6 +155,17 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
         )
 
         if path:  # Check whether a file was picked
+            if self.widget.isModified():
+                # Unsaved changes in input parameters, confirm before continuing
+                confirmation_result = QMessageBox.question(
+                    self.widget, "Confirm Load",
+                    "You have unsaved changes in the Input Parameters section. Proceed loading" +
+                    " the file?",
+                    defaultButton=QMessageBox.No)
+
+                if confirmation_result != QMessageBox.Yes:
+                    return
+
             try:
                 if path.endswith(".bin"):
                     # Open binary pickle file

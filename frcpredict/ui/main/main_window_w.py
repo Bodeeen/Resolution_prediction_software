@@ -111,6 +111,10 @@ class MainWindow(QMainWindow, BaseWidget):
         """ Pre-caches all results from the currently loaded simulation. """
         self.outputDirector.cacheAllResults()
 
+    def isModified(self) -> bool:
+        """ Returns whether the input parameters have been modified since they were loaded. """
+        return self.configPanel.isModified()
+
     def setFullSimulation(self, model: SimulationResults) -> None:
         """
         Sets the input parameters and the output data at the same time, from a simulation results

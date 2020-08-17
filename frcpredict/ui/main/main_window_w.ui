@@ -639,12 +639,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>ConfigPanelWidget</class>
-   <extends>QWidget</extends>
-   <header>frcpredict.ui</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>FluorophoreSettingsWidget</class>
    <extends>QWidget</extends>
    <header>frcpredict.ui</header>
@@ -688,6 +682,12 @@
   </customwidget>
   <customwidget>
    <class>OutputDirectorWidget</class>
+   <extends>QWidget</extends>
+   <header>frcpredict.ui</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ConfigPanelWidget</class>
    <extends>QWidget</extends>
    <header>frcpredict.ui</header>
    <container>1</container>

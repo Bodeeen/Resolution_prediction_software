@@ -77,7 +77,7 @@ class ConfigPanelWidget(BaseWidget):
         """ Sets the type of model that is intended to be loaded/saved. """
         self._modelType = modelType
 
-    def modified(self) -> bool:
+    def isModified(self) -> bool:
         """ Returns whether the current configuration has been modified since it was loaded. """
         return self._modified
 
