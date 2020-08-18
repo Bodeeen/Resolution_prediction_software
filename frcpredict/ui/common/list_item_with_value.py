@@ -33,4 +33,4 @@ class ListItemWithValue(QListWidgetItem, Generic[T, U]):
         if isinstance(self.value(), (int, float)):
             return self.value() > other.value()
         else:
-            return super().__lt__(other)
+            return super().__gt__(other)
