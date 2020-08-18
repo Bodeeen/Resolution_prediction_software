@@ -37,9 +37,9 @@ class SampleStructurePickerDialog(QDialog, BaseWidget):
         """ Sets which sample structures are available for the user to pick. """
         self.listSample.clear()
         for structure in structures:
+            listItemText = structure.properties.name or snakeCaseToName(structure.image.id)
             self.listSample.addItem(
-                ListItemWithValue(text=structure.properties.name or snakeCaseToName(structure.id),
-                                  value=structure, tag=structure.id)
+                ListItemWithValue(text=listItemText, value=structure, tag=structure.image.id)
             )
 
     def value(self) -> SampleStructure:

@@ -9,11 +9,11 @@ from frcpredict.model import (
     FluorophoreSettings, ImagingSystemSettings, PulseScheme, SampleProperties, CameraProperties,
     RunInstance, SimulationResults, PersistentContainer
 )
-from frcpredict.ui import BasePresenter
+from frcpredict.ui import BasePresenter, Preferences
 from frcpredict.ui.util import UserFileDirs
 from frcpredict.util import clear_signals, rebuild_dataclass
 from .about_dialog import AboutDialog
-from .preferences_dialog import PreferencesDialog
+from .preferences_dialog_w import PreferencesDialog
 
 
 class MainWindowPresenter(BasePresenter[RunInstance]):
@@ -209,7 +209,7 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
 
         path, _ = QFileDialog.getSaveFileName(
             self.widget,
-            caption="Export Simulation Results (JSON format",
+            caption="Export Simulation Results (JSON format)",
             filter="JSON files (*.json)",
             directory=UserFileDirs.SavedResults
         )
@@ -232,8 +232,8 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
         )
 
         if path:  # Check whether a file was picked
-            # Cache all simulations
-            self.widget.cacheAllSimulationResults()
+            # Precache all simulations
+            self.widget.precacheAllSimulationResults()
 
             # Save
             persistentContainer = PersistentContainer(
@@ -290,7 +290,10 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
         def run(self) -> None:
             try:
                 results = self._runInstance.simulate(
-                    self.signals.preprocessingFinished, self.signals.progressUpdated
+                    cache_kernels2d=Preferences.get().cacheKernels2D,
+                    precache_frc_curves=Preferences.get().precacheFrcCurves,
+                    preprocessing_finished_callback=self.signals.preprocessingFinished,
+                    progress_updated_callback=self.signals.progressUpdated
                 )
 
                 if results is not None:

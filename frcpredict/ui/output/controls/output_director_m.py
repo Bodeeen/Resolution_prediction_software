@@ -4,19 +4,9 @@ from typing import Optional, List
 import numpy as np
 from PySignal import Signal
 
-from frcpredict.model import SimulationResults
+from frcpredict.model import SimulationResults, SampleImage
+from frcpredict.ui import Preferences
 from frcpredict.util import dataclass_internal_attrs, dataclass_with_properties, observable_property
-
-
-@dataclass
-class SampleImage:
-    """
-    A description of a loaded sample image.
-    """
-
-    id: Optional[str] = None
-
-    imageArr: np.ndarray = np.zeros((1, 1))
 
 
 @dataclass
@@ -82,13 +72,14 @@ class SimulationResultsView:
         "_threshold", default=0.15, signal_name="thresholdChanged", emit_arg_name="threshold"
     )
 
-    def cacheAllResults(self) -> None:
+    def precacheAllResults(self) -> None:
         """ Pre-caches all results from the simulation. """
         if self.results is not None:
-            self.results.cache_all(
-                self.sampleImage.id if self.sampleImage is not None else None,
-                self.sampleImage.imageArr if self.sampleImage is not None else None
-            )
+            if self.sampleImage is None:
+                self.results.clear_cache(clear_expected_image=True)
+
+            self.results.precache(cache_kernels2d=True, cache_frc_curves=True,
+                                  cache_expected_image_for=self.sampleImage)
 
     def setMultivalueValue(self, indexOfMultivalue: int, indexInMultivalue: int) -> None:
         """

@@ -2,12 +2,16 @@
 import frcpredict.ui.resources
 
 
+# Preferences
+from .preferences import Preferences
+
+
 # Base
 from .base_widget import BaseWidget
 from .base_presenter import BasePresenter
 
 
-# Windows
+# Main
 from .main.main_window_w import MainWindow
 
 

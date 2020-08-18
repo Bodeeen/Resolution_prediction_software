@@ -74,7 +74,7 @@
       </widget>
      </item>
      <item row="2" column="0">
-      <widget class="QCheckBox" name="chkPrecacheExpectedImages_2">
+      <widget class="QCheckBox" name="chkCacheKernels2D">
        <property name="text">
         <string>Cache 2D kernels</string>
        </property>
@@ -108,7 +108,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
      </property>
     </widget>
    </item>

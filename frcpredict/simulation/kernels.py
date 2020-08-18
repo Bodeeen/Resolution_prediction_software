@@ -132,6 +132,7 @@ def make_kernels_detection(N: int, QE: float, det_eff: float,
 
 
 def simulate(run_instance: "mdl.RunInstance", *,
+             cache_kernels2d: bool = True,
              precache_frc_curves: bool = True,
              abort_signal: Optional[Signal] = None,
              preprocessing_finished_callback: Optional[Signal] = None,
@@ -182,7 +183,7 @@ def simulate(run_instance: "mdl.RunInstance", *,
         )
 
         if precache_frc_curves:
-            result.cache_frc_curve(run_instance_single)
+            result.cache_frc_curve(run_instance_single, cache_kernels2d=cache_kernels2d)
 
         nonlocal completed_simulations
         completed_simulations += 1

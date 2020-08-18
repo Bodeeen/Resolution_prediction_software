@@ -147,7 +147,7 @@ class FrcResultsPresenter(BasePresenter[FrcResultsModel]):
                 self.widget,
                 caption="Export FRC Plot Values",
                 filter="CSV files (*.csv)",
-                directory=UserFileDirs.SimulatedImages
+                directory=UserFileDirs.SimulatedData
             )
 
             if path:  # Check whether a file was picked
@@ -161,7 +161,7 @@ class FrcResultsPresenter(BasePresenter[FrcResultsModel]):
                 self.widget,
                 caption="Export Inspection Plot Values",
                 filter="CSV files (*.csv)",
-                directory=UserFileDirs.SimulatedImages
+                directory=UserFileDirs.SimulatedData
             )
 
             if path:  # Check whether a file was picked

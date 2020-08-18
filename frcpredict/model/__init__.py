@@ -17,6 +17,7 @@ from .sample import SampleProperties
 from .camera import CameraProperties
 
 from .sample_structure import SampleStructure, SampleStructureProperties
+from .sample_image import SampleImage
 
 from .run_instance import RunInstance
 from .results import KernelSimulationResult, KernelSimulationResult, SimulationResults

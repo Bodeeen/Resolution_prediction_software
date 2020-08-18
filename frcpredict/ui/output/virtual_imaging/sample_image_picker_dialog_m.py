@@ -16,7 +16,7 @@ class SampleImagePickerModel:
     Model for the sample image picker widget.
     """
 
-    image: Array2DPatternData = field(default_factory=Array2DPatternData)
+    imageArr: np.ndarray = np.zeros((1, 1))
 
     sampleStructureId: Optional[str] = None
 
@@ -32,4 +32,4 @@ class SampleImagePickerModel:
         Returns the sample image with the values scaled in accordance with the value of the
         fluorophroes per unit field.
         """
-        return self.image.get_numpy_array() * self.fluorophoresPerUnit
+        return self.imageArr * self.fluorophoresPerUnit

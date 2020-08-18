@@ -7,8 +7,8 @@ from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QFileDialog
 from skimage.io import imsave
 
-from frcpredict.model import RunInstance, KernelSimulationResult
-from frcpredict.ui import BasePresenter
+from frcpredict.model import RunInstance, KernelSimulationResult, SampleImage
+from frcpredict.ui import BasePresenter, Preferences
 from frcpredict.ui.util import UserFileDirs
 from .sample_image_picker_dialog_w import SampleImagePickerDialog
 from .virtual_imaging_results_m import VirtualImagingResultsModel
@@ -63,9 +63,9 @@ class VirtualImagingResultsPresenter(BasePresenter[VirtualImagingResultsModel]):
         sampleImage = self.widget.outputDirector().value().sampleImage
 
         if kernelResult is not None and sampleImage is not None:
-            sampleImageId = sampleImage.id
-            sampleImageArr = sampleImage.imageArr
-            expectedImageArr = kernelResult.get_expected_image(runInstance, sampleImageId, sampleImageArr)
+            expectedImageArr = kernelResult.get_expected_image(
+                runInstance, sampleImage, cache_kernels2d=Preferences.get().cacheKernels2D
+            )
         else:
             expectedImageArr = None
 
@@ -98,7 +98,9 @@ class VirtualImagingResultsPresenter(BasePresenter[VirtualImagingResultsModel]):
                 # Generate random ID for caching purposes
                 imageId = "".join(random.choices(string.ascii_letters + string.digits, k=32))
 
-            self.widget.outputDirector().setSampleImage(imageArr, imageId)
+            self.widget.outputDirector().setSampleImage(
+                SampleImage(id=imageId, image_arr=imageArr)
+            )
 
     @pyqtSlot()
     def _uiClickUnloadImage(self) -> None:
@@ -120,7 +122,7 @@ class VirtualImagingResultsPresenter(BasePresenter[VirtualImagingResultsModel]):
             self.widget,
             caption="Export Expected Image",
             filter="TIFF files (*.tiff)",
-            directory=UserFileDirs.SimulatedImages
+            directory=UserFileDirs.SimulatedData
         )
 
         if path:  # Check whether a file was picked

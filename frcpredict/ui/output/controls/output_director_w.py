@@ -3,7 +3,7 @@ from typing import Optional, Union, Tuple, List
 import numpy as np
 from PyQt5.QtCore import pyqtSignal
 
-from frcpredict.model import  RunInstance, KernelSimulationResult, SimulationResults
+from frcpredict.model import RunInstance, KernelSimulationResult, SimulationResults, SampleImage
 from frcpredict.ui import BaseWidget
 from .multivalues_edit import MultivalueListSignals
 from .output_director_m import SimulationResultsView, ViewOptions
@@ -20,7 +20,7 @@ class OutputDirectorWidget(BaseWidget):
     kernelResultChanged = pyqtSignal(object, object, bool)
     expectedImageChanged = pyqtSignal(object, object, bool)
 
-    sampleImageChanged = pyqtSignal(object, object)
+    sampleImageChanged = pyqtSignal(object)
     thresholdChanged = pyqtSignal(float)
     optimizeClicked = pyqtSignal()
 
@@ -35,24 +35,21 @@ class OutputDirectorWidget(BaseWidget):
         # Initialize presenter
         self._presenter = OutputDirectorPresenter(self)
 
-    def cacheAllResults(self) -> None:
+    def precacheAllResults(self) -> None:
         """ Pre-caches all results from the currently loaded simulation. """
-        self.value().cacheAllResults()
+        self.value().precacheAllResults()
 
     def setThreshold(self, threshold: float) -> None:
         """ Sets the FRC threshold to the given value. """
         self.thresholdChanged.emit(threshold)
 
-    def setSampleImage(self, image: np.ndarray, imageId: str) -> None:
-        """
-        Sets the loaded sample image. An ID unique to the image must be supplied, for caching
-        purposes.
-        """
-        self.sampleImageChanged.emit(image, imageId)
+    def setSampleImage(self, sampleImage: SampleImage) -> None:
+        """ Sets the loaded sample image. """
+        self.sampleImageChanged.emit(sampleImage)
 
     def clearSampleImage(self) -> None:
         """ Unloads any loaded sample image. """
-        self.sampleImageChanged.emit(None, None)
+        self.sampleImageChanged.emit(None)
 
     def simulationResults(self) -> SimulationResults:
         """ Returns the currently loaded simulation results. """

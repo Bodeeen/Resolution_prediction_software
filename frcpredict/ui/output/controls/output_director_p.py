@@ -5,7 +5,7 @@ import numpy as np
 from PyQt5.QtCore import pyqtSlot
 
 from frcpredict.model import SimulationResults
-from frcpredict.ui import BasePresenter
+from frcpredict.ui import BasePresenter, Preferences
 from frcpredict.ui.util import getLabelForMultivalue
 from frcpredict.util import expand_with_multivalues
 from .output_director_m import SimulationResultsView, SampleImage, ViewOptions, InspectionDetails
@@ -154,7 +154,7 @@ class OutputDirectorPresenter(BasePresenter[SimulationResultsView]):
 
         # Reset multivalue and inspection state
         if results is not None:
-            self.model._multivalueValueIndices = [0] * results.kernel_results.ndim
+            self.model._multivalueValueIndices = [0] * results.kernel_results.ndim  # All zeroes
         else:
             self.model._multivalueValueIndices = []
 
@@ -163,7 +163,11 @@ class OutputDirectorPresenter(BasePresenter[SimulationResultsView]):
         # Update widget
         self._updateDataInWidget(initialDisplayOfData=True)
 
-    def _onSampleImageChange(self, _) -> None:
+    def _onSampleImageChange(self, sampleImage: SampleImage) -> None:
+        if Preferences.get().precacheExpectedImages and self.model.results is not None:
+            self.model.results.precache(cache_kernels2d=Preferences.get().cacheKernels2D,
+                                        cache_expected_image_for=sampleImage)
+
         self._updateDataInWidget(initialDisplayOfData=True)
 
     def _onInspectedIndexChange(self, _) -> None:
@@ -182,14 +186,9 @@ class OutputDirectorPresenter(BasePresenter[SimulationResultsView]):
     def _uiMultivalueChange(self, index_of_multivalue: int, index_in_multivalue: int) -> None:
         self.model.setMultivalueValue(index_of_multivalue, index_in_multivalue)
 
-    @pyqtSlot(object, object)
-    def _uiSampleImageChange(self, imageArr: Optional[np.ndarray], imageId: Optional[str]) -> None:
-        if imageArr is not None and imageId is not None:
-            self.model.sampleImage = SampleImage(id=imageId, imageArr=imageArr)
-        elif imageArr is None and imageId is None:
-            self.model.sampleImage = None
-        else:
-            raise ValueError("imageArr and imageId must both either be None or not None")
+    @pyqtSlot(object)
+    def _uiSampleImageChange(self, sampleImage: Optional[SampleImage]) -> None:
+        self.model.sampleImage = sampleImage
 
     @pyqtSlot(float)
     def _uiThresholdChange(self, threshold: float) -> None:

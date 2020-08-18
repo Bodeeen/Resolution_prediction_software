@@ -107,9 +107,9 @@ class MainWindow(QMainWindow, BaseWidget):
         # Initialize presenter
         self._presenter = MainWindowPresenter(self)
 
-    def cacheAllSimulationResults(self) -> None:
+    def precacheAllSimulationResults(self) -> None:
         """ Pre-caches all results from the currently loaded simulation. """
-        self.outputDirector.cacheAllResults()
+        self.outputDirector.precacheAllResults()
 
     def isModified(self) -> bool:
         """ Returns whether the input parameters have been modified since they were loaded. """
@@ -181,7 +181,7 @@ class MainWindow(QMainWindow, BaseWidget):
 
     # Internal methods
     def _loadWindowSettings(self) -> None:
-        settings = self._getSettings()
+        settings = self._getWindowSettingsObject()
         geometry = settings.value(_geometrySettingName)
         state = settings.value(_stateSettingName)
 
@@ -192,12 +192,12 @@ class MainWindow(QMainWindow, BaseWidget):
             self.restoreState(state)
 
     def _saveWindowSettings(self) -> None:
-        settings = self._getSettings()
+        settings = self._getWindowSettingsObject()
         settings.setValue(_geometrySettingName, self.saveGeometry())
         settings.setValue(_stateSettingName, self.saveState())
 
     def _resetWindowSettings(self) -> None:
-        settings = self._getSettings()
+        settings = self._getWindowSettingsObject()
         settings.remove(_geometrySettingName)
         settings.remove(_stateSettingName)
 
@@ -205,7 +205,7 @@ class MainWindow(QMainWindow, BaseWidget):
         self.restoreState(self._defaultState)
         centerWindow(self)
 
-    def _getSettings(self) -> QSettings:
+    def _getWindowSettingsObject(self) -> QSettings:
         return QSettings(frcpredict.__author__, frcpredict.__title__)
 
     # Event handling

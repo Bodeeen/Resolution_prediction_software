@@ -41,6 +41,6 @@ class SampleProperties:
 
     def load_structure(self, structure: SampleStructure) -> None:
         """ Loads properties from the given sample structure. """
-        self.loaded_structure_id = structure.id
+        self.loaded_structure_id = structure.image.id
         self.spectral_power = structure.properties.spectral_power
         self.K_origin = structure.properties.K_origin

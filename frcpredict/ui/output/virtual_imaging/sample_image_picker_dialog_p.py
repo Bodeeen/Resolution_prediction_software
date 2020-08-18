@@ -1,5 +1,6 @@
 from typing import Optional
 
+import numpy as np
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QFileDialog
 
@@ -58,12 +59,8 @@ class SampleImagePickerPresenter(BasePresenter[SampleImagePickerModel]):
     def _onModelSet(self, model: SampleImagePickerModel) -> None:
         """ Updates the preview and fields based on the image data. """
 
-        self.widget.updateFields(not model.image.is_empty(), model.fromFile,
-                                 model.sampleStructureId)
-
-        self.widget.updatePreview(
-            getArrayPixmap(model.image.get_numpy_array())
-        )
+        self.widget.updateFields(model.imageArr.any(), model.fromFile, model.sampleStructureId)
+        self.widget.updatePreview(getArrayPixmap(model.imageArr))
 
         self._onFluorophoresPerUnitChange(model.fluorophoresPerUnit)
 
@@ -77,21 +74,21 @@ class SampleImagePickerPresenter(BasePresenter[SampleImagePickerModel]):
             return
 
         self.model = SampleImagePickerModel(
-            image=sample.image, sampleStructureId=sample.id,
+            imageArr=sample.image.image_arr, sampleStructureId=sample.image.id,
             fluorophoresPerUnit=1.0, fromFile=False
         )
 
     @pyqtSlot()
     def _uiFromSampleSelect(self) -> None:
         self.model = SampleImagePickerModel(
-            image=Array2DPatternData(), sampleStructureId=None,
+            imageArr=np.zeros((1, 1)), sampleStructureId=None,
             fluorophoresPerUnit=1.0, fromFile=False
         )
 
     @pyqtSlot()
     def _uiFromFileSelect(self) -> None:
         self.model = SampleImagePickerModel(
-            image=Array2DPatternData(), sampleStructureId=None,
+            imageArr=np.zeros((1, 1)), sampleStructureId=None,
             fluorophoresPerUnit=1.0, fromFile=True
         )
 
@@ -110,7 +107,7 @@ class SampleImagePickerPresenter(BasePresenter[SampleImagePickerModel]):
                 image = Array2DPatternData.from_image_file(path)
 
             self.model = SampleImagePickerModel(
-                image=image, sampleStructureId=None,
+                imageArr=image.get_numpy_array(), sampleStructureId=None,
                 fluorophoresPerUnit=self.model.fluorophoresPerUnit, fromFile=True
             )
 

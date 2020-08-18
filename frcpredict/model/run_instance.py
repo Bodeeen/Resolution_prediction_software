@@ -74,10 +74,15 @@ class RunInstance:
     )
 
     # Methods
-    def simulate(self, preprocessing_finished_callback: Optional[Signal] = None,
+    def simulate(self, *,
+                 cache_kernels2d: bool = True,
+                 precache_frc_curves: bool = True,
+                 preprocessing_finished_callback: Optional[Signal] = None,
                  progress_updated_callback: Optional[Signal] = None):
         """ Runs the simulation and returns the results. """
         return simulate(deepcopy(self),
+                        cache_kernels2d=cache_kernels2d,
+                        precache_frc_curves=precache_frc_curves,
                         abort_signal=self._abort_signal,
                         preprocessing_finished_callback=preprocessing_finished_callback,
                         progress_updated_callback=progress_updated_callback)

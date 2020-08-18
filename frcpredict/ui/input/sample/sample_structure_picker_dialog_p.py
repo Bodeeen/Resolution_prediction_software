@@ -39,12 +39,8 @@ class SampleStructurePickerPresenter(BasePresenter[SampleStructure]):
     # Model event handling
     def _onModelSet(self, model: SampleStructure) -> None:
         """ Updates the preview and property fields based on the sample structure. """
-
-        self.widget.updateStructure(model.id, model.properties)
-
-        self.widget.updatePreview(
-            getArrayPixmap(model.image.get_numpy_array())
-        )
+        self.widget.updateStructure(model.image.id, model.properties)
+        self.widget.updatePreview(getArrayPixmap(model.image.image_arr))
 
     # UI event handling
     @pyqtSlot(object)

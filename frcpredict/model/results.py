@@ -10,6 +10,7 @@ from frcpredict.simulation import (
 )
 from frcpredict.util import ndarray_field, expand_with_multivalues
 from .run_instance import RunInstance
+from .sample_image import SampleImage
 
 
 @dataclass_json
@@ -64,47 +65,71 @@ class KernelSimulationResult:
             # Probably raised because the entered threshold is outside the interpolation range
             return None
 
-    def get_frc_curve(self, run_instance: RunInstance) -> Tuple[np.ndarray, np.ndarray]:
+    def get_frc_curve(self, run_instance: RunInstance, *,
+                      cache_kernels2d: bool = True) -> Tuple[np.ndarray, np.ndarray]:
         """ Returns a tuple containing the X and Y values respectively of the FRC curve. """
-        self.cache_frc_curve(run_instance)
+        self.cache_frc_curve(run_instance, cache_kernels2d=cache_kernels2d)
         return self._cached_frc_curve_x, self._cached_frc_curve_y
 
-    def get_expected_image(self, run_instance: RunInstance, sample_id: str,
-                           sample_image: np.ndarray) -> np.ndarray:
+    def get_expected_image(self, run_instance: RunInstance, sample_image: SampleImage, *,
+                           cache_kernels2d: bool = True) -> np.ndarray:
         """ Returns the expected image of the given sample as a 2D array. """
-        self.cache_expected_image(run_instance, sample_id, sample_image)
+        self.cache_expected_image(run_instance, sample_image, cache_kernels2d=cache_kernels2d)
         return self._cached_expected_image
 
-    def cache_frc_curve(self, run_instance: RunInstance) -> None:
+    def cache_frc_curve(self, run_instance: RunInstance, *,
+                        cache_kernels2d: bool = True) -> None:
         """ Simulates the FRC curve based on the kernels and caches the result. """
         if self._cached_frc_curve_x is None or self._cached_frc_curve_y is None:
-            self._cache_kernels2d(run_instance)
+            kernels2d = self._get_kernels2d(run_instance, cache=cache_kernels2d)
             self._cached_frc_curve_x, self._cached_frc_curve_y = get_frc_curve_from_kernels2d(
-                self._cached_kernels2d, run_instance
+                kernels2d, run_instance
             )
 
-    def cache_expected_image(self, run_instance: RunInstance, sample_id: str,
-                             sample_image_arr: np.ndarray) -> None:
+    def cache_expected_image(self, run_instance: RunInstance, sample_image: SampleImage, *,
+                             cache_kernels2d: bool = True) -> None:
         """
         Simulates the FRC curve based on the kernels and the given sample image, and caches the
         result.
         """
         if (self._cached_expected_image is None
-                or sample_id != self._cached_expected_image_sample_id):
-            self._cache_kernels2d(run_instance)
+                or sample_image.id != self._cached_expected_image_sample_id):
+            kernels2d = self._get_kernels2d(run_instance, cache=cache_kernels2d)
             self._cached_expected_image = get_expected_image_from_kernels2d(
-                self._cached_kernels2d, sample_image_arr
+                kernels2d, sample_image.image_arr
             )
-            self._cached_expected_image_sample_id = sample_id
+            self._cached_expected_image_sample_id = sample_image.id
+
+    def clear_cache(self, *, clear_kernels2d: bool = False, clear_frc_curves: bool = False,
+                    clear_expected_image: bool = False) -> None:
+        """ Clears the chosen caches. """
+
+        if clear_kernels2d:
+            self._cached_kernels2d = None
+
+        if clear_frc_curves:
+            self._cached_frc_curve_x = None
+            self._cached_frc_curve_y = None
+
+        if clear_expected_image:
+            self._cached_expected_image = None
+            self._cached_expected_image_sample_id = None
 
     # Internal methods
-    def _cache_kernels2d(self, run_instance: RunInstance) -> None:
+    def _get_kernels2d(self, run_instance: RunInstance, *, cache: bool = True) -> np.ndarray:
         """ Expands the simulated kernels to 2D arrays and caches the result. """
-        if self._cached_kernels2d is None:
-            self._cached_kernels2d = expand_kernels_to_2d(
-                self.exp_kernel, self.var_kernel,
-                pixels_per_nm=run_instance.imaging_system_settings.scanning_step_size
-            )
+        if self._cached_kernels2d is not None:
+            return self._cached_kernels2d
+
+        kernels2d = expand_kernels_to_2d(
+            self.exp_kernel, self.var_kernel,
+            pixels_per_nm=run_instance.imaging_system_settings.scanning_step_size
+        )
+
+        if cache:
+            self._cached_kernels2d = kernels2d
+
+        return kernels2d
 
 
 @dataclass_json
@@ -132,8 +157,9 @@ class SimulationResults:
     )
 
     # Methods
-    def cache_all(self, sample_id: Optional[str], sample_image_arr: Optional[np.ndarray]) -> None:
-        """ Pre-caches all FRC curves and expected images. """
+    def precache(self, *, cache_kernels2d: bool = False, cache_frc_curves: bool = False,
+                 cache_expected_image_for: Optional[SampleImage] = None) -> None:
+        """ Pre-caches the chosen elements in all kernel result instances. """
 
         for kernel_result in np.nditer(self.kernel_results, flags=["refs_ok"]):
             kernel_result_item = kernel_result.item()
@@ -142,7 +168,22 @@ class SimulationResults:
                                                    self.multivalue_paths,
                                                    kernel_result_item.multivalue_values)
 
-            kernel_result_item.cache_frc_curve(run_instance)
+            has_expected_image = cache_expected_image_for is not None
 
-            if sample_id is not None and sample_image_arr is not None:
-                kernel_result_item.cache_expected_image(run_instance, sample_id, sample_image_arr)
+            if cache_frc_curves:
+                kernel_result_item.cache_frc_curve(run_instance, cache_kernels2d=has_expected_image)
+
+            if has_expected_image:
+                kernel_result_item.cache_expected_image(run_instance, cache_expected_image_for)
+
+            if not cache_kernels2d:
+                kernel_result_item.clear_cache(clear_kernels2d=True)
+
+    def clear_cache(self, *, clear_kernels2d: bool = False, clear_frc_curves: bool = False,
+                    clear_expected_image: bool = False) -> None:
+        """ Clears the chosen caches in all kernel result instances. """
+        for kernel_result in np.nditer(self.kernel_results, flags=["refs_ok"]):
+            kernel_result_item = kernel_result.item()
+            kernel_result_item.clear_cache(clear_kernels2d=clear_kernels2d,
+                                           clear_frc_curves=clear_frc_curves,
+                                           clear_expected_image=clear_expected_image)
