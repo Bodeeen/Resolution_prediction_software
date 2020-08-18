@@ -112,6 +112,11 @@ class FrcResultsWidget(BaseWidget):
         if frcCurve is not None:
             self.plotFrc.plot(*frcCurve)
 
+            # Re-draw crosshair
+            for plotItem in self._thresholdPlotItems:
+                self.plotFrc.plot(plotItem.curve.xData, plotItem.curve.yData,
+                                  pen=plotItem.curve.opts["pen"])
+
         self.grpData.setEnabled(frcCurve is not None)
         self.btnExportValues.setEnabled(frcCurve is not None)
         self.btnExportGraph.setEnabled(frcCurve is not None)
