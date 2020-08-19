@@ -115,7 +115,12 @@ class OutputDirectorPresenter(BasePresenter[SimulationResultsView]):
 
                 inspectedCurveX[i] = kernelResult.multivalue_values[inspectedIndex]
                 inspectedCurveY[i] = kernelResult.resolution_at_threshold(
-                    self.model.results.run_instance, self.model.threshold
+                    expand_with_multivalues(
+                        self.model.results.run_instance,
+                        self.model.results.multivalue_paths,
+                        kernelResult.multivalue_values
+                    ),
+                    self.model.threshold
                 )
 
             self.widget.updateViewOptions(
