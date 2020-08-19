@@ -102,6 +102,10 @@ class FrcResultsPresenter(BasePresenter[FrcResultsModel]):
 
     def _onFrcCurveChange(self, frcCurve: Optional[Tuple[np.ndarray, np.ndarray]]) -> None:
         self.widget.updateFrcCurve(frcCurve)
+        self.widget.updateViewOptions(
+            self.model.viewOptions,
+            self.model.crosshairEnabled and frcCurve is not None
+        )
 
     def _onViewOptionsChange(self, viewOptions: ViewOptions) -> None:
         self.widget.updateViewOptions(

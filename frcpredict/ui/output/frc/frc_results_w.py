@@ -31,7 +31,7 @@ class FrcResultsWidget(BaseWidget):
     # Methods
     def __init__(self, *args, **kwargs) -> None:
         self._outputDirector = None
-        self._thresholdPlotItems = []
+        self._frcThresholdPlotItems = []
         self._inspectionPlotItems = []
 
         super().__init__(__file__, *args, **kwargs)
@@ -112,11 +112,6 @@ class FrcResultsWidget(BaseWidget):
         if frcCurve is not None:
             self.plotFrc.plot(*frcCurve)
 
-            # Re-draw crosshair
-            for plotItem in self._thresholdPlotItems:
-                self.plotFrc.plot(plotItem.curve.xData, plotItem.curve.yData,
-                                  pen=plotItem.curve.opts["pen"])
-
         self.grpData.setEnabled(frcCurve is not None)
         self.btnExportValues.setEnabled(frcCurve is not None)
         self.btnExportGraph.setEnabled(frcCurve is not None)
@@ -156,9 +151,13 @@ class FrcResultsWidget(BaseWidget):
                 plotYMin = inspectionCurveY.min() - paddingY
                 plotYMax = inspectionCurveY.max() + paddingY
 
-                self.plotInspection.setRange(xRange=[plotXMin, plotXMax],
-                                             yRange=[plotYMin, plotYMax],
-                                             padding=0)
+                try:
+                    self.plotInspection.setRange(xRange=[plotXMin, plotXMax],
+                                                 yRange=[plotYMin, plotYMax],
+                                                 padding=0)
+                except:
+                    # Probably raised due to nan range, in turn due to non-intersecting threshold
+                    pass
 
                 # Update inspection plot crosshair lines
                 for plotItem in self._inspectionPlotItems:
@@ -193,19 +192,19 @@ class FrcResultsWidget(BaseWidget):
         """ Updates the threshold indicators in the FRC plot. """
 
         # Update FRC plot crosshair lines
-        for plotItem in self._thresholdPlotItems:
+        for plotItem in self._frcThresholdPlotItems:
             self.plotFrc.removeItem(plotItem)
 
-        self._thresholdPlotItems = []
+        self._frcThresholdPlotItems = []
 
         if showCrosshair:
-            self._thresholdPlotItems.append(
+            self._frcThresholdPlotItems.append(
                 self.plotFrc.plot([0, 1 / 25], [threshold, threshold],
                                   pen=pg.mkPen("r", style=Qt.DashLine))
             )
 
             if valueAtThreshold:
-                self._thresholdPlotItems.append(
+                self._frcThresholdPlotItems.append(
                     self.plotFrc.plot([1 / valueAtThreshold, 1 / valueAtThreshold], [-0.1, 1.1],
                                       pen=pg.mkPen("r", style=Qt.DashLine))
                 )
