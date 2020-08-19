@@ -68,10 +68,10 @@ class SampleImagePickerDialog(QDialog, BaseWidget):
 
         if loadedSampleIndex > -1:
             self.listSample.setCurrentRow(loadedSampleIndex)
-            self.lblInfo.setText("Note: FRC/resolution output data will not be accurate when" +
+            self.lblInfo.setText("Note: FRC/resolution output data may not be accurate when" +
                                  " picking anything other than the loaded sample structure.")
         else:
-            self.lblInfo.setText("Note: FRC/resolution output data will not be accurate, since" +
+            self.lblInfo.setText("Note: FRC/resolution output data may not be accurate, since" +
                                  " the simulation was run without any loaded sample structure.")
 
     def value(self) -> SampleImagePickerModel:
