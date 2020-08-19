@@ -43,6 +43,7 @@ class FluorophoreSettingsWidget(BaseWidget):
         self.listResponses.currentItemChanged.connect(self.responseSelectionChanged)
         self.btnAddResponse.clicked.connect(self.addResponseClicked)
         self.btnRemoveResponse.clicked.connect(self.removeResponseClicked)
+        self.configPanel.dataLoaded.connect(self.modifiedFlagSet)
 
         # Initialize presenter
         self._presenter = FluorophoreSettingsPresenter(self)

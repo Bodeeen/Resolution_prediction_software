@@ -37,6 +37,7 @@ class CameraPropertiesWidget(BaseWidget):
                      self.readoutNoiseChanged)
         connectMulti(self.editQuantumEfficiency.valueChanged, [float, Multivalue],
                      self.quantumEfficiencyChanged)
+        self.configPanel.dataLoaded.connect(self.modifiedFlagSet)
 
         # Initialize presenter
         self._presenter = CameraPropertiesPresenter(self)

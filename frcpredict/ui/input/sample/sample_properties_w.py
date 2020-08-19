@@ -45,6 +45,7 @@ class SamplePropertiesWidget(BaseWidget):
                      self.labellingDensityChanged)
         connectMulti(self.editKOrigin.valueChanged, [float, Multivalue],
                      self.KOriginChanged)
+        self.configPanel.dataLoaded.connect(self.modifiedFlagSet)
 
         self.btnLoadSampleStructure.clicked.connect(self.loadSampleStructureClicked)
         self.btnUnloadSampleStructure.clicked.connect(self.unloadSampleStructureClicked)

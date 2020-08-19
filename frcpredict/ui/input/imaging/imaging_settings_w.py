@@ -63,6 +63,7 @@ class ImagingSystemSettingsWidget(BaseWidget):
         self.editPinholeFunction.valueChanged.connect(self.pinholeFunctionChanged)
         connectMulti(self.editScanningStepSize.valueChanged, [float, Multivalue],
                      self.scanningStepSizeChanged)
+        self.configPanel.dataLoaded.connect(self.modifiedFlagSet)
 
         # Initialize presenter
         self._presenter = ImagingSystemSettingsPresenter(self)

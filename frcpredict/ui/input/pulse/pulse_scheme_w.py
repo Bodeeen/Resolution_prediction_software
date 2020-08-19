@@ -57,6 +57,7 @@ class PulseSchemeWidget(BaseWidget):
         self.plot.scene().sigMouseClicked.connect(self.plotClicked)
         self.btnAddPulse.clicked.connect(self.addPulseClicked)
         self.btnRemovePulse.clicked.connect(self.removePulseClicked)
+        self.configPanel.dataLoaded.connect(self.modifiedFlagSet)
 
         connectMulti(self.editProperties.wavelengthChangedByUser, [float, Multivalue],
                      self.pulseWavelengthChangedByUser)
