@@ -11,7 +11,7 @@ from .dataclass_extras import (
 from .data_dir_utils import get_sample_structure_data_dir_names, get_sample_structure_data_file_paths
 
 from .pattern_utils import (
-    get_canvas_params, radial_profile,
+    get_canvas_radius_nm, get_canvas_dimensions_px, radial_profile,
     generate_gaussian, generate_doughnut, generate_airy,
     generate_digital_pinhole, generate_physical_pinhole
 )

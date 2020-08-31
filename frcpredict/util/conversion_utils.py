@@ -7,7 +7,7 @@ import numpy as np
 
 
 def int_to_flux(intensity: float, wavelength: float) -> float:
-    """Takes intensity as W/cm^2 and wavelength in nm and returns photons/(nm^2*ms)"""
+    """ Takes intensity as W/cm^2 and wavelength in nm and returns photons/(nm^2*ms) """
 
     E = 1000 * 1.24 / wavelength
 

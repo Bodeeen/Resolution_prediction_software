@@ -1,6 +1,7 @@
 from .pattern import Pattern, PatternType
 from .pattern_data import (
     PatternData,
+    RadialPatternData,
     Array2DPatternData,
     GaussianPatternData,
     DoughnutPatternData,

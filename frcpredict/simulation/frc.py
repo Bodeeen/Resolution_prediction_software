@@ -8,7 +8,7 @@ from typing import Tuple
 import numpy as np
 
 import frcpredict.model as mdl
-from frcpredict.util import radial_profile
+from frcpredict.util import get_canvas_radius_nm, get_canvas_dimensions_px, radial_profile
 
 
 def get_frc_curve_from_kernels2d(kernels2d: np.ndarray,
@@ -21,14 +21,12 @@ def get_frc_curve_from_kernels2d(kernels2d: np.ndarray,
     # Pixel size in nanometres
     px_size_nm = run_instance.imaging_system_settings.scanning_step_size
 
-    # Inner radius in nm of all 2D patterns (PSF, illumination patterns, pinholes etc.)
-    psf_kernel_rad_nm = 2000
-
-    # Inner radius in pixels of all 2D patterns (PSF, illumination patterns, pinholes etc.)
-    psf_kernel_rad_px = np.int(psf_kernel_rad_nm / px_size_nm)
+    # Radius in pixels of all 2D patterns (PSF, illumination patterns, pinholes etc.)
+    canvas_outer_rad_nm = get_canvas_radius_nm(extend_sides_to_diagonal=True)
+    canvas_outer_rad_px, _ = get_canvas_dimensions_px(canvas_outer_rad_nm, px_size_nm)
 
     # Calculate canvas parameters
-    half_canvas_side = np.int(np.floor((psf_kernel_rad_px - 1) / 2))
+    half_canvas_side = np.int(np.floor((canvas_outer_rad_px - 1) / 2))
     freq_arr = np.fft.fftfreq(2 * half_canvas_side - 1, px_size_nm)[:half_canvas_side]
     freq_arr_step = freq_arr[1] - freq_arr[0]
 

@@ -11,7 +11,9 @@ from scipy.signal import fftconvolve
 
 import frcpredict.model as mdl
 from frcpredict.util import (
-    get_paths_of_multivalues, expand_multivalues, int_to_flux, na_to_collection_efficiency
+    get_paths_of_multivalues, expand_multivalues,
+    int_to_flux, na_to_collection_efficiency,
+    get_canvas_radius_nm, get_canvas_dimensions_px, radial_profile
 )
 from .telegraph import make_random_telegraph_data
 
@@ -208,22 +210,32 @@ def simulate(run_instance: "mdl.RunInstance", *,
 
 def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.ndarray]:
     """ Main function to run the simulations """
+
     px_size_nm = run_instance.imaging_system_settings.scanning_step_size  # Pixel size nanometers
 
-    # Radius in nm of all 2D patterns (PSF, illumination patterns, pinholes etc.) (inside the square)
-    psf_kernel_rad_nm = 2000
-    # Radius in pixels of all 2D patterns (PSF, illumination patterns, pinholes etc.) (inside the square)
-    psf_kernel_rad_px = np.int(psf_kernel_rad_nm / px_size_nm)
+    # Radius in pixels of all 2D patterns (PSF, illumination patterns, pinholes etc.)
+    canvas_outer_rad_nm = get_canvas_radius_nm(extend_sides_to_diagonal=True)
+    canvas_outer_rad_px, _ = get_canvas_dimensions_px(canvas_outer_rad_nm, px_size_nm)
 
     # Calculate G(x,y), the convolution of the detection PSF and the pinhole function
-    PSF = run_instance.imaging_system_settings.optical_psf.get_numpy_array(px_size_nm)
-    P = run_instance.imaging_system_settings.pinhole_function.get_numpy_array(px_size_nm)
-    G2D = fftconvolve(P, PSF, mode="same")
-    G_rad = np.zeros(psf_kernel_rad_px)
-    G_rad_temp = G2D[psf_kernel_rad_px - 1][psf_kernel_rad_px - 1:]
-    G_rad[0:len(G_rad_temp)] = G_rad_temp
+    psf = run_instance.imaging_system_settings.optical_psf
+    pinhole = run_instance.imaging_system_settings.pinhole_function
 
-    if isinstance(run_instance.imaging_system_settings.optical_psf.pattern_data, mdl.AiryNAPatternData):
+    radial_psf_and_pinhole = (isinstance(psf, mdl.RadialPatternData) and
+                              isinstance(pinhole, mdl.RadialPatternData))
+    psf_arr = psf.get_numpy_array(px_size_nm, extend_sides_to_diagonal=radial_psf_and_pinhole)
+    pinhole_arr = pinhole.get_numpy_array(px_size_nm, extend_sides_to_diagonal=radial_psf_and_pinhole)
+
+    G_2D = fftconvolve(pinhole_arr, psf_arr, mode="same")
+    G_rad = np.zeros(canvas_outer_rad_px)
+    if radial_psf_and_pinhole:
+        G_rad[0:canvas_outer_rad_px] = G_2D[canvas_outer_rad_px - 1][canvas_outer_rad_px - 1:]
+    else:
+        G_rad[0:canvas_outer_rad_px] = radial_profile(G_2D)
+
+    # Calculate collection efficiency
+    if isinstance(run_instance.imaging_system_settings.optical_psf.pattern_data,
+                  mdl.AiryNAPatternData):
         collection_efficiency = na_to_collection_efficiency(
             run_instance.imaging_system_settings.optical_psf.pattern_data.na,
             run_instance.imaging_system_settings.refractive_index
@@ -231,21 +243,15 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
     else:
         collection_efficiency = 0.3  # TODO: This is a temporary fallback
 
-    # Calculate ON-state probabilities after ON-switching illumination
-    P_on = np.zeros(psf_kernel_rad_px)
+    # Calculate ON-state probabilities after illumination
+    P_on = np.zeros(canvas_outer_rad_px)
     for pulse_index, pulse in enumerate(run_instance.pulse_scheme.pulses):
-        # TODO: This does currently not create radial profile from an average
-        illumination_pattern_rad = pulse.illumination_pattern.get_numpy_array(
-            px_size_nm
-        )[psf_kernel_rad_px - 1][psf_kernel_rad_px - 1:]
-
+        illumination_pattern_rad = pulse.illumination_pattern.get_radial_profile(px_size_nm)
+        expected_photons = int_to_flux(pulse.max_intensity * 1000, pulse.wavelength) * px_size_nm ** 2
         response = run_instance.fluorophore_settings.get_response(pulse.wavelength)
-        expected_photons = int_to_flux(pulse.max_intensity * 1000,
-                                       pulse.wavelength) * px_size_nm ** 2
 
         # The following comes from the rate being defined per photon falling in a 20x20 nm area
-        # TODO: Change
-        temp_scaling_factor = (20 / px_size_nm) ** 2
+        temp_scaling_factor = (20 / px_size_nm) ** 2  # TODO: Change
 
         if pulse_index < len(run_instance.pulse_scheme.pulses) - 1:
             P_on = expected_Pon(
