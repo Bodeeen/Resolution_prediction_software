@@ -96,7 +96,7 @@ class KernelSimulationResult:
                 or sample_image.id != self._cached_expected_image_sample_id):
             kernels2d = self._get_kernels2d(run_instance, cache=cache_kernels2d)
             self._cached_expected_image = get_expected_image_from_kernels2d(
-                kernels2d, sample_image.image_arr
+                kernels2d, run_instance, sample_image.image_arr
             )
             self._cached_expected_image_sample_id = sample_image.id
 
