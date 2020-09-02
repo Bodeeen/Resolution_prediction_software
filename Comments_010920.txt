@@ -1,0 +1,10 @@
+Comments on program
+
+- Physical pinhole function is not correct? Gives inf resolution sometimes... Scaling?
+
+- For camera we need to redefine the read-out noise. We could define per pixel but then need to recalculate according to nr
+of pixels used. Could be fairly easily done from the pihole function image. Calculate sum of image and scale with ration between
+scanning step "pixel size" and camera pixel size. I.e. pinhole function defined with 20x20 nm2 pixels and has a sum of 10 then
+total read out noise would be 10 * (20*20)/(65*65) if camera pixel size is 65x65 nm2. It's maybe a bit rought but should be
+mostly ok...
+Alternativly recalculate pinhole fcn with camera pixel size directly.

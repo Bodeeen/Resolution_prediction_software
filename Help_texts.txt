@@ -1,0 +1,17 @@
+Help text 
+
+Cross section
+
+The value set here determines the rate of ON-switching induced per kW/cm2 of light intensity. The rate of ON-switching is calculated as the cross section
+times the illumination power given in kW/cm2. The unit for the cross section is thus rate/(kW/cm2).
+
+
+Spectral power
+
+The FRC value is based on the expected properties of the Fourier transform of the output image. From the image formation model empoyed, the Fourier transform
+of the output image depends on the properties of the Fourier transform of the underlying fluorophore density. To calculate the FRC value at a certain frequency,
+the spectral power of the underlying fluorophore density at that point needs to be known. In reality every unique fluorophore density map has a specific
+spectral power and an experimentally measures FRC curve depends on what sample is being imaged. In order to predict an absolute resolution value, it is thus necessary
+to define/assume a spectral power curve of the sample. In these simulations, the spectral power curve is assumed to be constant at every non-zero frequency. This constant
+value can either be set manually in the "Spectral power" edit box or estimated as the average spectral power of an example fluorophore density map using the
+"Load sample structure..." button. 
