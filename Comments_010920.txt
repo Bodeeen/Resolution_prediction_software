@@ -8,3 +8,12 @@ scanning step "pixel size" and camera pixel size. I.e. pinhole function defined 
 total read out noise would be 10 * (20*20)/(65*65) if camera pixel size is 65x65 nm2. It's maybe a bit rought but should be
 mostly ok...
 Alternativly recalculate pinhole fcn with camera pixel size directly.
+
+- add "RMS" to noise unit.
+
+- No way to change labelling density no in virtual image now.
+
+- Remove labelling density from sample properties and only have it when choosing from example image.
+
+- Larger images when generating gaussians etc.
+
