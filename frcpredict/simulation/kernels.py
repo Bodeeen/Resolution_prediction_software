@@ -221,8 +221,8 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
     psf = run_instance.imaging_system_settings.optical_psf
     pinhole = run_instance.imaging_system_settings.pinhole_function
 
-    radial_psf_and_pinhole = (isinstance(psf, mdl.RadialPatternData) and
-                              isinstance(pinhole, mdl.RadialPatternData))
+    radial_psf_and_pinhole = (isinstance(psf.pattern_data, mdl.RadialPatternData) and
+                              isinstance(pinhole.pattern_data, mdl.RadialPatternData))
     psf_arr = psf.get_numpy_array(px_size_nm, extend_sides_to_diagonal=radial_psf_and_pinhole)
     pinhole_arr = pinhole.get_numpy_array(px_size_nm, extend_sides_to_diagonal=radial_psf_and_pinhole)
 
@@ -231,7 +231,8 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
     if radial_psf_and_pinhole:
         G_rad[0:canvas_outer_rad_px] = G_2D[canvas_outer_rad_px - 1][canvas_outer_rad_px - 1:]
     else:
-        G_rad[0:canvas_outer_rad_px] = radial_profile(G_2D)
+        radial_profile_result = radial_profile(G_2D)
+        G_rad[0:len(radial_profile_result)] = radial_profile_result
 
     # Calculate collection efficiency
     if isinstance(run_instance.imaging_system_settings.optical_psf.pattern_data,
