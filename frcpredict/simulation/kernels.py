@@ -257,8 +257,8 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
         if pulse_index < len(run_instance.pulse_scheme.pulses) - 1:
             P_on = expected_Pon(
                 P_on,
-                expected_photons * response.cross_section_off_to_on * temp_scaling_factor * illumination_pattern_rad,
-                expected_photons * response.cross_section_on_to_off * temp_scaling_factor * illumination_pattern_rad,
+                pulse.max_intensity * response.cross_section_off_to_on * illumination_pattern_rad,
+                pulse.max_intensity * response.cross_section_on_to_off * illumination_pattern_rad,
                 pulse.duration
             )
         else:  # Last pulse (readout pulse)
@@ -267,11 +267,11 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
                 run_instance.camera_properties.quantum_efficiency,
                 collection_efficiency,
                 P_on,
-                expected_photons,
+                pulse.max_intensity,
                 illumination_pattern_rad,
-                response.cross_section_off_to_on * temp_scaling_factor,
-                response.cross_section_on_to_off * temp_scaling_factor,
-                response.cross_section_emission * temp_scaling_factor,
+                response.cross_section_off_to_on,
+                response.cross_section_on_to_off,
+                response.cross_section_emission,
                 pulse.duration
             )
 
