@@ -32,7 +32,7 @@ def make_random_telegraph_data(num_trials=10000, t_on=1.0, t_off=1.0, t_bleach=1
         each entry is fraction of exposure time spent in on state
     """
     output_array = np.zeros(num_trials)
-    N_switch_array = np.zeros(num_trials)
+
     for i in prange(num_trials):
         on_time = 0.0
         t_elapsed = 0.0
@@ -45,7 +45,7 @@ def make_random_telegraph_data(num_trials=10000, t_on=1.0, t_off=1.0, t_bleach=1
             on_time += state*(min(time_until_switch, t_exp - t_elapsed))
             state = (state + 1) % 2
             t_elapsed += time_until_switch
-        N_switch_array[i] = N_switches  # For some reason this line apparently has to run before
-        output_array[i] = on_time       # this line in some configurations?
+        output_array[i] = on_time
+
     lifetimes = np.random.exponential(t_bleach, size=num_trials)
-    return np.minimum(output_array, lifetimes), N_switch_array
+    return np.minimum(output_array, lifetimes)

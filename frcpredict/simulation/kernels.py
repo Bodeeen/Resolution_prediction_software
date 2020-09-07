@@ -65,7 +65,7 @@ def expected_Pon(P_pre: np.ndarray, Ron: np.ndarray, Roff: np.ndarray,
 
 
 def variance_detection(N: int, Ron: np.ndarray, Roff: np.ndarray, alpha: np.ndarray,
-                       T_exp: float, Pon: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+                       T_exp: float, Pon: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     """ Function to calculate/estimate the variance of emitted photons
     for a single fluorophore observer for a certain observation time. Ron, Roff
     and alpha are given as arrays of "paired" values. Outputs are also arrays.
@@ -82,24 +82,22 @@ def variance_detection(N: int, Ron: np.ndarray, Roff: np.ndarray, alpha: np.ndar
 
     v = np.zeros(Ron.shape)
     m = np.zeros(Ron.shape)
-    Ns = np.zeros(Ron.shape)
 
     for idx, val in np.ndenumerate(Ron):
-        ON_times, N_switches = make_random_telegraph_data(N,
-                                                          t_on=1 / Roff[idx],
-                                                          t_off=1 / Ron[idx],
-                                                          t_bleach=1e10,
-                                                          t_exp=T_exp,
-                                                          p_on=Pon[idx])
+        ON_times = make_random_telegraph_data(N,
+                                              t_on=1 / Roff[idx],
+                                              t_off=1 / Ron[idx],
+                                              t_bleach=1e10,
+                                              t_exp=T_exp,
+                                              p_on=Pon[idx])
 
         # Eq (2) in publication
         variance = alpha[idx] * ON_times.mean() + alpha[idx] ** 2 * ON_times.var()
 
         v[idx] = variance
         m[idx] = alpha[idx] * ON_times.mean()
-        Ns[idx] = N_switches.mean()
 
-    return v, m, Ns
+    return v, m
 
 
 def make_kernels_detection(N: int, QE: float, det_eff: float,
@@ -127,7 +125,7 @@ def make_kernels_detection(N: int, QE: float, det_eff: float,
     expONt = expected_ON_time(PonStart, E_p_RO * RO_ill * Ponswitch, E_p_RO * RO_ill * Poffswitch,
                               T_obs)
     expDet = np.multiply(alpha, expONt)  # Comparable to eq (1) i publication
-    varDet, mean, N_switches = variance_detection(
+    varDet, mean = variance_detection(
         N, E_p_RO * RO_ill * Ponswitch, E_p_RO * RO_ill * Poffswitch, alpha, T_obs, PonStart)
 
     return expDet, varDet  # mean is just for confirmation
@@ -229,14 +227,13 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
     G_2D = fftconvolve(pinhole_arr, psf_arr, mode="same")
     G_rad = np.zeros(canvas_outer_rad_px)
     if radial_psf_and_pinhole:
-        G_rad[0:canvas_outer_rad_px] = G_2D[canvas_outer_rad_px - 1][canvas_outer_rad_px - 1:]
+        G_rad[0:canvas_outer_rad_px] = G_2D[canvas_outer_rad_px - 1, canvas_outer_rad_px - 1:]
     else:
         radial_profile_result = radial_profile(G_2D)
         G_rad[0:len(radial_profile_result)] = radial_profile_result
 
     # Calculate collection efficiency
-    if isinstance(run_instance.imaging_system_settings.optical_psf.pattern_data,
-                  mdl.AiryNAPatternData):
+    if isinstance(psf.pattern_data, mdl.AiryNAPatternData):
         collection_efficiency = na_to_collection_efficiency(
             run_instance.imaging_system_settings.optical_psf.pattern_data.na,
             run_instance.imaging_system_settings.refractive_index
