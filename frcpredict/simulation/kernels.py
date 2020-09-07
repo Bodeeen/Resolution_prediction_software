@@ -18,21 +18,22 @@ from frcpredict.util import (
 from .telegraph import make_random_telegraph_data
 
 
-def expected_ON_time(P_on: np.ndarray, Ron: np.ndarray, Roff: np.ndarray,
+def expected_on_time(*, P_on: np.ndarray, R_on: np.ndarray, R_off: np.ndarray,
                      T_obs: float) -> np.ndarray:
-    """ Eq. 6. Funcition calculating the expected time a fluorophore is ON
-    during an observation time T_obs
+    """
+    Calculates the expected time a fluorophore is ON during some observation time.
+    (Eq (6) in publication.)
 
     - P_on: Probability of fluorophore being ON at start
     - Ron: Rate of ON-switching (events/ms)
     - Roff: Rate of OFF-switching (events/ms)
     - T_obs: Observation time
-
     """
-    k = Ron + Roff
 
-    t1 = T_obs * Ron / k
-    fac1 = P_on - Ron / k
+    k = R_on + R_off
+
+    t1 = T_obs * R_on / k
+    fac1 = P_on - R_on / k
     fac2 = (1 - np.exp(-k * T_obs)) / k
 
     exp_ONt = t1 + fac1 * fac2
@@ -40,22 +41,22 @@ def expected_ON_time(P_on: np.ndarray, Ron: np.ndarray, Roff: np.ndarray,
     return exp_ONt
 
 
-def expected_Pon(P_pre: np.ndarray, Ron: np.ndarray, Roff: np.ndarray,
-                 T_exp: float) -> np.ndarray:
-    """ Eq. 5. Function for calculating the probability of a fluorophore
-    being in the ON-state after some observation time.
+def expected_P_on(*, P_pre: np.ndarray, R_on: np.ndarray, R_off: np.ndarray,
+                  T_exp: float) -> np.ndarray:
+    """
+    Calculates the probability of a fluorophore being in the ON-state after some observation time.
+    (Eq (5) in publication.)
 
     - P_pre: Probability of fluorophore being ON at start
-    - Ron: Rate of ON-switching (events/ms)
-    - Roff: Rate of OFF-switching (events/ms)
+    - R_on: Rate of ON-switching (events/ms)
+    - R_off: Rate of OFF-switching (events/ms)
     - T_exp: Observation time
     - P_post: Probability of fluorophore being ON at end
-
     """
 
-    k = Ron + Roff + np.finfo(float).eps
+    k = R_on + R_off + np.finfo(float).eps
 
-    t1 = Ron / k
+    t1 = R_on / k
     fac1 = P_pre - t1
     fac2 = np.exp(-k * T_exp)
 
@@ -64,71 +65,78 @@ def expected_Pon(P_pre: np.ndarray, Ron: np.ndarray, Roff: np.ndarray,
     return P_post
 
 
-def variance_detection(N: int, Ron: np.ndarray, Roff: np.ndarray, alpha: np.ndarray,
-                       T_exp: float, Pon: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-    """ Function to calculate/estimate the variance of emitted photons
-    for a single fluorophore observer for a certain observation time. Ron, Roff
-    and alpha are given as arrays of "paired" values. Outputs are also arrays.
+def variance_detection(*, num_fluorophore_simulations: int, R_on: np.ndarray, R_off: np.ndarray,
+                       alpha: np.ndarray, T_exp: float, P_on: np.ndarray) -> np.ndarray:
+    """
+    Estimates the variance of emitted photons for a single fluorophore observer for a certain
+    observation time. R_on, R_off and alpha are given as arrays of "paired" values. Outputs are also
+    arrays.
 
-    - N: number of times to simulate fluorophore in order to get good statistics
-    - Ron: Rate of ON-switching (events/ms)
-    - Roff: Rate of OFF-switching (events/ms)
-    - alpha: expected number of photons emitted/detected per ms that the
+    - num_fluorophore_simulations: Number of times to simulate fluorophore
+    - R_on: Rate of ON-switching (events/ms)
+    - R_off: Rate of OFF-switching (events/ms)
+    - alpha: Expected number of photons emitted/detected per ms that the
         fluorophore is in the ON-state
     - T_exp: Observation time
-    - Pon: Probability of fluorophore being ON at start
+    - P_on: Probability of fluorophore being ON at start
     """
-    assert Ron.shape == Roff.shape == alpha.shape == Pon.shape
 
-    v = np.zeros(Ron.shape)
-    m = np.zeros(Ron.shape)
+    assert R_on.shape == R_off.shape == alpha.shape == P_on.shape
 
-    for idx, val in np.ndenumerate(Ron):
-        ON_times = make_random_telegraph_data(N,
-                                              t_on=1 / Roff[idx],
-                                              t_off=1 / Ron[idx],
+    variances = np.zeros(R_on.shape)
+
+    for idx, val in np.ndenumerate(R_on):
+        ON_times = make_random_telegraph_data(num_fluorophore_simulations,
+                                              t_on=1 / R_off[idx],
+                                              t_off=1 / R_on[idx],
                                               t_bleach=1e10,
                                               t_exp=T_exp,
-                                              p_on=Pon[idx])
+                                              P_on=P_on[idx])
 
         # Eq (2) in publication
-        variance = alpha[idx] * ON_times.mean() + alpha[idx] ** 2 * ON_times.var()
+        variances[idx] = alpha[idx] * ON_times.mean() + alpha[idx] ** 2 * ON_times.var()
 
-        v[idx] = variance
-        m[idx] = alpha[idx] * ON_times.mean()
-
-    return v, m
+    return variances
 
 
-def make_kernels_detection(N: int, QE: float, det_eff: float,
-                           PonStart: np.ndarray, E_p_RO: float, RO_ill: np.ndarray,
-                           Ponswitch: float, Poffswitch: float, Pfl: float,
-                           T_obs: float) -> Tuple[np.ndarray, np.ndarray]:
-    """ Function to create the expeced emission and variance of emission
-    "kernels".
-
-    - N: number of times to simulate fluorophore in order to get good statistics
-    - QE: Quantum efficiency of camera
-    - det_eff: Detection efficiency through optical system (including collection
-        angle of objective)
-    - PonStart: Probability of fluorophore being ON at start
-    - E_p_RO: Expected maximum number of photons arriving from read-out
-        illumination (at relative illumination = 1)
-    - RO_ill: Relative read-out illumination intensity
-    - Ponswitch: Probability of photon causing an ON-switch event
-    - Poffswitch: Probability of photon causing an OFF-switch event
-    - Pfl: Probability of photon causing a fluoreschent emission event
+def make_kernels_detection(*, num_fluorophore_simulations: int,
+                           quantum_efficiency: float, collection_efficiency: float,
+                           readout_expected_photons: float, relative_readout_intensity: np.ndarray,
+                           P_pre: np.ndarray, P_on_switch: float, P_off_switch: float,
+                           P_fluorescent: float, T_obs: float) -> Tuple[np.ndarray, np.ndarray]:
     """
-    assert PonStart.shape == RO_ill.shape, 'Not the same shapes'
+    Creates the expected emission and variance of emission "kernels".
 
-    alpha = QE * det_eff * E_p_RO * RO_ill * Pfl
-    expONt = expected_ON_time(PonStart, E_p_RO * RO_ill * Ponswitch, E_p_RO * RO_ill * Poffswitch,
-                              T_obs)
-    expDet = np.multiply(alpha, expONt)  # Comparable to eq (1) i publication
-    varDet, mean = variance_detection(
-        N, E_p_RO * RO_ill * Ponswitch, E_p_RO * RO_ill * Poffswitch, alpha, T_obs, PonStart)
+    - num_fluorophore_simulations: Number of times to simulate fluorophore
+    - quantum_efficiency: Quantum efficiency of camera
+    - collection_efficiency: Detection efficiency through optical system (including collection
+        angle of objective)
+    - readout_expected_photons: Expected maximum number of photons arriving from read-out
+        illumination (at relative illumination = 1)
+    - relative_readout_intensity: Relative read-out illumination intensity
+    - P_pre: Probability of fluorophore being ON at start
+    - P_on_switch: Probability of photon causing an ON-switch event
+    - P_off_switch: Probability of photon causing an OFF-switch event
+    - P_fluorescent: Probability of photon causing a fluorescent emission event
+    - T_obs: Observation time
+    """
 
-    return expDet, varDet  # mean is just for confirmation
+    assert P_pre.shape == relative_readout_intensity.shape, "Not the same shapes"
+
+    photon_illumination = readout_expected_photons * relative_readout_intensity
+
+    alpha = quantum_efficiency * collection_efficiency * photon_illumination * P_fluorescent
+    expected_on_at_obs = expected_on_time(P_on=P_pre, R_on=photon_illumination * P_on_switch,
+                                          R_off=photon_illumination * P_off_switch, T_obs=T_obs)
+
+    exp_det = np.multiply(alpha, expected_on_at_obs)  # Comparable to eq (1) in publication
+    var_det = variance_detection(
+        num_fluorophore_simulations=num_fluorophore_simulations,
+        R_on=photon_illumination * P_on_switch, R_off=photon_illumination * P_off_switch,
+        alpha=alpha, T_exp=T_obs, P_on=P_pre
+    )
+
+    return exp_det, var_det
 
 
 def simulate(run_instance: "mdl.RunInstance", *,
@@ -137,7 +145,7 @@ def simulate(run_instance: "mdl.RunInstance", *,
              abort_signal: Optional[Signal] = None,
              preprocessing_finished_callback: Optional[Signal] = None,
              progress_updated_callback: Optional[Signal] = None) -> Optional["mdl.SimulationResults"]:
-    """ Simulates kernels based on the given run instance. """
+    """ Simulates kernels based on the given run instance. Aborts if abort_signal is emitted. """
 
     # Input validation
     if len(run_instance.fluorophore_settings.responses) < 1:
@@ -207,7 +215,10 @@ def simulate(run_instance: "mdl.RunInstance", *,
 
 
 def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.ndarray]:
-    """ Main function to run the simulations """
+    """
+    Main function to run the simulations. run_instance must be a RunInstance without any
+    multivalues.
+    """
 
     px_size_nm = run_instance.imaging_system_settings.scanning_step_size  # Pixel size nanometers
 
@@ -239,7 +250,7 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
             run_instance.imaging_system_settings.refractive_index
         )
     else:
-        collection_efficiency = 0.3  # TODO: This is a temporary fallback
+        raise Exception("Unsupported optical PSF type (only Airy from NA is currently supported)")
 
     # Calculate ON-state probabilities after illumination
     P_on = np.zeros(canvas_outer_rad_px)
@@ -252,24 +263,24 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
         temp_scaling_factor = (20 / px_size_nm) ** 2  # TODO: Change
 
         if pulse_index < len(run_instance.pulse_scheme.pulses) - 1:
-            P_on = expected_Pon(
-                P_on,
-                expected_photons * response.cross_section_off_to_on * temp_scaling_factor * illumination_pattern_rad,
-                expected_photons * response.cross_section_on_to_off * temp_scaling_factor * illumination_pattern_rad,
-                pulse.duration
+            P_on = expected_P_on(
+                P_pre=P_on,
+                R_on=expected_photons * response.cross_section_off_to_on * temp_scaling_factor * illumination_pattern_rad,
+                R_off=expected_photons * response.cross_section_on_to_off * temp_scaling_factor * illumination_pattern_rad,
+                T_exp=pulse.duration
             )
         else:  # Last pulse (readout pulse)
             exp_kernel, var_kernel = make_kernels_detection(
-                500000,
-                run_instance.camera_properties.quantum_efficiency,
-                collection_efficiency,
-                P_on,
-                expected_photons,
-                illumination_pattern_rad,
-                response.cross_section_off_to_on * temp_scaling_factor,
-                response.cross_section_on_to_off * temp_scaling_factor,
-                response.cross_section_emission * temp_scaling_factor,
-                pulse.duration
+                num_fluorophore_simulations=500000,
+                quantum_efficiency=run_instance.camera_properties.quantum_efficiency,
+                collection_efficiency=collection_efficiency,
+                readout_expected_photons=expected_photons,
+                relative_readout_intensity=illumination_pattern_rad,
+                P_pre=P_on,
+                P_on_switch=response.cross_section_off_to_on * temp_scaling_factor,
+                P_off_switch=response.cross_section_on_to_off * temp_scaling_factor,
+                P_fluorescent=response.cross_section_emission * temp_scaling_factor,
+                T_obs=pulse.duration
             )
 
             # As described in eq (17) and (18) in publication

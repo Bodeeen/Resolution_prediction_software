@@ -49,7 +49,7 @@ class RadialPatternData(PatternData, ABC):
         outer_radius_nm = get_canvas_radius_nm(extend_sides_to_diagonal=True)
         outer_radius_px, _ = get_canvas_dimensions_px(outer_radius_nm, pixels_per_nm)
         pixels_2d = self.get_numpy_array(pixels_per_nm, extend_sides_to_diagonal=True)
-        return pixels_2d[outer_radius_px - 1][outer_radius_px - 1:]
+        return pixels_2d[outer_radius_px - 1, outer_radius_px - 1:]
 
 
 @dataclass_json
