@@ -1,19 +1,6 @@
 import numpy as np
 
-# if you have numba it will massively speed this simulation up. I was getting
-# about 300x improvement. If not, we define a dummy decorator so this will
-# run.
-try:
-    from numba import jit, prange
-except ImportError:
-    print("Couldn't import numba. This might be a little slow...")
-
-    def jit(*_args, **_kwargs):
-        def pass_through(f):
-            return f
-        return pass_through
-
-    prange = range
+from frcpredict.util.numba_compat import jit, prange
 
 # https://en.wikipedia.org/wiki/Telegraph_process
 # The mean and variance listed there don't map precisely on to what
@@ -22,8 +9,8 @@ except ImportError:
 
 
 @jit(nopython=True, parallel=True)
-def make_random_telegraph_data(num_trials=10000, t_on = 1.0, t_off=1.0, t_bleach=10.0,
-                               t_exp=10.0, p_on=.5):
+def make_random_telegraph_data(num_trials=10000, t_on=1.0, t_off=1.0, t_bleach=10.0, t_exp=10.0,
+                               p_on=0.5):
     """generate realization of on times from telegraph process with bleaching
 
     Parameters

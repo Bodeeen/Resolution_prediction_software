@@ -1,8 +1,10 @@
-from typing import Optional, Tuple
+from typing import Tuple
 
 import numpy as np
 from astropy.modeling.functional_models import AiryDisk2D, Gaussian2D
 from astropy.stats import gaussian_fwhm_to_sigma
+
+from .spin_average import spinavej
 
 
 # Functions
@@ -20,19 +22,10 @@ def get_canvas_dimensions_px(radius_nm: float, pixels_per_nm: float) -> Tuple[in
 
 def radial_profile(data: np.ndarray, fftshift: bool = False) -> np.ndarray:
     """ Calculates the radial profile of a 2D array. """
-
-    y, x = np.indices(data.shape)
-    center = np.floor(np.divide(data.shape, 2))
-    r = np.sqrt((x - center[0]) ** 2 + (y - center[1]) ** 2).astype(np.int)
-
     if fftshift:
-        r = np.fft.fftshift(r)
+        data = np.fft.fftshift(data)
 
-    tbin = np.bincount(r.ravel(), data.ravel())
-    nr = np.bincount(r.ravel())
-
-    result = tbin / nr
-    return result
+    return spinavej(data)
 
 
 def generate_gaussian(*, amplitude: float, fwhm: float,
