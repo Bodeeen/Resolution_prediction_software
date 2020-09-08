@@ -1,6 +1,5 @@
-from typing import Optional, Union, Tuple, List
+from typing import Optional, List
 
-import numpy as np
 from PyQt5.QtCore import pyqtSignal
 
 from frcpredict.model import RunInstance, KernelSimulationResult, SimulationResults, SampleImage

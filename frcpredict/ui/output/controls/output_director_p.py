@@ -51,6 +51,10 @@ class OutputDirectorPresenter(BasePresenter[SimulationResultsView]):
         self._currentRunInstance = None
         self._currentKernelResult = None
 
+        self._cachedInspectionCurveThreshold = None
+        self._cachedInspectionCurveX = None
+        self._cachedInspectionCurveY = None
+
         super().__init__(SimulationResultsView(), widget)
 
         # Prepare UI events
@@ -105,23 +109,32 @@ class OutputDirectorPresenter(BasePresenter[SimulationResultsView]):
             label = getLabelForMultivalue(self.model.results,
                                           self.model.results.multivalue_paths[inspectedIndex])
 
-            inspectedCurveX = np.zeros(numEvaluations)
-            inspectedCurveY = np.zeros(numEvaluations)
+            if self._cachedInspectionCurveThreshold == threshold:
+                # Use cached curve
+                inspectedCurveX = self._cachedInspectionCurveX
+                inspectedCurveY = self._cachedInspectionCurveY
+            else:
+                inspectedCurveX = np.zeros(numEvaluations)
+                inspectedCurveY = np.zeros(numEvaluations)
 
-            for i in range(0, numEvaluations):
-                multivalueValueIndices = list(self.model.multivalueValueIndices)
-                multivalueValueIndices[inspectedIndex] = i
-                kernelResult = self.model.results.kernel_results[tuple(multivalueValueIndices)]
+                for i in range(0, numEvaluations):
+                    multivalueValueIndices = list(self.model.multivalueValueIndices)
+                    multivalueValueIndices[inspectedIndex] = i
+                    kernelResult = self.model.results.kernel_results[tuple(multivalueValueIndices)]
 
-                inspectedCurveX[i] = kernelResult.multivalue_values[inspectedIndex]
-                inspectedCurveY[i] = kernelResult.resolution_at_threshold(
-                    expand_with_multivalues(
-                        self.model.results.run_instance,
-                        self.model.results.multivalue_paths,
-                        kernelResult.multivalue_values
-                    ),
-                    self.model.threshold
-                )
+                    inspectedCurveX[i] = kernelResult.multivalue_values[inspectedIndex]
+                    inspectedCurveY[i] = kernelResult.resolution_at_threshold(
+                        expand_with_multivalues(
+                            self.model.results.run_instance,
+                            self.model.results.multivalue_paths,
+                            kernelResult.multivalue_values
+                        ),
+                        self.model.threshold
+                    )
+
+                self._cachedInspectionCurveThreshold = threshold
+                self._cachedInspectionCurveX = inspectedCurveX
+                self._cachedInspectionCurveY = inspectedCurveY
 
             self.widget.updateViewOptions(
                 ViewOptions(
@@ -215,9 +228,16 @@ class OutputDirectorPresenter(BasePresenter[SimulationResultsView]):
                                          flags=["refs_ok", "multi_index"])
 
         for kernelResult in kernelResultIterator:
-            resolutionForKernelResult = kernelResult.item().resolution_at_threshold(
-                self.model.results.run_instance, self.model.threshold
+            kernelResult = kernelResult.item()
+
+            runInstance = expand_with_multivalues(
+                self.model.results.run_instance,
+                self.model.results.multivalue_paths,
+                kernelResult.multivalue_values
             )
+
+            resolutionForKernelResult = kernelResult.resolution_at_threshold(runInstance,
+                                                                             self.model.threshold)
 
             if resolutionForKernelResult is not None and resolutionForKernelResult < bestResolution:
                 bestMultivalueIndices = list(kernelResultIterator.multi_index)
