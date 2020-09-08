@@ -45,7 +45,7 @@ class PatternFieldPresenter(BasePresenter[Pattern]):
 
         self.widget.updateVisualisation(
             pixmap=getArrayPixmap(
-                model.get_numpy_array(pixels_per_nm=64),
+                model.get_numpy_array(pixels_per_nm=5),
                 normalize=self._normalizeVisualisation
             ),
             description=str(model)

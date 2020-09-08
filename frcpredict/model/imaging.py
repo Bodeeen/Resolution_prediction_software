@@ -38,7 +38,7 @@ class ImagingSystemSettings:
                                                description="pinhole function")
 
     scanning_step_size: Union[float, Multivalue[float]] = extended_field(
-        observable_property("_scanning_step_size", default=20.0, signal_name="basic_field_changed"),
+        observable_property("_scanning_step_size", default=10.0, signal_name="basic_field_changed"),
         description="scanning step size [nm]", accept_multivalues=True
     )
 

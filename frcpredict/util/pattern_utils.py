@@ -112,5 +112,5 @@ def _radial_to_2d(radius_nm: float, pixels_per_nm: float) -> np.ndarray:
 
 
 # Constants
-_canvas_inner_radius_nm = 2000.0
+_canvas_inner_radius_nm = 500.0
 _canvas_outer_radius_nm = _canvas_inner_radius_nm * np.sqrt(2)
