@@ -229,7 +229,7 @@
         <bool>false</bool>
        </property>
        <property name="text">
-        <string>Export values…</string>
+        <string>Export curve values…</string>
        </property>
       </widget>
      </item>
@@ -239,7 +239,7 @@
         <bool>false</bool>
        </property>
        <property name="text">
-        <string>Export graph…</string>
+        <string>Export graph image…</string>
        </property>
       </widget>
      </item>

@@ -222,7 +222,7 @@ class MainWindow(QMainWindow, BaseWidget):
     def closeEvent(self, event: QCloseEvent) -> None:
         confirmation_result = QMessageBox.question(
             self, "Exit?",
-            f"Exit the program? All unsaved input parameters and results will be lost.",
+            f"Exit the program? Any unsaved input parameters and results will be lost.",
             defaultButton=QMessageBox.No
         )
 
