@@ -285,7 +285,7 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
 
             # As described in eq (17) and (18) in publication
             exp_kernel *= G_rad
-            var_kernel *= np.abs(G_rad)
+            var_kernel *= G_rad ** 2
 
             return exp_kernel, var_kernel
 
