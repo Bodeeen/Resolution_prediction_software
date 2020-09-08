@@ -108,7 +108,7 @@ def make_kernels_detection(*, num_fluorophore_simulations: int,
     Creates the expected emission and variance of emission "kernels".
 
     - num_fluorophore_simulations: Number of times to simulate fluorophore
-    - quantum_efficiency: Quantum efficiency of camera
+    - quantum_efficiency: Quantum efficiency of detector
     - collection_efficiency: Detection efficiency through optical system (including collection
         angle of objective)
     - readout_expected_photons: Expected maximum number of photons arriving from read-out
@@ -272,7 +272,7 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
         else:  # Last pulse (readout pulse)
             exp_kernel, var_kernel = make_kernels_detection(
                 num_fluorophore_simulations=500000,
-                quantum_efficiency=run_instance.camera_properties.quantum_efficiency,
+                quantum_efficiency=run_instance.detector_properties.quantum_efficiency,
                 collection_efficiency=collection_efficiency,
                 readout_expected_photons=expected_photons,
                 relative_readout_intensity=illumination_pattern_rad,

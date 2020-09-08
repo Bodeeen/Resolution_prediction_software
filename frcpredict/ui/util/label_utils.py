@@ -23,7 +23,7 @@ def getLabelForMultivalue(results: SimulationResults, multivaluePath: List[Union
         dataclassField = containerDataclass.__dataclass_fields__[multivaluePathSegment]
 
         if dataclassField.name not in ["fluorophore_settings", "imaging_system_settings",
-                                       "pulse_scheme", "sample_properties", "camera_properties",
+                                       "pulse_scheme", "sample_properties", "detector_properties",
                                        "pattern_data"]:  # Don't include these in the name
             if len(label) > 0:
                 label += " "

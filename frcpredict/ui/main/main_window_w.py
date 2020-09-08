@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QMessageBox, QMainWindow
 
 import frcpredict
 from frcpredict.model import (
-    FluorophoreSettings, ImagingSystemSettings, PulseScheme, SampleProperties, CameraProperties,
+    FluorophoreSettings, ImagingSystemSettings, PulseScheme, SampleProperties, DetectorProperties,
     RunInstance, SimulationResults, KernelSimulationResult
 )
 from frcpredict.ui import BaseWidget
@@ -24,7 +24,7 @@ class MainWindow(QMainWindow, BaseWidget):
     imagingSystemSettingsModelSet = pyqtSignal(ImagingSystemSettings)
     pulseSchemeModelSet = pyqtSignal(PulseScheme)
     samplePropertiesModelSet = pyqtSignal(SampleProperties)
-    cameraPropertiesModelSet = pyqtSignal(CameraProperties)
+    detectorPropertiesModelSet = pyqtSignal(DetectorProperties)
 
     simulateFrcClicked = pyqtSignal()
     abortClicked = pyqtSignal()
@@ -47,8 +47,8 @@ class MainWindow(QMainWindow, BaseWidget):
             "The quick brown fox jumps over the lazy dog"
         )
         self.resize(
-            min(screenGeometry.width() - 96, 1280 * (textSizeInfo.width() / 214) ** 0.5),
-            min(screenGeometry.height() - 96, 780 * (textSizeInfo.height() / 13) ** 0.5)
+            min(screenGeometry.width() - 96, 1300 * (textSizeInfo.width() / 214) ** 0.5),
+            min(screenGeometry.height() - 96, 800 * (textSizeInfo.height() / 13) ** 0.5)
         )
 
         # Prepare UI elements
@@ -82,7 +82,7 @@ class MainWindow(QMainWindow, BaseWidget):
         self.imagingSystemSettings.modifiedFlagSet.connect(self._onModifiedFlagSet)
         self.pulseScheme.modifiedFlagSet.connect(self._onModifiedFlagSet)
         self.sampleProperties.modifiedFlagSet.connect(self._onModifiedFlagSet)
-        self.cameraProperties.modifiedFlagSet.connect(self._onModifiedFlagSet)
+        self.detectorProperties.modifiedFlagSet.connect(self._onModifiedFlagSet)
 
         self.outputDirector.kernelResultChanged.connect(self._onKernelResultChange)
         self.actionExit.triggered.connect(self.close)
@@ -93,7 +93,7 @@ class MainWindow(QMainWindow, BaseWidget):
         self.imagingSystemSettings.valueChanged.connect(self.imagingSystemSettingsModelSet)
         self.pulseScheme.valueChanged.connect(self.pulseSchemeModelSet)
         self.sampleProperties.valueChanged.connect(self.samplePropertiesModelSet)
-        self.cameraProperties.valueChanged.connect(self.cameraPropertiesModelSet)
+        self.detectorProperties.valueChanged.connect(self.detectorPropertiesModelSet)
 
         self.btnSimulateFrc.clicked.connect(self.simulateFrcClicked)
         self.btnAbort.clicked.connect(self.abortClicked)
@@ -173,8 +173,8 @@ class MainWindow(QMainWindow, BaseWidget):
     def updateSampleProperties(self, sampleProperties: SampleProperties) -> None:
         self.sampleProperties.setValue(sampleProperties, emitSignal=False)
 
-    def updateCameraProperties(self, cameraProperties: CameraProperties) -> None:
-        self.cameraProperties.setValue(cameraProperties, emitSignal=False)
+    def updateDetectorProperties(self, detectorProperties: DetectorProperties) -> None:
+        self.detectorProperties.setValue(detectorProperties, emitSignal=False)
 
     def updateSimulationProgress(self, progress: float) -> None:
         self.pbProgress.setValue(progress * 100 if 0 < progress < 1 else 0)

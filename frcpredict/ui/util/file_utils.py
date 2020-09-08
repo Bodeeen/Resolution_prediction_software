@@ -3,6 +3,7 @@ from abc import ABC
 
 _basePresetFilesDir = os.path.join("data", "presets")
 _baseUserFilesDir = "user_files"
+_baseUserConfigFilesDir = os.path.join("user_files", "saved_configs")
 
 
 def subOfPresetFilesDir(subdir: str) -> str:
@@ -13,6 +14,14 @@ def subOfPresetFilesDir(subdir: str) -> str:
 def subOfUserFilesDir(subdir: str) -> str:
     """ Returns the sub-file or sub-directory with the given name, in the user files directory. """
     return os.path.join(os.getcwd(), _baseUserFilesDir, subdir)
+
+
+def subOfUserConfigFilesDir(subdir: str) -> str:
+    """
+    Returns the sub-file or sub-directory with the given name, in the user's saved configuration
+    files directory.
+    """
+    return os.path.join(os.getcwd(), _baseUserConfigFilesDir, subdir)
 
 
 def initUserFilesIfNeeded() -> None:
@@ -49,7 +58,7 @@ class PresetFileDirs(ConfigFileDirs):
     ImagingSystemSettings: str = subOfPresetFilesDir("imaging_system_settings")
     PulseScheme: str = subOfPresetFilesDir("pulse_scheme")
     SampleProperties: str = subOfPresetFilesDir("sample_properties")
-    CameraProperties: str = subOfPresetFilesDir("camera_properties")
+    DetectorProperties: str = subOfPresetFilesDir("detector_properties")
     RunInstance: str = subOfPresetFilesDir("run_instance")
 
 
@@ -58,11 +67,12 @@ class UserFileDirs(ConfigFileDirs):
     Catalog of directories that contain user-saved configuration files.
     """
 
-    FluorophoreSettings: str = subOfUserFilesDir("fluorophore_settings")
-    ImagingSystemSettings: str = subOfUserFilesDir("imaging_system_settings")
-    PulseScheme: str = subOfUserFilesDir("pulse_scheme")
-    SampleProperties: str = subOfUserFilesDir("sample_properties")
-    CameraProperties: str = subOfUserFilesDir("camera_properties")
-    RunInstance: str = subOfUserFilesDir("run_instance")
+    FluorophoreSettings: str = subOfUserConfigFilesDir("fluorophore_settings")
+    ImagingSystemSettings: str = subOfUserConfigFilesDir("imaging_system_settings")
+    PulseScheme: str = subOfUserConfigFilesDir("pulse_scheme")
+    SampleProperties: str = subOfUserConfigFilesDir("sample_properties")
+    DetectorProperties: str = subOfUserConfigFilesDir("detector_properties")
+    RunInstance: str = subOfUserConfigFilesDir("run_instance")
+
     SavedResults: str = subOfUserFilesDir("saved_results")
     SimulatedData: str = subOfUserFilesDir("simulated_data")

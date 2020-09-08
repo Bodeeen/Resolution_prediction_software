@@ -15,7 +15,7 @@ from .fluorophore import FluorophoreSettings, IlluminationResponse
 from .imaging import ImagingSystemSettings, RefractiveIndex
 from .pulse import Pulse, PulseScheme
 from .sample import SampleProperties
-from .camera import CameraProperties
+from .detector import DetectorProperties
 
 from .sample_structure import SampleStructure, SampleStructureProperties
 from .sample_image import SampleImage

@@ -6,7 +6,7 @@ from PyQt5.QtCore import pyqtSignal, pyqtSlot, QObject, QThreadPool, QRunnable, 
 from PyQt5.QtWidgets import QMessageBox, QFileDialog
 
 from frcpredict.model import (
-    FluorophoreSettings, ImagingSystemSettings, PulseScheme, SampleProperties, CameraProperties,
+    FluorophoreSettings, ImagingSystemSettings, PulseScheme, SampleProperties, DetectorProperties,
     RunInstance, SimulationResults, PersistentContainer
 )
 from frcpredict.ui import BasePresenter, Preferences
@@ -29,7 +29,7 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
             self._model.imaging_system_settings_loaded.disconnect(self._onImagingSystemSettingsLoad)
             self._model.pulse_scheme_loaded.disconnect(self._onPulseSchemeLoad)
             self._model.sample_properties_loaded.disconnect(self._onSamplePropertiesLoad)
-            self._model.camera_properties_loaded.disconnect(self._onCameraPropertiesLoad)
+            self._model.detector_properties_loaded.disconnect(self._onDetectorPropertiesLoad)
         except AttributeError:
             pass
 
@@ -41,14 +41,14 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
         self._onImagingSystemSettingsLoad(model.imaging_system_settings)
         self._onPulseSchemeLoad(model.pulse_scheme)
         self._onSamplePropertiesLoad(model.sample_properties)
-        self._onCameraPropertiesLoad(model.camera_properties)
+        self._onDetectorPropertiesLoad(model.detector_properties)
 
         # Prepare model events
         model.fluorophore_settings_loaded.connect(self._onFluorophoreSettingsLoad)
         model.imaging_system_settings_loaded.connect(self._onImagingSystemSettingsLoad)
         model.pulse_scheme_loaded.connect(self._onPulseSchemeLoad)
         model.sample_properties_loaded.connect(self._onSamplePropertiesLoad)
-        model.camera_properties_loaded.connect(self._onCameraPropertiesLoad)
+        model.detector_properties_loaded.connect(self._onDetectorPropertiesLoad)
 
     # Methods
     def __init__(self, widget) -> None:
@@ -62,7 +62,7 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
         widget.imagingSystemSettingsModelSet.connect(self._uiSetImagingSystemSettingsModel)
         widget.pulseSchemeModelSet.connect(self._uiSetPulseSchemeModel)
         widget.samplePropertiesModelSet.connect(self._uiSetSamplePropertiesModel)
-        widget.cameraPropertiesModelSet.connect(self._uiSetCameraPropertiesModel)
+        widget.detectorPropertiesModelSet.connect(self._uiSetDetectorPropertiesModel)
 
         widget.simulateFrcClicked.connect(self._uiClickSimulateFrc)
         widget.abortClicked.connect(self._uiClickAbort)
@@ -93,8 +93,8 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
     def _onSamplePropertiesLoad(self, sampleProperties: SampleProperties) -> None:
         self.widget.updateSampleProperties(sampleProperties)
 
-    def _onCameraPropertiesLoad(self, cameraProperties: CameraProperties) -> None:
-        self.widget.updateCameraProperties(cameraProperties)
+    def _onDetectorPropertiesLoad(self, detectorProperties: DetectorProperties) -> None:
+        self.widget.updateDetectorProperties(detectorProperties)
 
     # UI event handling
     @pyqtSlot(FluorophoreSettings)
@@ -114,9 +114,9 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
     def _uiSetSamplePropertiesModel(self, sampleProperties: SampleProperties) -> None:
         self.model.sample_properties = sampleProperties
 
-    @pyqtSlot(CameraProperties)
-    def _uiSetCameraPropertiesModel(self, cameraProperties: CameraProperties) -> None:
-        self.model.camera_properties = cameraProperties
+    @pyqtSlot(DetectorProperties)
+    def _uiSetDetectorPropertiesModel(self, detectorProperties: DetectorProperties) -> None:
+        self.model.detector_properties = detectorProperties
 
     @pyqtSlot()
     def _uiClickSimulateFrc(self) -> None:

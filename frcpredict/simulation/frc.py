@@ -37,7 +37,8 @@ def get_frc_curve_from_kernels2d(kernels2d: np.ndarray,
     K_0_0 = run_instance.sample_properties.K_origin
     D_0_0 = labelling_density * K_0_0
 
-    ro_var = run_instance.camera_properties.readout_noise ** 2
+    pinhole = run_instance.imaging_system_settings.pinhole_function
+    ro_var = run_instance.detector_properties.get_total_readout_noise_var(pinhole)
 
     # Fourier transform kernels
     ft_kernels2d = np.abs(np.fft.fft2(kernels2d))

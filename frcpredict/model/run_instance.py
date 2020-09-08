@@ -9,7 +9,7 @@ from frcpredict.simulation import simulate
 from frcpredict.util import (
     dataclass_internal_attrs, dataclass_with_properties, observable_property, extended_field
 )
-from .camera import CameraProperties
+from .detector import DetectorProperties
 from .fluorophore import FluorophoreSettings
 from .imaging import ImagingSystemSettings
 from .pulse import PulseScheme
@@ -23,7 +23,7 @@ from .sample import SampleProperties
     imaging_system_settings_loaded=Signal,
     pulse_scheme_loaded=Signal,
     sample_properties_loaded=Signal,
-    camera_properties_loaded=Signal,
+    detector_properties_loaded=Signal,
 
     _abort_signal=Signal
 )
@@ -65,12 +65,12 @@ class RunInstance:
         description="sample properties"
     )
 
-    camera_properties: CameraProperties = extended_field(
+    detector_properties: DetectorProperties = extended_field(
         observable_property(
-            "_camera_properties", default=CameraProperties,
-            signal_name="camera_properties_loaded", emit_arg_name="camera_properties"
+            "_detector_properties", default=DetectorProperties,
+            signal_name="detector_properties_loaded", emit_arg_name="detector_properties"
         ),
-        description="camera properties"
+        description="detector properties"
     )
 
     # Methods

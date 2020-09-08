@@ -35,7 +35,7 @@ from .input.pulse.pulse_properties_w import PulsePropertiesWidget
 
 from .input.sample.sample_properties_w import SamplePropertiesWidget
 
-from .input.camera.camera_properties_w import CameraPropertiesWidget
+from .input.detector.detector_properties_w import DetectorPropertiesWidget
 
 
 # Output
