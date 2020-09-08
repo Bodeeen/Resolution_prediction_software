@@ -139,6 +139,9 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
         confirmation_result = QMessageBox.question(
             self.widget, "Abort Simulation", "Abort the current simulation?")
 
+        if self._currentWorker is None or self._currentWorker.hasFinished():
+            return
+
         if confirmation_result == QMessageBox.Yes:
             self.widget.setAborting(True)
             self._currentWorker.abort()
