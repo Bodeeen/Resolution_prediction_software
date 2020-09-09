@@ -103,8 +103,8 @@ def variance_detection(N: int, Ron: np.ndarray, Roff: np.ndarray, alpha: np.ndar
 
 
 def make_kernels_detection(N: int, QE: float, det_eff: float,
-                           PonStart: np.ndarray, E_p_RO: float, RO_ill: np.ndarray,
-                           Ponswitch: float, Poffswitch: float, Pfl: float,
+                           PonStart: np.ndarray, MaxInt: float, RO_ill: np.ndarray,
+                           CSonswitch: float, CSoffswitch: float, CSfl: float,
                            T_obs: float) -> Tuple[np.ndarray, np.ndarray]:
     """ Function to create the expeced emission and variance of emission
     "kernels".
@@ -114,21 +114,20 @@ def make_kernels_detection(N: int, QE: float, det_eff: float,
     - det_eff: Detection efficiency through optical system (including collection
         angle of objective)
     - PonStart: Probability of fluorophore being ON at start
-    - E_p_RO: Expected maximum number of photons arriving from read-out
-        illumination (at relative illumination = 1)
+    - MaxInt: Maximum intensity of illumination pattern (at relative illumination = 1)
     - RO_ill: Relative read-out illumination intensity
-    - Ponswitch: Probability of photon causing an ON-switch event
-    - Poffswitch: Probability of photon causing an OFF-switch event
-    - Pfl: Probability of photon causing a fluoreschent emission event
+    - CSonswitch: Cross-section for an ON-switch event
+    - CSoffswitch: Cross-section for an OFF-switch event
+    - CSfl: Cross-section for a fluoreschent emission event
     """
     assert PonStart.shape == RO_ill.shape, 'Not the same shapes'
 
-    alpha = QE * det_eff * E_p_RO * RO_ill * Pfl
-    expONt = expected_ON_time(PonStart, E_p_RO * RO_ill * Ponswitch, E_p_RO * RO_ill * Poffswitch,
+    alpha = QE * det_eff * MaxInt * RO_ill * CSfl
+    expONt = expected_ON_time(PonStart, MaxInt * RO_ill * CSonswitch, MaxInt * RO_ill * CSoffswitch,
                               T_obs)
     expDet = np.multiply(alpha, expONt)  # Comparable to eq (1) i publication
     varDet, mean, N_switches = variance_detection(
-        N, E_p_RO * RO_ill * Ponswitch, E_p_RO * RO_ill * Poffswitch, alpha, T_obs, PonStart)
+        N, MaxInt * RO_ill * CSonswitch, MaxInt * RO_ill * CSoffswitch, alpha, T_obs, PonStart)
 
     return expDet, varDet  # mean is just for confirmation
 
@@ -221,17 +220,24 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
     psf = run_instance.imaging_system_settings.optical_psf
     pinhole = run_instance.imaging_system_settings.pinhole_function
 
-    radial_psf_and_pinhole = (isinstance(psf, mdl.RadialPatternData) and
-                              isinstance(pinhole, mdl.RadialPatternData))
+    radial_psf_and_pinhole = (isinstance(psf.pattern_data, mdl.RadialPatternData) and
+                              isinstance(pinhole.pattern_data, mdl.RadialPatternData))
     psf_arr = psf.get_numpy_array(px_size_nm, extend_sides_to_diagonal=radial_psf_and_pinhole)
+    psf_arr = np.divide(psf_arr, psf_arr.sum())
     pinhole_arr = pinhole.get_numpy_array(px_size_nm, extend_sides_to_diagonal=radial_psf_and_pinhole)
 
     G_2D = fftconvolve(pinhole_arr, psf_arr, mode="same")
+    Gvar_2D = fftconvolve(pinhole_arr**2, psf_arr, mode="same")
     G_rad = np.zeros(canvas_outer_rad_px)
+    Gvar_rad = np.zeros(canvas_outer_rad_px)
     if radial_psf_and_pinhole:
         G_rad[0:canvas_outer_rad_px] = G_2D[canvas_outer_rad_px - 1][canvas_outer_rad_px - 1:]
+        Gvar_rad[0:canvas_outer_rad_px] = Gvar_2D[canvas_outer_rad_px - 1][canvas_outer_rad_px - 1:]
     else:
-        G_rad[0:canvas_outer_rad_px] = radial_profile(G_2D)
+        radial_profile_result = radial_profile(G_2D)
+        radial_profile_result_var = radial_profile(Gvar_2D)
+        G_rad[0:len(radial_profile_result)] = radial_profile_result
+        Gvar_rad[0:len(radial_profile_result)] = radial_profile_result_var
 
     # Calculate collection efficiency
     if isinstance(run_instance.imaging_system_settings.optical_psf.pattern_data,
@@ -247,17 +253,14 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
     P_on = np.zeros(canvas_outer_rad_px)
     for pulse_index, pulse in enumerate(run_instance.pulse_scheme.pulses):
         illumination_pattern_rad = pulse.illumination_pattern.get_radial_profile(px_size_nm)
-        expected_photons = int_to_flux(pulse.max_intensity * 1000, pulse.wavelength) * px_size_nm ** 2
         response = run_instance.fluorophore_settings.get_response(pulse.wavelength)
 
-        # The following comes from the rate being defined per photon falling in a 20x20 nm area
-        temp_scaling_factor = (20 / px_size_nm) ** 2  # TODO: Change
 
         if pulse_index < len(run_instance.pulse_scheme.pulses) - 1:
             P_on = expected_Pon(
                 P_on,
-                expected_photons * response.cross_section_off_to_on * temp_scaling_factor * illumination_pattern_rad,
-                expected_photons * response.cross_section_on_to_off * temp_scaling_factor * illumination_pattern_rad,
+                pulse.max_intensity * response.cross_section_off_to_on * illumination_pattern_rad,
+                pulse.max_intensity * response.cross_section_on_to_off * illumination_pattern_rad,
                 pulse.duration
             )
         else:  # Last pulse (readout pulse)
@@ -266,17 +269,19 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
                 run_instance.camera_properties.quantum_efficiency,
                 collection_efficiency,
                 P_on,
-                expected_photons,
+                pulse.max_intensity,
                 illumination_pattern_rad,
-                response.cross_section_off_to_on * temp_scaling_factor,
-                response.cross_section_on_to_off * temp_scaling_factor,
-                response.cross_section_emission * temp_scaling_factor,
+                response.cross_section_off_to_on,
+                response.cross_section_on_to_off,
+                response.cross_section_emission,
                 pulse.duration
             )
 
             # As described in eq (17) and (18) in publication
             exp_kernel *= G_rad
-            var_kernel *= np.abs(G_rad)
+            """According to publication this should be abs(G_rad), but i believe this is an error and that it should be power(G_rad, 2)"""
+#            var_kernel *= np.power(G_rad, 2)
+            var_kernel *= Gvar_rad
 
             return exp_kernel, var_kernel
 
