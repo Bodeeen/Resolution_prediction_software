@@ -219,6 +219,7 @@ class ConfigPanelWidget(BaseWidget):
         self._valueSetter(persistentContainer.data)
         self.setLoadedPath(loadedPath)
         self.dataLoaded.emit()
+        self.clearModifiedFlag()
 
     def _saveUserConfigToFile(self, path: str):
         """ Saves the current configuration to a JSON file. """
