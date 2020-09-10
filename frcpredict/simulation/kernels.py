@@ -101,9 +101,9 @@ def variance_detection(*, num_fluorophore_simulations: int, R_on: np.ndarray, R_
 
 def make_kernels_detection(*, num_fluorophore_simulations: int,
                            quantum_efficiency: float, collection_efficiency: float,
-                           readout_expected_photons: float, relative_readout_intensity: np.ndarray,
-                           P_pre: np.ndarray, P_on_switch: float, P_off_switch: float,
-                           P_fluorescent: float, T_obs: float) -> Tuple[np.ndarray, np.ndarray]:
+                           max_intensity: float, relative_readout_intensity: np.ndarray,
+                           P_pre: np.ndarray, CS_on_switch: float, CS_off_switch: float,
+                           CS_fluorescent: float, T_obs: float) -> Tuple[np.ndarray, np.ndarray]:
     """
     Creates the expected emission and variance of emission "kernels".
 
@@ -111,28 +111,27 @@ def make_kernels_detection(*, num_fluorophore_simulations: int,
     - quantum_efficiency: Quantum efficiency of detector
     - collection_efficiency: Detection efficiency through optical system (including collection
         angle of objective)
-    - readout_expected_photons: Expected maximum number of photons arriving from read-out
-        illumination (at relative illumination = 1)
+    - max_intensity: Maximum intensity of illumination pattern (at relative illumination = 1)
     - relative_readout_intensity: Relative read-out illumination intensity
     - P_pre: Probability of fluorophore being ON at start
-    - P_on_switch: Probability of photon causing an ON-switch event
-    - P_off_switch: Probability of photon causing an OFF-switch event
-    - P_fluorescent: Probability of photon causing a fluorescent emission event
+    - CS_on_switch: Cross-section for an ON-switch event
+    - CS_off_switch: Cross-section for an OFF-switch event
+    - CS_fluorescent: Cross-section for a fluoreschent emission event
     - T_obs: Observation time
     """
 
     assert P_pre.shape == relative_readout_intensity.shape, "Not the same shapes"
 
-    photon_illumination = readout_expected_photons * relative_readout_intensity
+    photon_illumination = max_intensity * relative_readout_intensity
 
-    alpha = quantum_efficiency * collection_efficiency * photon_illumination * P_fluorescent
-    expected_on_at_obs = expected_on_time(P_on=P_pre, R_on=photon_illumination * P_on_switch,
-                                          R_off=photon_illumination * P_off_switch, T_obs=T_obs)
+    alpha = quantum_efficiency * collection_efficiency * photon_illumination * CS_fluorescent
+    expected_on_at_obs = expected_on_time(P_on=P_pre, R_on=photon_illumination * CS_on_switch,
+                                          R_off=photon_illumination * CS_off_switch, T_obs=T_obs)
 
     exp_det = np.multiply(alpha, expected_on_at_obs)  # Comparable to eq (1) in publication
     var_det = variance_detection(
         num_fluorophore_simulations=num_fluorophore_simulations,
-        R_on=photon_illumination * P_on_switch, R_off=photon_illumination * P_off_switch,
+        R_on=photon_illumination * CS_on_switch, R_off=photon_illumination * CS_off_switch,
         alpha=alpha, T_exp=T_obs, P_on=P_pre
     )
 
@@ -236,16 +235,22 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
 
     psf_arr = psf.get_numpy_array(canvas_inner_rad_nm, px_size_nm,
                                   extend_sides_to_diagonal=radial_psf_and_pinhole)
+    psf_arr = psf_arr / psf_arr.sum()
     pinhole_arr = pinhole.get_numpy_array(canvas_inner_rad_nm, px_size_nm,
                                           extend_sides_to_diagonal=radial_psf_and_pinhole)
 
     G_2D = fftconvolve(pinhole_arr, psf_arr, mode="same")
+    Gvar_2D = fftconvolve(pinhole_arr ** 2, psf_arr, mode="same")
     G_rad = np.zeros(canvas_outer_rad_px)
+    Gvar_rad = np.zeros(canvas_outer_rad_px)
     if radial_psf_and_pinhole:
         G_rad[0:canvas_outer_rad_px] = G_2D[canvas_outer_rad_px - 1, canvas_outer_rad_px - 1:]
+        Gvar_rad[0:canvas_outer_rad_px] = Gvar_2D[canvas_outer_rad_px - 1][canvas_outer_rad_px - 1:]
     else:
         radial_profile_result = radial_profile(G_2D)
+        radial_profile_result_var = radial_profile(Gvar_2D)
         G_rad[0:len(radial_profile_result)] = radial_profile_result
+        Gvar_rad[0:len(radial_profile_result)] = radial_profile_result_var
 
     # Calculate collection efficiency
     if isinstance(psf.pattern_data, mdl.AiryNAPatternData):
@@ -262,17 +267,13 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
         illumination_pattern_rad = pulse.illumination_pattern.get_radial_profile(
             canvas_inner_rad_nm, px_size_nm
         )
-        expected_photons = int_to_flux(pulse.max_intensity * 1000, pulse.wavelength) * px_size_nm ** 2
         response = run_instance.fluorophore_settings.get_response(pulse.wavelength)
-
-        # The following comes from the rate being defined per photon falling in a 20x20 nm area
-        temp_scaling_factor = (20 / px_size_nm) ** 2  # TODO: Change
 
         if pulse_index < len(run_instance.pulse_scheme.pulses) - 1:
             P_on = expected_P_on(
                 P_pre=P_on,
-                R_on=expected_photons * response.cross_section_off_to_on * temp_scaling_factor * illumination_pattern_rad,
-                R_off=expected_photons * response.cross_section_on_to_off * temp_scaling_factor * illumination_pattern_rad,
+                R_on=pulse.max_intensity * response.cross_section_off_to_on * illumination_pattern_rad,
+                R_off=pulse.max_intensity * response.cross_section_on_to_off * illumination_pattern_rad,
                 T_exp=pulse.duration
             )
         else:  # Last pulse (readout pulse)
@@ -280,18 +281,19 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
                 num_fluorophore_simulations=run_instance.simulation_settings.num_kernel_detection_iterations,
                 quantum_efficiency=run_instance.detector_properties.quantum_efficiency,
                 collection_efficiency=collection_efficiency,
-                readout_expected_photons=expected_photons,
+                max_intensity=pulse.max_intensity,
                 relative_readout_intensity=illumination_pattern_rad,
                 P_pre=P_on,
-                P_on_switch=response.cross_section_off_to_on * temp_scaling_factor,
-                P_off_switch=response.cross_section_on_to_off * temp_scaling_factor,
-                P_fluorescent=response.cross_section_emission * temp_scaling_factor,
+                CS_on_switch=response.cross_section_off_to_on,
+                CS_off_switch=response.cross_section_on_to_off,
+                CS_fluorescent=response.cross_section_emission,
                 T_obs=pulse.duration
             )
 
             # As described in eq (17) and (18) in publication
             exp_kernel *= G_rad
-            var_kernel *= G_rad ** 2
+            var_kernel *= Gvar_rad  # According to the publication this should be abs(G_rad),
+                                    # but that may be an error
 
             return exp_kernel, var_kernel
 
