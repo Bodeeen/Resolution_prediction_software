@@ -23,12 +23,12 @@ class PatternData(ABC):
     Abstract class that describes the actual properties of a pattern.
     """
 
-    def get_radial_profile(self, canvas_inner_radius_nm: float, pixels_per_nm: float) -> np.ndarray:
+    def get_radial_profile(self, canvas_inner_radius_nm: float, px_size_nm: float) -> np.ndarray:
         """ Returns a numpy array representation of the pattern data as a radial profile. """
-        return radial_profile(self.get_numpy_array(canvas_inner_radius_nm, pixels_per_nm))
+        return radial_profile(self.get_numpy_array(canvas_inner_radius_nm, px_size_nm))
 
     @abstractmethod
-    def get_numpy_array(self, canvas_inner_radius_nm: float, pixels_per_nm: float,
+    def get_numpy_array(self, canvas_inner_radius_nm: float, px_size_nm: float,
                         extend_sides_to_diagonal: bool = False) -> np.ndarray:
         """ Returns a numpy array representation of the pattern data. """
         pass
@@ -45,12 +45,12 @@ class RadialPatternData(PatternData, ABC):
     Pattern data class for fully radial patterns. Contains an optimized radial profile method.
     """
 
-    def get_radial_profile(self, canvas_inner_radius_nm: float, pixels_per_nm: float) -> np.ndarray:
+    def get_radial_profile(self, canvas_inner_radius_nm: float, px_size_nm: float) -> np.ndarray:
         outer_radius_nm = get_canvas_radius_nm(canvas_inner_radius_nm,
                                                extend_sides_to_diagonal=True)
-        outer_radius_px, _ = get_canvas_dimensions_px(outer_radius_nm, pixels_per_nm)
+        outer_radius_px, _ = get_canvas_dimensions_px(outer_radius_nm, px_size_nm)
 
-        pixels_2d = self.get_numpy_array(canvas_inner_radius_nm, pixels_per_nm,
+        pixels_2d = self.get_numpy_array(canvas_inner_radius_nm, px_size_nm,
                                          extend_sides_to_diagonal=True)
         return pixels_2d[outer_radius_px - 1, outer_radius_px - 1:]
 
@@ -66,16 +66,16 @@ class Array2DPatternData(PatternData):
 
     # Methods
     def get_numpy_array(self, canvas_inner_radius_nm: Optional[float] = None,
-                        pixels_per_nm: Optional[float] = None, _: bool = False) -> np.ndarray:
+                        px_size_nm: Optional[float] = None, _: bool = False) -> np.ndarray:
         """
         Returns a numpy array representation of the 2D array. If canvas_inner_radius_nm and
-        pixels_per_nm are set, the 2D array will be resized under the assumption that it has an
+        px_size_nm are set, the 2D array will be resized under the assumption that it has an
         inner radius of the same size as the constant canvas_inner_radius_nm.
         """
 
-        if canvas_inner_radius_nm is not None and pixels_per_nm is not None:
+        if canvas_inner_radius_nm is not None and px_size_nm is not None:
             _, canvas_side_length_px = get_canvas_dimensions_px(
-                get_canvas_radius_nm(canvas_inner_radius_nm), pixels_per_nm
+                get_canvas_radius_nm(canvas_inner_radius_nm), px_size_nm
             )
             canvas_size = (canvas_side_length_px, canvas_side_length_px)
 
@@ -123,12 +123,12 @@ class GaussianPatternData(RadialPatternData):
     fwhm: Union[float, Multivalue[float]] = extended_field(240.0, description="FWHM [nm]")
 
     # Methods
-    def get_numpy_array(self, canvas_inner_radius_nm: float, pixels_per_nm: float,
+    def get_numpy_array(self, canvas_inner_radius_nm: float, px_size_nm: float,
                         extend_sides_to_diagonal: bool = False) -> np.ndarray:
         return generate_gaussian(amplitude=self.amplitude, fwhm=self.fwhm,
                                  canvas_radius=get_canvas_radius_nm(canvas_inner_radius_nm,
                                                                     extend_sides_to_diagonal),
-                                 pixels_per_nm=pixels_per_nm)
+                                 px_size_nm=px_size_nm)
 
     def __str__(self) -> str:
         return f"Gaussian; amplitude = {self.amplitude}, FWHM = {self.fwhm} nm"
@@ -145,12 +145,12 @@ class DoughnutPatternData(RadialPatternData):
                                                                   description="periodicity [nm]")
 
     # Methods
-    def get_numpy_array(self, canvas_inner_radius_nm: float, pixels_per_nm: float,
+    def get_numpy_array(self, canvas_inner_radius_nm: float, px_size_nm: float,
                         extend_sides_to_diagonal: bool = False) -> np.ndarray:
         return generate_doughnut(periodicity=self.periodicity,
                                  canvas_radius=get_canvas_radius_nm(canvas_inner_radius_nm,
                                                                     extend_sides_to_diagonal),
-                                 pixels_per_nm=pixels_per_nm)
+                                 px_size_nm=px_size_nm)
 
     def __str__(self) -> str:
         return f"Doughnut; periodicity = {self.periodicity} nm"
@@ -167,12 +167,12 @@ class AiryFWHMPatternData(RadialPatternData):
     fwhm: Union[float, Multivalue[float]] = extended_field(240.0, description="FWHM [nm]")
 
     # Methods
-    def get_numpy_array(self, canvas_inner_radius_nm: float, pixels_per_nm: float,
+    def get_numpy_array(self, canvas_inner_radius_nm: float, px_size_nm: float,
                         extend_sides_to_diagonal: bool = False) -> np.ndarray:
         return generate_airy(amplitude=self.amplitude, fwhm=self.fwhm,
                              canvas_radius=get_canvas_radius_nm(canvas_inner_radius_nm,
                                                                 extend_sides_to_diagonal),
-                             pixels_per_nm=pixels_per_nm)
+                             px_size_nm=px_size_nm)
 
     def __str__(self) -> str:
         return f"Airy; amplitude = {self.amplitude}, FWHM = {self.fwhm} nm"
@@ -191,12 +191,12 @@ class AiryNAPatternData(RadialPatternData):
     )
 
     # Methods
-    def get_numpy_array(self, canvas_inner_radius_nm: float, pixels_per_nm: float,
+    def get_numpy_array(self, canvas_inner_radius_nm: float, px_size_nm: float,
                         extend_sides_to_diagonal: bool = False) -> np.ndarray:
         return generate_airy(amplitude=1.0, fwhm=self.emission_wavelength / (2 * self.na),
                              canvas_radius=get_canvas_radius_nm(canvas_inner_radius_nm,
                                                                 extend_sides_to_diagonal),
-                             pixels_per_nm=pixels_per_nm)
+                             px_size_nm=px_size_nm)
 
     def __str__(self) -> str:
         return f"Airy; NA = {self.na}, emission wavelength = {self.emission_wavelength} nm"
@@ -212,12 +212,12 @@ class DigitalPinholePatternData(RadialPatternData):
     fwhm: Union[float, Multivalue[float]] = 240.0  # nanometres
 
     # Methods
-    def get_numpy_array(self, canvas_inner_radius_nm: float, pixels_per_nm: float,
+    def get_numpy_array(self, canvas_inner_radius_nm: float, px_size_nm: float,
                         extend_sides_to_diagonal: bool = False) -> np.ndarray:
         return generate_digital_pinhole(fwhm=self.fwhm,
                                         canvas_radius=get_canvas_radius_nm(canvas_inner_radius_nm,
                                                                            extend_sides_to_diagonal),
-                                        pixels_per_nm=pixels_per_nm)
+                                        px_size_nm=px_size_nm)
 
     def __str__(self) -> str:
         return f"Digital pinhole; FWHM = {self.fwhm} nm"
@@ -233,12 +233,12 @@ class PhysicalPinholePatternData(RadialPatternData):
     radius: Union[float, Multivalue[float]] = extended_field(100.0, description="radius [nm]")
 
     # Methods
-    def get_numpy_array(self, canvas_inner_radius_nm: float, pixels_per_nm: float,
+    def get_numpy_array(self, canvas_inner_radius_nm: float, px_size_nm: float,
                         extend_sides_to_diagonal: bool = False) -> np.ndarray:
         return generate_physical_pinhole(radius=self.radius,
                                          canvas_radius=get_canvas_radius_nm(canvas_inner_radius_nm,
                                                                             extend_sides_to_diagonal),
-                                         pixels_per_nm=pixels_per_nm)
+                                         px_size_nm=px_size_nm)
 
     def __str__(self) -> str:
         return f"Physical pinhole; radius = {self.radius} nm"

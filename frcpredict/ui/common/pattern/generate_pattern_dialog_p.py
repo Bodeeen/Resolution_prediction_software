@@ -54,7 +54,7 @@ class GeneratePatternPresenter(BasePresenter[Pattern]):
         self.widget.updatePreview(
             getArrayPixmap(
                 model.get_numpy_array(canvas_inner_radius_nm=self.widget.canvasInnerRadius(),
-                                      pixels_per_nm=self.widget.canvasInnerRadius() * 2 / 81),
+                                      px_size_nm=self.widget.canvasInnerRadius() * 2 / 81),
                 normalize=self._normalizePreview
             )
         )

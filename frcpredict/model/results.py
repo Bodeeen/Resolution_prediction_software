@@ -126,7 +126,7 @@ class KernelSimulationResult:
         kernels2d = expand_kernels_to_2d(
             self.exp_kernel, self.var_kernel,
             canvas_inner_radius_nm=run_instance.simulation_settings.canvas_inner_radius,
-            pixels_per_nm=run_instance.imaging_system_settings.scanning_step_size
+            px_size_nm=run_instance.imaging_system_settings.scanning_step_size
         )
 
         if cache:

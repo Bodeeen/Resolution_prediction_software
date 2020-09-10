@@ -10,13 +10,13 @@ from frcpredict.util import get_canvas_radius_nm, get_canvas_dimensions_px
 
 
 def expand_kernels_to_2d(*kernels,
-                         canvas_inner_radius_nm: float, pixels_per_nm: float) -> np.ndarray:
+                         canvas_inner_radius_nm: float, px_size_nm: float) -> np.ndarray:
     """
     Expands radial kernels to 2D arrays. The output will be an array containing these 2D arrays.
     """
 
     canvas_outer_rad_px, _ = get_canvas_dimensions_px(
-        get_canvas_radius_nm(canvas_inner_radius_nm, extend_sides_to_diagonal=True), pixels_per_nm
+        get_canvas_radius_nm(canvas_inner_radius_nm, extend_sides_to_diagonal=True), px_size_nm
     )
     half_side = np.int(np.floor((canvas_outer_rad_px - 1) / 2))
 

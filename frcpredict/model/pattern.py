@@ -90,14 +90,14 @@ class Pattern:
         self.pattern_type = self._get_pattern_type_from_data(pattern_data)
         self.pattern_data = pattern_data
 
-    def get_radial_profile(self, canvas_inner_radius_nm: float, pixels_per_nm: float) -> np.ndarray:
+    def get_radial_profile(self, canvas_inner_radius_nm: float, px_size_nm: float) -> np.ndarray:
         """ Returns a numpy array representation of the pattern data as a radial profile. """
-        return self.pattern_data.get_radial_profile(canvas_inner_radius_nm, pixels_per_nm)
+        return self.pattern_data.get_radial_profile(canvas_inner_radius_nm, px_size_nm)
 
-    def get_numpy_array(self, canvas_inner_radius_nm: float, pixels_per_nm: float,
+    def get_numpy_array(self, canvas_inner_radius_nm: float, px_size_nm: float,
                         extend_sides_to_diagonal: bool = False) -> np.ndarray:
         """ Returns a numpy array representation of the pattern data. """
-        return self.pattern_data.get_numpy_array(canvas_inner_radius_nm, pixels_per_nm,
+        return self.pattern_data.get_numpy_array(canvas_inner_radius_nm, px_size_nm,
                                                  extend_sides_to_diagonal)
 
     def __str__(self) -> str:
