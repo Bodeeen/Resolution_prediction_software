@@ -18,10 +18,14 @@ from .main.main_window_w import MainWindow
 # Common
 from .common.list_item_with_value import ListItemWithValue
 from .common.config_panel import ConfigPanelWidget
+
 from .common.value_boxes.free_float_box import FreeFloatBox
 from .common.value_boxes.extended_free_float_box import ExtendedFreeFloatBox
 from .common.value_boxes.extended_spin_box import ExtendedSpinBox
+
 from .common.pattern.pattern_field_w import PatternFieldWidget
+
+from .common.sample_structure.sample_structure_picker_dialog_w import SampleStructurePickerDialog
 
 
 # Input

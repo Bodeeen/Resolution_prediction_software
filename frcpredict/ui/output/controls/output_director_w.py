@@ -2,7 +2,9 @@ from typing import Optional, List
 
 from PyQt5.QtCore import pyqtSignal
 
-from frcpredict.model import RunInstance, KernelSimulationResult, SimulationResults, SampleImage
+from frcpredict.model import (
+    RunInstance, KernelSimulationResult, SimulationResults, DisplayableSample
+)
 from frcpredict.ui import BaseWidget
 from .multivalues_edit import MultivalueListSignals
 from .output_director_m import SimulationResultsView, ViewOptions
@@ -19,7 +21,7 @@ class OutputDirectorWidget(BaseWidget):
     kernelResultChanged = pyqtSignal(object, object, bool)
     expectedImageChanged = pyqtSignal(object, object, bool)
 
-    sampleImageChanged = pyqtSignal(object)
+    displayableSampleChanged = pyqtSignal(object)
     thresholdChanged = pyqtSignal(float)
     optimizeClicked = pyqtSignal()
 
@@ -42,13 +44,13 @@ class OutputDirectorWidget(BaseWidget):
         """ Sets the FRC threshold to the given value. """
         self.thresholdChanged.emit(threshold)
 
-    def setSampleImage(self, sampleImage: SampleImage) -> None:
+    def setDisplayableSample(self, displayableSample: DisplayableSample) -> None:
         """ Sets the loaded sample image. """
-        self.sampleImageChanged.emit(sampleImage)
+        self.displayableSampleChanged.emit(displayableSample)
 
-    def clearSampleImage(self) -> None:
+    def clearDisplayableSample(self) -> None:
         """ Unloads any loaded sample image. """
-        self.sampleImageChanged.emit(None)
+        self.displayableSampleChanged.emit(None)
 
     def simulationResults(self) -> SimulationResults:
         """ Returns the currently loaded simulation results. """
@@ -77,7 +79,7 @@ class OutputDirectorWidget(BaseWidget):
 
     def updateDisplayedKernelResult(self, runInstance: Optional[RunInstance],
                                     kernelResult: Optional[KernelSimulationResult],
-                                    multivalueIndices: List[int], inspectedIndex: int,
+                                    multivalueIndices: List[int],
                                     initialDisplayOfData: bool = False) -> None:
         """
         Updates the parameter multivalue labels, and emits signals to inform that the displayed

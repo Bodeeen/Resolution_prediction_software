@@ -14,11 +14,10 @@ from .multivalue import Multivalue, ValueList, RangeType, ValueRange
 from .fluorophore import FluorophoreSettings, IlluminationResponse
 from .imaging import ImagingSystemSettings, RefractiveIndex
 from .pulse import Pulse, PulseScheme
-from .sample import SampleProperties
+from .sample import (
+    SampleProperties, ExplicitSampleProperties, DisplayableSample, SampleStructure, SampleImage
+)
 from .detector import DetectorProperties
-
-from .sample_structure import SampleStructure, SampleStructureProperties
-from .sample_image import SampleImage
 from .simulation_setings import SimulationSettings
 
 from .run_instance import RunInstance

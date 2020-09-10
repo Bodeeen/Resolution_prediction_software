@@ -5,9 +5,12 @@ import frcpredict.model as mdl
 
 
 def get_expected_image_from_kernels2d(kernels2d: np.ndarray, run_instance: "mdl.RunInstance",
-                                      sample_image_arr: np.ndarray) -> np.ndarray:
+                                      displayable_sample: mdl.DisplayableSample) -> np.ndarray:
     """ Returns the expected image based on the given sample image and simulated kernels. """
 
+    sample_image_arr = displayable_sample.get_image_arr(
+        run_instance.imaging_system_settings.scanning_step_size
+    )
     exp_kernel_result = fftconvolve(sample_image_arr, kernels2d[0], mode="same")
     var_kernel_result = fftconvolve(sample_image_arr, kernels2d[1], mode="same").clip(0)
 

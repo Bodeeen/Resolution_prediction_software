@@ -8,7 +8,9 @@ from frcpredict.model import SimulationResults
 from frcpredict.ui import BasePresenter, Preferences
 from frcpredict.ui.util import getLabelForMultivalue
 from frcpredict.util import expand_with_multivalues
-from .output_director_m import SimulationResultsView, SampleImage, ViewOptions, InspectionDetails
+from .output_director_m import (
+    SimulationResultsView, ViewOptions, InspectionDetails, DisplayableSample
+)
 
 
 class OutputDirectorPresenter(BasePresenter[SimulationResultsView]):
@@ -27,7 +29,7 @@ class OutputDirectorPresenter(BasePresenter[SimulationResultsView]):
                 self._model.resultsChanged.disconnect(self._onResultsChange)
                 self._model.inspectedMultivalueIndexChanged.disconnect(self._onInspectedIndexChange)
                 self._model.multivalueValueIndexChanged.disconnect(self._onMultivalueIndexChange)
-                self._model.sampleImageChanged.disconnect(self._onSampleImageChange)
+                self._model.displayableSampleChanged.disconnect(self._onDisplayableSampleChange)
                 self._model.thresholdChanged.disconnect(self._onThresholdChange)
             except AttributeError:
                 pass
@@ -43,7 +45,7 @@ class OutputDirectorPresenter(BasePresenter[SimulationResultsView]):
             model.resultsChanged.connect(self._onResultsChange)
             model.inspectedMultivalueIndexChanged.connect(self._onInspectedIndexChange)
             model.multivalueValueIndexChanged.connect(self._onMultivalueIndexChange)
-            model.sampleImageChanged.connect(self._onSampleImageChange)
+            model.displayableSampleChanged.connect(self._onDisplayableSampleChange)
             model.thresholdChanged.connect(self._onThresholdChange)
 
     # Methods
@@ -58,7 +60,7 @@ class OutputDirectorPresenter(BasePresenter[SimulationResultsView]):
         super().__init__(SimulationResultsView(), widget)
 
         # Prepare UI events
-        widget.sampleImageChanged.connect(self._uiSampleImageChange)
+        widget.displayableSampleChanged.connect(self._uiDisplayableSampleChange)
         widget.thresholdChanged.connect(self._uiThresholdChange)
         widget.optimizeClicked.connect(self._uiClickOptimize)
 
@@ -83,7 +85,6 @@ class OutputDirectorPresenter(BasePresenter[SimulationResultsView]):
             runInstance=self._currentRunInstance,
             kernelResult=self._currentKernelResult,
             multivalueIndices=self.model.multivalueValueIndices,
-            inspectedIndex=self.model.inspectedMultivalueIndex,
             initialDisplayOfData=initialDisplayOfData
         )
         self._updateViewOptionsInWidget()
@@ -181,10 +182,10 @@ class OutputDirectorPresenter(BasePresenter[SimulationResultsView]):
         # Update widget
         self._updateDataInWidget(initialDisplayOfData=True)
 
-    def _onSampleImageChange(self, sampleImage: SampleImage) -> None:
+    def _onDisplayableSampleChange(self, displayableSample: DisplayableSample) -> None:
         if Preferences.get().precacheExpectedImages and self.model.results is not None:
             self.model.results.precache(cache_kernels2d=Preferences.get().cacheKernels2D,
-                                        cache_expected_image_for=sampleImage)
+                                        cache_expected_image_for=displayableSample)
 
         self._updateDataInWidget(initialDisplayOfData=True)
 
@@ -205,8 +206,8 @@ class OutputDirectorPresenter(BasePresenter[SimulationResultsView]):
         self.model.setMultivalueValue(index_of_multivalue, index_in_multivalue)
 
     @pyqtSlot(object)
-    def _uiSampleImageChange(self, sampleImage: Optional[SampleImage]) -> None:
-        self.model.sampleImage = sampleImage
+    def _uiDisplayableSampleChange(self, displayableSample: Optional[DisplayableSample]) -> None:
+        self.model.displayableSample = displayableSample
 
     @pyqtSlot(float)
     def _uiThresholdChange(self, threshold: float) -> None:

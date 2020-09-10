@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Optional, Union
 
 from PyQt5.QtCore import pyqtSignal
 
@@ -40,6 +40,14 @@ class ExtendedFreeFloatBox(BaseExtendedValueBox[float]):
 
     def text(self) -> str:
         return self.editValue.text()
+
+    def setStaticText(self, text: Optional[str]) -> None:
+        """
+        Sets the displayed value to a static text string. In most use cases, this should be combined
+        with setEnabled(False). Note that this doesn't affect the returned value from value(). Pass
+        None as the argument to restore the previous value.
+        """
+        self.editValue.setStaticText(text)
 
     def setValue(self, value: Union[float, Multivalue[float]]) -> None:
         if type(value) is not type(self.value()) or value != self.value():

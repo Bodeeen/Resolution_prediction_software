@@ -21,7 +21,8 @@ class VirtualImagingResultsWidget(BaseWidget):
 
     loadImageClicked = pyqtSignal()
     unloadImageClicked = pyqtSignal()
-    exportImageClicked = pyqtSignal()
+    exportSampleImageClicked = pyqtSignal()
+    exportExpectedImageClicked = pyqtSignal()
 
     panZoomResetClicked = pyqtSignal()
     panZoomAutoResetToggled = pyqtSignal(int)
@@ -43,7 +44,8 @@ class VirtualImagingResultsWidget(BaseWidget):
         # Connect forwarded signals
         self.btnLoadImage.clicked.connect(self.loadImageClicked)
         self.btnUnloadImage.clicked.connect(self.unloadImageClicked)
-        self.btnExportImage.clicked.connect(self.exportImageClicked)
+        self.btnExportSampleImage.clicked.connect(self.exportSampleImageClicked)
+        self.btnExportExpectedImage.clicked.connect(self.exportExpectedImageClicked)
 
         self.btnResetPanZoom.clicked.connect(self.panZoomResetClicked)
         self.chkPanZoomAutoReset.stateChanged.connect(self.panZoomAutoResetToggled)
@@ -111,7 +113,8 @@ class VirtualImagingResultsWidget(BaseWidget):
             self.imgExpectedImage.setImage(np.zeros((0, 0)))
 
         self.imgExpectedImage.setEnabled(imageIsLoaded)
-        self.btnExportImage.setEnabled(imageIsLoaded)
+        self.btnExportSampleImage.setEnabled(imageIsLoaded)
+        self.btnExportExpectedImage.setEnabled(imageIsLoaded)
         self.grpPanZoom.setEnabled(imageIsLoaded)
         self.grpAutoLevelling.setEnabled(imageIsLoaded)
         self.btnUnloadImage.setEnabled(imageIsLoaded)

@@ -1,8 +1,8 @@
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
 
-from frcpredict.model import SampleProperties, Multivalue
+from frcpredict.model import Multivalue, SampleProperties, ExplicitSampleProperties
 from frcpredict.ui import BaseWidget
-from frcpredict.ui.util import connectMulti, PresetFileDirs, UserFileDirs
+from frcpredict.ui.util import connectMulti, setTabOrderForChildren, PresetFileDirs, UserFileDirs
 from .sample_properties_p import SamplePropertiesPresenter
 
 
@@ -15,9 +15,8 @@ class SamplePropertiesWidget(BaseWidget):
     valueChanged = pyqtSignal(SampleProperties)
     modifiedFlagSet = pyqtSignal()
 
-    spectralPowerChanged = pyqtSignal([float], [Multivalue])
-    labellingDensityChanged = pyqtSignal([float], [Multivalue])
-    KOriginChanged = pyqtSignal([float], [Multivalue])
+    inputPowerChanged = pyqtSignal([float], [Multivalue])
+    DOriginChanged = pyqtSignal([float], [Multivalue])
 
     loadSampleStructureClicked = pyqtSignal()
     unloadSampleStructureClicked = pyqtSignal()
@@ -33,18 +32,19 @@ class SamplePropertiesWidget(BaseWidget):
         self.configPanel.setValueGetter(self.value)
         self.configPanel.setValueSetter(self.setValue)
 
-        self.updatePresetLoaded(False)
+        self.updateStructureLoaded(False)
+
+        setTabOrderForChildren(self, [self.configPanel, self.editInputPower, self.editDOrigin,
+                                      self.btnLoadSampleStructure, self.btnUnloadSampleStructure])
 
         # Connect own signal slots
         self.modifiedFlagSet.connect(self._onModifiedFlagSet)
 
         # Connect forwarded signals
-        connectMulti(self.editSpectralPower.valueChanged, [float, Multivalue],
-                     self.spectralPowerChanged)
-        connectMulti(self.editLabellingDensity.valueChanged, [float, Multivalue],
-                     self.labellingDensityChanged)
-        connectMulti(self.editKOrigin.valueChanged, [float, Multivalue],
-                     self.KOriginChanged)
+        connectMulti(self.editInputPower.valueChanged, [float, Multivalue],
+                     self.inputPowerChanged)
+        connectMulti(self.editDOrigin.valueChanged, [float, Multivalue],
+                     self.DOriginChanged)
         self.configPanel.dataLoaded.connect(self.modifiedFlagSet)
 
         self.btnLoadSampleStructure.clicked.connect(self.loadSampleStructureClicked)
@@ -63,14 +63,17 @@ class SamplePropertiesWidget(BaseWidget):
         if emitSignal:
             self.valueChanged.emit(model)
 
-    def updateBasicFields(self, model: SampleProperties) -> None:
-        self.editSpectralPower.setValue(model.spectral_power)
-        self.editLabellingDensity.setValue(model.labelling_density)
-        self.editKOrigin.setValue(model.K_origin)
+    def updateBasicFields(self, basicProperties: ExplicitSampleProperties) -> None:
+        self.editInputPower.setValue(basicProperties.input_power)
+        self.editDOrigin.setValue(basicProperties.D_origin)
 
-    def updatePresetLoaded(self, loaded: bool) -> None:
-        self.editSpectralPower.setEnabled(not loaded)
-        self.editKOrigin.setEnabled(not loaded)
+    def updateStructureLoaded(self, loaded: bool) -> None:
+        self.editInputPower.setEnabled(not loaded)
+        self.editDOrigin.setEnabled(not loaded)
+
+        self.editInputPower.setStaticText("Automatic" if loaded else None)
+        self.editDOrigin.setStaticText("Automatic" if loaded else None)
+
         self.btnLoadSampleStructure.setVisible(not loaded)
         self.btnUnloadSampleStructure.setVisible(loaded)
 

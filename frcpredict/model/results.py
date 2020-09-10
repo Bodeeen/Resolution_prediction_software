@@ -10,7 +10,7 @@ from frcpredict.simulation import (
 )
 from frcpredict.util import ndarray_field, expand_with_multivalues
 from .run_instance import RunInstance
-from .sample_image import SampleImage
+from .sample import DisplayableSample
 
 
 @dataclass_json
@@ -24,9 +24,11 @@ class KernelSimulationResult:
 
     multivalue_values: List[Union[int, float]] = field(default_factory=list)
 
-    exp_kernel: np.ndarray = ndarray_field(default=np.zeros(()), encode_as_base64=True)
+    exp_kernel: np.ndarray = ndarray_field(default_factory=lambda: np.zeros(()),
+                                           encode_as_base64=True)
 
-    var_kernel: np.ndarray = ndarray_field(default=np.zeros(()), encode_as_base64=True)
+    var_kernel: np.ndarray = ndarray_field(default_factory=lambda: np.zeros(()),
+                                           encode_as_base64=True)
 
     _cached_kernels2d: Optional[np.ndarray] = ndarray_field(default=None, encode_as_base64=True,
                                                             exclude=Exclude.ALWAYS)
@@ -71,10 +73,10 @@ class KernelSimulationResult:
         self.cache_frc_curve(run_instance, cache_kernels2d=cache_kernels2d)
         return self._cached_frc_curve_x, self._cached_frc_curve_y
 
-    def get_expected_image(self, run_instance: RunInstance, sample_image: SampleImage, *,
-                           cache_kernels2d: bool = True) -> np.ndarray:
+    def get_expected_image(self, run_instance: RunInstance, displayable_sample: DisplayableSample,
+                           *, cache_kernels2d: bool = True) -> np.ndarray:
         """ Returns the expected image of the given sample as a 2D array. """
-        self.cache_expected_image(run_instance, sample_image, cache_kernels2d=cache_kernels2d)
+        self.cache_expected_image(run_instance, displayable_sample, cache_kernels2d=cache_kernels2d)
         return self._cached_expected_image
 
     def cache_frc_curve(self, run_instance: RunInstance, *,
@@ -86,19 +88,19 @@ class KernelSimulationResult:
                 kernels2d, run_instance
             )
 
-    def cache_expected_image(self, run_instance: RunInstance, sample_image: SampleImage, *,
-                             cache_kernels2d: bool = True) -> None:
+    def cache_expected_image(self, run_instance: RunInstance, displayable_sample: DisplayableSample,
+                             *, cache_kernels2d: bool = True) -> None:
         """
         Simulates the FRC curve based on the kernels and the given sample image, and caches the
         result.
         """
         if (self._cached_expected_image is None
-                or sample_image.id != self._cached_expected_image_sample_id):
+                or displayable_sample.get_id() != self._cached_expected_image_sample_id):
             kernels2d = self._get_kernels2d(run_instance, cache=cache_kernels2d)
             self._cached_expected_image = get_expected_image_from_kernels2d(
-                kernels2d, run_instance, sample_image.image_arr
+                kernels2d, run_instance, displayable_sample
             )
-            self._cached_expected_image_sample_id = sample_image.id
+            self._cached_expected_image_sample_id = displayable_sample.get_id()
 
     def clear_cache(self, *, clear_kernels2d: bool = False, clear_frc_curves: bool = False,
                     clear_expected_image: bool = False) -> None:
@@ -123,6 +125,7 @@ class KernelSimulationResult:
 
         kernels2d = expand_kernels_to_2d(
             self.exp_kernel, self.var_kernel,
+            canvas_inner_radius_nm=run_instance.simulation_settings.canvas_inner_radius,
             pixels_per_nm=run_instance.imaging_system_settings.scanning_step_size
         )
 
@@ -151,14 +154,14 @@ class SimulationResults:
     multivalue_paths: List[List[Union[int, str]]] = field(default_factory=list)
 
     kernel_results: np.ndarray = ndarray_field(  # array of KernelResult
-        default=np.zeros(()),
+        default_factory=lambda: np.zeros(()),
         custom_encoder=lambda arr: arr,
         custom_decoder=lambda arr: np.frompyfunc(KernelSimulationResult.from_dict, 1, 1)(np.array(arr))
     )
 
     # Methods
     def precache(self, *, cache_kernels2d: bool = False, cache_frc_curves: bool = False,
-                 cache_expected_image_for: Optional[SampleImage] = None) -> None:
+                 cache_expected_image_for: Optional[DisplayableSample] = None) -> None:
         """ Pre-caches the chosen elements in all kernel result instances. """
 
         for kernel_result in np.nditer(self.kernel_results, flags=["refs_ok"]):

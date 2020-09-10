@@ -36,38 +36,32 @@
       <number>6</number>
      </property>
      <item row="0" column="0">
-      <widget class="QLabel" name="lblSpectralPower">
+      <widget class="QLabel" name="lblInputPower">
        <property name="text">
-        <string>Spectral power:</string>
+        <string>Input power:</string>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="ExtendedFreeFloatBox" name="editSpectralPower" native="true">
+      <widget class="ExtendedFreeFloatBox" name="editInputPower" native="true">
        <property name="infoText" stdset="0">
-        <string>TODO: Add info text here.</string>
+        <string>The FRC value is based on the expected properties of the Fourier transform of the output image. From the image formation model employed, the Fourier transform of the output image depends on the properties of the Fourier transform of the underlying fluorophore density.
+
+To calculate the FRC value at a certain frequency, the spectral power of the underlying fluorophore density at that point needs to be known. In reality every unique fluorophore density map has a specific spectral power and an experimentally measures FRC curve depends on what sample is being imaged. In order to predict an absolute resolution value, it is thus necessary to define/assume a spectral power curve of the sample.
+
+In these simulations, the spectral power curve is assumed to be constant at every non-zero frequency. The input power, another constant, is then defined as the spectral power multiplied by the square of the labelling density. This constant value can either be set manually in the &quot;Input power&quot; edit box or estimated as the average input power of an example fluorophore density map using the &quot;Load sample structure…&quot; button.</string>
        </property>
       </widget>
      </item>
      <item row="1" column="0">
-      <widget class="QLabel" name="lblLabellingDensity">
+      <widget class="QLabel" name="lblDOrigin">
        <property name="text">
-        <string>Labelling density [fl./mm²]:</string>
+        <string>D(0, 0):</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="ExtendedFreeFloatBox" name="editLabellingDensity" native="true"/>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="lblKOrigin">
-       <property name="text">
-        <string>K(0, 0):</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="ExtendedFreeFloatBox" name="editKOrigin" native="true"/>
+      <widget class="ExtendedFreeFloatBox" name="editDOrigin" native="true"/>
      </item>
     </layout>
    </item>
@@ -129,9 +123,6 @@
    <header>frcpredict.ui</header>
   </customwidget>
  </customwidgets>
- <tabstops>
-  <tabstop>editLabellingDensity</tabstop>
- </tabstops>
  <resources/>
  <connections/>
 </ui>

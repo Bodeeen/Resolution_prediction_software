@@ -4,8 +4,7 @@ from typing import Optional, List
 import numpy as np
 from PySignal import Signal
 
-from frcpredict.model import SimulationResults, SampleImage
-from frcpredict.ui import Preferences
+from frcpredict.model import SimulationResults, DisplayableSample
 from frcpredict.util import dataclass_internal_attrs, dataclass_with_properties, observable_property
 
 
@@ -42,7 +41,7 @@ class ViewOptions:
 @dataclass_with_properties
 @dataclass_internal_attrs(
     resultsChanged=Signal, inspectedMultivalueIndexChanged=Signal,
-    multivalueValueIndexChanged=Signal, sampleImageChanged=Signal, thresholdChanged=Signal
+    multivalueValueIndexChanged=Signal, displayableSampleChanged=Signal, thresholdChanged=Signal
 )
 @dataclass
 class SimulationResultsView:
@@ -51,7 +50,8 @@ class SimulationResultsView:
     """
 
     results: Optional[SimulationResults] = observable_property(
-        "_results", default=None, signal_name="resultsChanged", emit_arg_name="results"
+        "_results", default=None, signal_name="resultsChanged",
+        emit_arg_name="results"
     )
 
     inspectedMultivalueIndex: int = observable_property(  # -1 if no multivalue inspected
@@ -64,22 +64,24 @@ class SimulationResultsView:
         emit_arg_name="multivalueValueIndices"
     )
 
-    sampleImage: Optional[SampleImage] = observable_property(  # loaded sample image
-        "_sampleImage", default=None, signal_name="sampleImageChanged", emit_arg_name="sampleImage"
+    displayableSample: Optional[DisplayableSample] = observable_property(  # loaded sample image
+        "_displayableSample", default=None, signal_name="displayableSampleChanged",
+        emit_arg_name="displayableSample"
     )
 
     threshold: float = observable_property(
-        "_threshold", default=0.15, signal_name="thresholdChanged", emit_arg_name="threshold"
+        "_threshold", default=0.15, signal_name="thresholdChanged",
+        emit_arg_name="threshold"
     )
 
     def precacheAllResults(self) -> None:
         """ Pre-caches all results from the simulation. """
         if self.results is not None:
-            if self.sampleImage is None:
+            if self.displayableSample is None:
                 self.results.clear_cache(clear_expected_image=True)
 
             self.results.precache(cache_kernels2d=True, cache_frc_curves=True,
-                                  cache_expected_image_for=self.sampleImage)
+                                  cache_expected_image_for=self.displayableSample)
 
     def setMultivalueValue(self, indexOfMultivalue: int, indexInMultivalue: int) -> None:
         """

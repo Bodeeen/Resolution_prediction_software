@@ -8,9 +8,8 @@ from PyQt5.QtWidgets import QFileDialog
 from skimage.io import imsave
 
 from frcpredict.model import RunInstance, KernelSimulationResult, SampleImage
-from frcpredict.ui import BasePresenter, Preferences
+from frcpredict.ui import BasePresenter, Preferences, SampleStructurePickerDialog
 from frcpredict.ui.util import UserFileDirs
-from .sample_image_picker_dialog_w import SampleImagePickerDialog
 from .virtual_imaging_results_m import VirtualImagingResultsModel
 
 
@@ -30,7 +29,10 @@ class VirtualImagingResultsPresenter(BasePresenter[VirtualImagingResultsModel]):
 
     # Methods
     def __init__(self, widget) -> None:
-        self._expectedImageArr = None  # TODO: Should be in model but initialDisplayOfData prevents it
+        # These should really be in the model, but initialDisplayOfData prevents it
+        self._sampleImageArr = None
+        self._expectedImageArr = None
+
         super().__init__(VirtualImagingResultsModel(), widget)
 
         # Prepare UI events
@@ -38,7 +40,8 @@ class VirtualImagingResultsPresenter(BasePresenter[VirtualImagingResultsModel]):
 
         widget.loadImageClicked.connect(self._uiClickLoadImage)
         widget.unloadImageClicked.connect(self._uiClickUnloadImage)
-        widget.exportImageClicked.connect(self._uiClickExportImage)
+        widget.exportSampleImageClicked.connect(self._uiClickExportSampleImage)
+        widget.exportExpectedImageClicked.connect(self._uiClickExportExpectedImage)
 
         widget.panZoomResetClicked.connect(self._uiClickPanZoomReset)
         widget.panZoomAutoResetToggled.connect(self._uiPanZoomAutoResetChange)
@@ -60,13 +63,16 @@ class VirtualImagingResultsPresenter(BasePresenter[VirtualImagingResultsModel]):
         if self.widget.outputDirector() is None:
             return
 
-        sampleImage = self.widget.outputDirector().value().sampleImage
-
-        if kernelResult is not None and sampleImage is not None:
+        displayableSample = self.widget.outputDirector().value().displayableSample
+        if kernelResult is not None and displayableSample is not None:
+            sampleImageArr = displayableSample.get_image_arr(
+                runInstance.imaging_system_settings.scanning_step_size
+            )
             expectedImageArr = kernelResult.get_expected_image(
-                runInstance, sampleImage, cache_kernels2d=Preferences.get().cacheKernels2D
+                runInstance, displayableSample, cache_kernels2d=Preferences.get().cacheKernels2D
             )
         else:
+            sampleImageArr = None
             expectedImageArr = None
 
         self.widget.updateExpectedImage(
@@ -75,6 +81,8 @@ class VirtualImagingResultsPresenter(BasePresenter[VirtualImagingResultsModel]):
             autoLevel=initialDisplayOfData or self.model.autoLevelAutoPerform,
             autoLevelLowerCutoff=self.model.autoLevelLowerCutoff
         )
+
+        self._sampleImageArr = sampleImageArr
         self._expectedImageArr = expectedImageArr
 
     @pyqtSlot()
@@ -84,23 +92,13 @@ class VirtualImagingResultsPresenter(BasePresenter[VirtualImagingResultsModel]):
         if self.widget.outputDirector() is None:
             return
 
-        imageData, okClicked = SampleImagePickerDialog.getImageData(
+        displayableSample, okClicked = SampleStructurePickerDialog.getDisplayableSampleForOutput(
             self.widget,
-            self.widget.outputDirector().value().results.run_instance.sample_properties.loaded_structure_id
+            self.widget.outputDirector().value().results.run_instance.sample_properties.structure
         )
 
         if okClicked:
-            imageArr = imageData.getImageWithScaledValues()
-
-            if not imageData.fromFile:
-                imageId = imageData.sampleStructureId
-            else:
-                # Generate random ID for caching purposes
-                imageId = "".join(random.choices(string.ascii_letters + string.digits, k=32))
-
-            self.widget.outputDirector().setSampleImage(
-                SampleImage(id=imageId, image_arr=imageArr)
-            )
+            self.widget.outputDirector().setDisplayableSample(displayableSample)
 
     @pyqtSlot()
     def _uiClickUnloadImage(self) -> None:
@@ -109,10 +107,29 @@ class VirtualImagingResultsPresenter(BasePresenter[VirtualImagingResultsModel]):
         if self.widget.outputDirector() is None:
             return
 
-        self.widget.outputDirector().clearSampleImage()
+        self.widget.outputDirector().clearDisplayableSample()
 
     @pyqtSlot()
-    def _uiClickExportImage(self) -> None:
+    def _uiClickExportSampleImage(self) -> None:
+        """
+        Exports the sample image that the displayed expected image is calculated from to a file.
+        """
+
+        if self._sampleImageArr is None:
+            return
+
+        path, _ = QFileDialog.getSaveFileName(
+            self.widget,
+            caption="Export Sample Image",
+            filter="TIFF files (*.tiff)",
+            directory=UserFileDirs.SimulatedData
+        )
+
+        if path:  # Check whether a file was picked
+            imsave(path, self._sampleImageArr.astype(np.float32))
+
+    @pyqtSlot()
+    def _uiClickExportExpectedImage(self) -> None:
         """ Exports the currently displayed expected image to a file. """
 
         if self._expectedImageArr is None:
