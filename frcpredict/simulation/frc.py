@@ -15,7 +15,7 @@ def get_frc_curve_from_kernels2d(kernels2d: np.ndarray,
                                  run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.ndarray]:
     """
     Returns a tuple that contains arrays of X and Y values respectively of the resulting FRC curve
-    from the given simulated kernels.
+    from the given simulated kernels. run_instance must be a RunInstance without any multivalues.
     """
 
     # Pixel size in nanometres

@@ -6,7 +6,10 @@ import frcpredict.model as mdl
 
 def get_expected_image_from_kernels2d(kernels2d: np.ndarray, run_instance: "mdl.RunInstance",
                                       displayable_sample: mdl.DisplayableSample) -> np.ndarray:
-    """ Returns the expected image based on the given sample image and simulated kernels. """
+    """
+    Returns the expected image based on the given sample image and simulated kernels. run_instance
+    must be a RunInstance without any multivalues.
+    """
 
     sample_image_arr = displayable_sample.get_image_arr(
         run_instance.imaging_system_settings.scanning_step_size

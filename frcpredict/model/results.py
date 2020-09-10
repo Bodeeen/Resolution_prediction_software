@@ -46,10 +46,11 @@ class KernelSimulationResult:
                                                             metadata=json_config(exclude=Exclude.ALWAYS))
 
     # Methods
-    def resolution_at_threshold(self, run_instance: RunInstance, threshold: float) -> Optional[float]:
+    def resolution_at_threshold(self, run_instance: RunInstance,
+                                threshold: float) -> Optional[float]:
         """
         Returns the resolution at a certain threshold, or None if the curve doesn't cross the
-        threshold.
+        threshold. run_instance must be a RunInstance without any multivalues.
         """
 
         x, y = self.get_frc_curve(run_instance)
@@ -69,19 +70,28 @@ class KernelSimulationResult:
 
     def get_frc_curve(self, run_instance: RunInstance, *,
                       cache_kernels2d: bool = True) -> Tuple[np.ndarray, np.ndarray]:
-        """ Returns a tuple containing the X and Y values respectively of the FRC curve. """
+        """
+        Returns a tuple containing the X and Y values respectively of the FRC curve. run_instance
+        must be a RunInstance without any multivalues.
+        """
         self.cache_frc_curve(run_instance, cache_kernels2d=cache_kernels2d)
         return self._cached_frc_curve_x, self._cached_frc_curve_y
 
     def get_expected_image(self, run_instance: RunInstance, displayable_sample: DisplayableSample,
                            *, cache_kernels2d: bool = True) -> np.ndarray:
-        """ Returns the expected image of the given sample as a 2D array. """
+        """
+        Returns the expected image of the given sample as a 2D array. run_instance must be a
+        RunInstance without any multivalues.
+        """
         self.cache_expected_image(run_instance, displayable_sample, cache_kernels2d=cache_kernels2d)
         return self._cached_expected_image
 
     def cache_frc_curve(self, run_instance: RunInstance, *,
                         cache_kernels2d: bool = True) -> None:
-        """ Simulates the FRC curve based on the kernels and caches the result. """
+        """
+        Simulates the FRC curve based on the kernels and caches the result. run_instance must be a
+        RunInstance without any multivalues.
+        """
         if self._cached_frc_curve_x is None or self._cached_frc_curve_y is None:
             kernels2d = self._get_kernels2d(run_instance, cache=cache_kernels2d)
             self._cached_frc_curve_x, self._cached_frc_curve_y = get_frc_curve_from_kernels2d(
@@ -92,7 +102,7 @@ class KernelSimulationResult:
                              *, cache_kernels2d: bool = True) -> None:
         """
         Simulates the FRC curve based on the kernels and the given sample image, and caches the
-        result.
+        result. run_instance must be a RunInstance without any multivalues.
         """
         if (self._cached_expected_image is None
                 or displayable_sample.get_id() != self._cached_expected_image_sample_id):
@@ -119,7 +129,10 @@ class KernelSimulationResult:
 
     # Internal methods
     def _get_kernels2d(self, run_instance: RunInstance, *, cache: bool = True) -> np.ndarray:
-        """ Expands the simulated kernels to 2D arrays and caches the result. """
+        """
+        Expands the simulated kernels to 2D arrays and caches the result. run_instance must be a
+        RunInstance without any multivalues.
+        """
         if self._cached_kernels2d is not None:
             return self._cached_kernels2d
 
