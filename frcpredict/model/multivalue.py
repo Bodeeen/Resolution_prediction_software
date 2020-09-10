@@ -83,7 +83,6 @@ class RangeType(Enum):
     """
     All supported range types for ValueRange.
     """
-
     linear = "linear"
     logarithmic = "logarithmic"
     inverse_logarithmic = "inverse_logarithmic"

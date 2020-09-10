@@ -53,7 +53,8 @@ class Preferences:
             with open(_preferencesFilePath, "r") as jsonFile:
                 json = jsonFile.read()
                 persistentContainer = PersistentContainer[
-                    Preferences].from_json_with_converted_dicts(
+                    Preferences
+                ].from_json_with_converted_dicts(
                     json, Preferences
                 )
                 _preferences = persistentContainer.data

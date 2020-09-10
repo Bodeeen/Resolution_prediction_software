@@ -2,10 +2,10 @@ from copy import deepcopy
 from dataclasses import field, fields, Field, MISSING
 from typing import Any, Optional, Union, Tuple, List, Dict, TypeVar
 
-from dataclasses_json import config as json_config
 import numpy as np
+from dataclasses_json import config as json_config
 
-import frcpredict.model
+import frcpredict.model as mdl
 from .dataclass_extras import clear_signals
 
 
@@ -24,9 +24,9 @@ def multi_accepting_field(default: Any = MISSING, *, default_factory: Any = MISS
     def decoder(value):
         if isinstance(value, dict):
             if "values" in value:
-                return frcpredict.model.ValueList.from_dict(value)
+                return mdl.ValueList.from_dict(value)
             else:
-                return frcpredict.model.ValueRange.from_dict(value)
+                return mdl.ValueRange.from_dict(value)
         else:
             return value
 
@@ -66,7 +66,7 @@ def get_paths_of_multivalues(dataclass_instance: object) -> Tuple[List[FieldPath
         field_name = dataclass_field.name
         field_value = getattr(dataclass_instance, dataclass_field.name)
 
-        if isinstance(field_value, frcpredict.model.Multivalue):
+        if isinstance(field_value, mdl.Multivalue):
             paths.append([field_name])
             num_combinations *= field_value.num_values()
         elif isinstance(field_value, list):
@@ -154,7 +154,7 @@ def avg_value_if_multivalue(multi_or_scalar_value) -> float:
     If the argument is a multivalue, this returns its average value. Otherwise, the argument is
     assumed to be a scalar (single) value returned.
     """
-    if isinstance(multi_or_scalar_value, frcpredict.model.Multivalue):
+    if isinstance(multi_or_scalar_value, mdl.Multivalue):
         return multi_or_scalar_value.avg_value()
     else:
         return multi_or_scalar_value

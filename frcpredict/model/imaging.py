@@ -16,7 +16,6 @@ class RefractiveIndex(Enum):
     """
     Some predefined immersion types, with the value being the refractive index.
     """
-
     glycerol = 1.47
     oil = 1.51
     silicone = 1.40

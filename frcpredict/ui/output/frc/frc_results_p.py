@@ -116,7 +116,7 @@ class FrcResultsPresenter(BasePresenter[FrcResultsModel]):
     # UI event handling
     @pyqtSlot(object, object, bool)
     def _uiKernelResultChange(self, runInstance: RunInstance,
-                              kernelResult: Optional[KernelSimulationResult], _: bool) -> None:
+                              kernelResult: Optional[KernelSimulationResult], _) -> None:
         self.model.frcCurve = kernelResult.get_frc_curve(runInstance)
 
     @pyqtSlot(ViewOptions)
