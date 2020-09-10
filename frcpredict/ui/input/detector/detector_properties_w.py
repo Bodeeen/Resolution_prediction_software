@@ -80,6 +80,7 @@ class DetectorPropertiesWidget(BaseWidget):
         else:
             self.rdoPointDetector.setChecked(True)
 
+        self.editReadoutNoise.setValue(model.readout_noise)
         self.editQuantumEfficiency.setValue(model.quantum_efficiency)
 
     # Event handling
