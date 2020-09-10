@@ -16,3 +16,8 @@ automatically downloaded when you run the command above) even if it installs cor
 
 ## Running the application
 In the root folder of the repo, run the command `python -m frcpredict` to launch the software.
+
+## Further information
+See [the wiki](https://github.com/Bodeeen/Resolution_prediction_software/wiki) for more information
+about how to use the program as well as a developer guide.
+ 
