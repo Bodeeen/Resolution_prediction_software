@@ -18,6 +18,16 @@ class PatternFieldWidget(BaseWidget):
 
     # Properties
     @pyqtProperty(bool)
+    def allowLoadFile(self) -> bool:
+        return self._allowLoadFile
+
+    @allowLoadFile.setter
+    def allowLoadFile(self, value: bool) -> None:
+        self._allowLoadFile = value
+        if self.isUiLoaded():
+            self.btnLoadFile.setVisible(value)
+
+    @pyqtProperty(bool)
     def normalizeVisualisation(self) -> bool:
         return self._normalizeVisualisation
 

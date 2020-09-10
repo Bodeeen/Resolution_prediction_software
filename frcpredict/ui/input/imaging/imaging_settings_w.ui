@@ -70,7 +70,11 @@
         <widget class="QComboBox" name="editImmersionType"/>
        </item>
        <item row="0" column="1">
-        <widget class="PatternFieldWidget" name="editOpticalPsf" native="true"/>
+        <widget class="PatternFieldWidget" name="editOpticalPsf" native="true">
+         <property name="allowLoadFile" stdset="0">
+          <bool>false</bool>
+         </property>
+        </widget>
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="lblPinholeFunction">
@@ -90,6 +94,9 @@
         <widget class="PatternFieldWidget" name="editPinholeFunction" native="true">
          <property name="normalizeVisualisation" stdset="0">
           <bool>true</bool>
+         </property>
+         <property name="allowLoadFile" stdset="0">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
