@@ -61,21 +61,21 @@ class SamplePropertiesPresenter(BasePresenter[SampleProperties]):
     @pyqtSlot(Multivalue)
     def _uiInputPowerChange(self, value: Union[float, Multivalue[float]]) -> None:
         if self.model.structure is None:
-            self.model.input_power = value
+            self.model.basic_properties.input_power = value
 
     @pyqtSlot(float)
     @pyqtSlot(Multivalue)
     def _uiDOriginChange(self, value: Union[float, Multivalue[float]]) -> None:
         if self.model.structure is None:
-            self.model.D_origin = value
+            self.model.basic_properties.D_origin = value
 
     @pyqtSlot()
     def _uiClickLoadSampleStructure(self) -> None:
         sampleStructure, okClicked = SampleStructurePickerDialog.getSampleStructure(self.widget)
 
         if okClicked:
-            self.model.structure = sampleStructure
+            self.model.load_structure(sampleStructure)
 
     @pyqtSlot()
     def _uiClickUnloadSampleStructure(self) -> None:
-        self.model.structure = None
+        self.model.unload_structure()

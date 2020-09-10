@@ -165,7 +165,7 @@ class SampleProperties:
     A description of sample-related properties in an environment.
     """
 
-    basic_properties: Optional[ExplicitSampleProperties] = extended_field(
+    basic_properties: ExplicitSampleProperties = extended_field(
         observable_property("_basic_properties", default=ExplicitSampleProperties(),
                             signal_name="data_loaded"),
         description="sample"
@@ -176,6 +176,16 @@ class SampleProperties:
                             signal_name="data_loaded"),
         description="structure"
     )
+
+    def load_structure(self, structure: SampleStructure) -> None:
+        """ Loads a sample structure. """
+        self.basic_properties.input_power = 1.0
+        self.basic_properties.D_origin = 1.0
+        self.structure = structure
+
+    def unload_structure(self) -> None:
+        """ Unloads any currently loaded sample structure. """
+        self.structure = None
 
     def get_combined_properties(self, px_size_nm: float) -> ExplicitSampleProperties:
         """
