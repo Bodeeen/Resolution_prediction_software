@@ -66,21 +66,21 @@
    <item row="3" column="1">
     <widget class="ExtendedFreeFloatBox" name="editEmission" native="true">
      <property name="infoText" stdset="0">
-      <string>TODO: Add info text here.</string>
+      <string>The value set here determines the rate of emission induced per kW/cm² of light intensity. The rate of emission is calculated as the cross section times the illumination power given in kW/cm². The unit for the cross section is thus rate/(kW/cm²).</string>
      </property>
     </widget>
    </item>
    <item row="2" column="1">
     <widget class="ExtendedFreeFloatBox" name="editOnToOff" native="true">
      <property name="infoText" stdset="0">
-      <string>TODO: Add info text here.</string>
+      <string>The value set here determines the rate of OFF-switching induced per kW/cm² of light intensity. The rate of OFF-switching is calculated as the cross section times the illumination power given in kW/cm². The unit for the cross section is thus rate/(kW/cm²).</string>
      </property>
     </widget>
    </item>
    <item row="1" column="1">
     <widget class="ExtendedFreeFloatBox" name="editOffToOn" native="true">
      <property name="infoText" stdset="0">
-      <string>TODO: Add info text here.</string>
+      <string>The value set here determines the rate of ON-switching induced per kW/cm² of light intensity. The rate of ON-switching is calculated as the cross section times the illumination power given in kW/cm². The unit for the cross section is thus rate/(kW/cm²).</string>
      </property>
     </widget>
    </item>
@@ -88,13 +88,13 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>FreeFloatBox</class>
-   <extends>QLineEdit</extends>
+   <class>ExtendedFreeFloatBox</class>
+   <extends>QWidget</extends>
    <header>frcpredict.ui</header>
   </customwidget>
   <customwidget>
-   <class>ExtendedFreeFloatBox</class>
-   <extends>QWidget</extends>
+   <class>FreeFloatBox</class>
+   <extends>QLineEdit</extends>
    <header>frcpredict.ui</header>
   </customwidget>
  </customwidgets>
