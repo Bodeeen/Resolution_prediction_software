@@ -68,6 +68,14 @@ class ImagingSystemSettingsWidget(BaseWidget):
         # Initialize presenter
         self._presenter = ImagingSystemSettingsPresenter(self)
 
+    def setCanvasInnerRadius(self, canvasInnerRadiusNm: float) -> None:
+        """
+        Sets the inner radius of the canvas, in nanometres, that the pattern fields will use to
+        generate pattern previews.
+        """
+        self.editOpticalPsf.setCanvasInnerRadius(canvasInnerRadiusNm)
+        self.editPinholeFunction.setCanvasInnerRadius(canvasInnerRadiusNm)
+
     def value(self) -> ImagingSystemSettings:
         return self._presenter.model
 

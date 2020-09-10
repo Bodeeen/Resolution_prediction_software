@@ -19,6 +19,7 @@ from .detector import DetectorProperties
 
 from .sample_structure import SampleStructure, SampleStructureProperties
 from .sample_image import SampleImage
+from .simulation_setings import SimulationSettings
 
 from .run_instance import RunInstance
 from .results import KernelSimulationResult, KernelSimulationResult, SimulationResults

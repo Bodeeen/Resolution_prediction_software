@@ -37,6 +37,9 @@ from .input.sample.sample_properties_w import SamplePropertiesWidget
 
 from .input.detector.detector_properties_w import DetectorPropertiesWidget
 
+from .input.simulation.simulation_settings_w import SimulationSettingsWidget
+from .input.simulation.simulation_settings_dialog import SimulationSettingsDialog
+
 
 # Output
 from .output.controls.output_director_w import OutputDirectorWidget

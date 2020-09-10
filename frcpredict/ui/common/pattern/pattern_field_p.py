@@ -38,6 +38,7 @@ class PatternFieldPresenter(BasePresenter[Pattern]):
         # Prepare UI events
         widget.loadFileClicked.connect(self._uiClickLoadFile)
         widget.generateClicked.connect(self._uiClickGenerate)
+        widget.canvasInnerRadiusChanged.connect(self._uiCanvasInnerRadiusChange)
 
     # Model event handling
     def _onPatternDataChange(self, model: Pattern):
@@ -45,7 +46,8 @@ class PatternFieldPresenter(BasePresenter[Pattern]):
 
         self.widget.updateVisualisation(
             pixmap=getArrayPixmap(
-                model.get_numpy_array(pixels_per_nm=5),
+                model.get_numpy_array(canvas_inner_radius_nm=self.widget.canvasInnerRadius(),
+                                      pixels_per_nm=self.widget.canvasInnerRadius() * 2 / 49),
                 normalize=self._normalizeVisualisation
             ),
             description=str(model)
@@ -82,9 +84,14 @@ class PatternFieldPresenter(BasePresenter[Pattern]):
             title=f"Generate {self.widget.fieldName()}",
             availableTypes=self.widget.availableGenerationTypes(),
             allowEditAmplitude=self.widget.allowEditGenerationAmplitude(),
+            canvasInnerRadiusNm=self.widget.canvasInnerRadius(),
             normalizePreview=self._normalizeVisualisation,
             initialValue=self.model
         )
         
         if okClicked:
             self.model.load_from_data(pattern_data)
+
+    @pyqtSlot(float)
+    def _uiCanvasInnerRadiusChange(self, _) -> None:
+        self._onPatternDataChange(self.model)

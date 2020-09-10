@@ -12,7 +12,8 @@ from dataclasses_json import config as json_config
 _has_overridden_dataclasses_json_asdict = False
 
 
-def ndarray_field(default: Any = MISSING, *, encode_as_base64: bool = False,
+def ndarray_field(default: Any = MISSING, *, default_factory: Any = MISSING,
+                  encode_as_base64: bool = False,
                   custom_encoder: Optional[Callable] = None,
                   custom_decoder: Optional[Callable] = None,
                   **json_config_args) -> field:
@@ -35,6 +36,7 @@ def ndarray_field(default: Any = MISSING, *, encode_as_base64: bool = False,
 
     return field(
         default=default,
+        default_factory=default_factory,
         metadata=json_config(
             encoder=encoder,
             decoder=decoder,

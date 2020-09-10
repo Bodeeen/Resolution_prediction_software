@@ -14,6 +14,7 @@ from .fluorophore import FluorophoreSettings
 from .imaging import ImagingSystemSettings
 from .pulse import PulseScheme
 from .sample import SampleProperties
+from .simulation_setings import SimulationSettings
 
 
 @dataclass_json
@@ -24,6 +25,7 @@ from .sample import SampleProperties
     pulse_scheme_loaded=Signal,
     sample_properties_loaded=Signal,
     detector_properties_loaded=Signal,
+    simulation_settings_loaded=Signal,
 
     _abort_signal=Signal
 )
@@ -71,6 +73,14 @@ class RunInstance:
             signal_name="detector_properties_loaded", emit_arg_name="detector_properties"
         ),
         description="detector properties"
+    )
+
+    simulation_settings: SimulationSettings = extended_field(
+        observable_property(
+            "_simulation_settings", default=SimulationSettings,
+            signal_name="simulation_settings_loaded", emit_arg_name="simulation_settings"
+        ),
+        description="simulation settings"
     )
 
     # Methods

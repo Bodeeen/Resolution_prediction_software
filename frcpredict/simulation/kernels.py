@@ -223,7 +223,8 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
     px_size_nm = run_instance.imaging_system_settings.scanning_step_size  # Pixel size nanometers
 
     # Radius in pixels of all 2D patterns (PSF, illumination patterns, pinholes etc.)
-    canvas_outer_rad_nm = get_canvas_radius_nm(extend_sides_to_diagonal=True)
+    canvas_inner_rad_nm = run_instance.simulation_settings.canvas_inner_radius
+    canvas_outer_rad_nm = get_canvas_radius_nm(canvas_inner_rad_nm, extend_sides_to_diagonal=True)
     canvas_outer_rad_px, _ = get_canvas_dimensions_px(canvas_outer_rad_nm, px_size_nm)
 
     # Calculate G(x,y), the convolution of the detection PSF and the pinhole function
@@ -232,8 +233,11 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
 
     radial_psf_and_pinhole = (isinstance(psf.pattern_data, mdl.RadialPatternData) and
                               isinstance(pinhole.pattern_data, mdl.RadialPatternData))
-    psf_arr = psf.get_numpy_array(px_size_nm, extend_sides_to_diagonal=radial_psf_and_pinhole)
-    pinhole_arr = pinhole.get_numpy_array(px_size_nm, extend_sides_to_diagonal=radial_psf_and_pinhole)
+
+    psf_arr = psf.get_numpy_array(canvas_inner_rad_nm, px_size_nm,
+                                  extend_sides_to_diagonal=radial_psf_and_pinhole)
+    pinhole_arr = pinhole.get_numpy_array(canvas_inner_rad_nm, px_size_nm,
+                                          extend_sides_to_diagonal=radial_psf_and_pinhole)
 
     G_2D = fftconvolve(pinhole_arr, psf_arr, mode="same")
     G_rad = np.zeros(canvas_outer_rad_px)
@@ -255,7 +259,9 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
     # Calculate ON-state probabilities after illumination
     P_on = np.zeros(canvas_outer_rad_px)
     for pulse_index, pulse in enumerate(run_instance.pulse_scheme.pulses):
-        illumination_pattern_rad = pulse.illumination_pattern.get_radial_profile(px_size_nm)
+        illumination_pattern_rad = pulse.illumination_pattern.get_radial_profile(
+            canvas_inner_rad_nm, px_size_nm
+        )
         expected_photons = int_to_flux(pulse.max_intensity * 1000, pulse.wavelength) * px_size_nm ** 2
         response = run_instance.fluorophore_settings.get_response(pulse.wavelength)
 
@@ -271,7 +277,7 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
             )
         else:  # Last pulse (readout pulse)
             exp_kernel, var_kernel = make_kernels_detection(
-                num_fluorophore_simulations=500000,
+                num_fluorophore_simulations=run_instance.simulation_settings.num_kernel_detection_iterations,
                 quantum_efficiency=run_instance.detector_properties.quantum_efficiency,
                 collection_efficiency=collection_efficiency,
                 readout_expected_photons=expected_photons,

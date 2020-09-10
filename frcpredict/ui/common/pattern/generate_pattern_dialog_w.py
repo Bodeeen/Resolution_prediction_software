@@ -30,8 +30,9 @@ class GeneratePatternDialog(QDialog, BaseWidget):
     # Methods
     def __init__(self, parent: Optional[QWidget] = None, title: str = "Generate Pattern",
                  availableTypes: List[PatternType] = [], allowEditAmplitude: bool = True,
-                 normalizePreview: bool = False) -> None:
+                 canvasInnerRadiusNm: float = 500.0, normalizePreview: bool = False) -> None:
         self._allowEditAmplitude = allowEditAmplitude
+        self._canvasInnerRadius = canvasInnerRadiusNm
         self._hasHandledInitialRowChange = False
 
         super().__init__(__file__, parent, Qt.WindowSystemMenuHint | Qt.WindowTitleHint)
@@ -91,6 +92,13 @@ class GeneratePatternDialog(QDialog, BaseWidget):
                                    self.lblEmissionWavelength, self.editEmissionWavelength,
                                    visible=emissionWavelength)
 
+    def canvasInnerRadius(self) -> float:
+        """
+        Sets the inner radius of the canvas, in nanometres, that will be used to generate pattern
+        previews.
+        """
+        return self._canvasInnerRadius
+
     def value(self) -> Pattern:
         return self._presenter.model
 
@@ -144,7 +152,7 @@ class GeneratePatternDialog(QDialog, BaseWidget):
     @staticmethod
     def getPatternData(parent: Optional[QWidget] = None, title: str = "Generate Pattern",
                        availableTypes: List[PatternType] = [], allowEditAmplitude: bool = True,
-                       normalizePreview: bool = False,
+                       canvasInnerRadiusNm: float = 500.0, normalizePreview: bool = False,
                        initialValue: Optional[Pattern] = None) -> Tuple[Optional[Pattern], bool]:
         """
         Synchronously opens a dialog for entering pattern properties. The second value in the
@@ -153,7 +161,7 @@ class GeneratePatternDialog(QDialog, BaseWidget):
         """
 
         dialog = GeneratePatternDialog(parent, title, availableTypes,
-                                       allowEditAmplitude, normalizePreview)
+                                       allowEditAmplitude, canvasInnerRadiusNm, normalizePreview)
 
         if initialValue is not None and initialValue.pattern_type != PatternType.array2D:
             dialog.setValue(clear_signals(deepcopy(initialValue)))

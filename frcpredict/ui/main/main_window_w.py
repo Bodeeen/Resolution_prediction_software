@@ -26,6 +26,8 @@ class MainWindow(QMainWindow, BaseWidget):
     samplePropertiesModelSet = pyqtSignal(SampleProperties)
     detectorPropertiesModelSet = pyqtSignal(DetectorProperties)
 
+    showSimulationSettingsClicked = pyqtSignal()
+
     simulateFrcClicked = pyqtSignal()
     abortClicked = pyqtSignal()
 
@@ -95,6 +97,8 @@ class MainWindow(QMainWindow, BaseWidget):
         self.sampleProperties.valueChanged.connect(self.samplePropertiesModelSet)
         self.detectorProperties.valueChanged.connect(self.detectorPropertiesModelSet)
 
+        self.btnSimulationSettings.clicked.connect(self.showSimulationSettingsClicked)
+
         self.btnSimulateFrc.clicked.connect(self.simulateFrcClicked)
         self.btnAbort.clicked.connect(self.abortClicked)
 
@@ -151,6 +155,14 @@ class MainWindow(QMainWindow, BaseWidget):
             self.btnAbort.setText("Aborting…")
         else:
             self.btnAbort.setText("Abort")
+
+    def setCanvasInnerRadius(self, canvasInnerRadiusNm: float) -> None:
+        """
+        Sets the inner radius of the canvas, in nanometres, that the pattern fields will use to
+        generate pattern previews.
+        """
+        self.pulseScheme.setCanvasInnerRadius(canvasInnerRadiusNm)
+        self.imagingSystemSettings.setCanvasInnerRadius(canvasInnerRadiusNm)
 
     def setProgressBarVisible(self, visible: bool) -> None:
         self.pbProgress.setVisible(visible)

@@ -67,6 +67,13 @@ class PulsePropertiesWidget(BaseWidget):
             self.frmBasicProperties, 3, self.lblOrder, self.editOrderContainer, visible=visible
         )
 
+    def setCanvasInnerRadius(self, canvasInnerRadiusNm: float) -> None:
+        """
+        Sets the inner radius of the canvas, in nanometres, that the pattern fields will use to
+        generate pattern previews.
+        """
+        self.editIlluminationPattern.setCanvasInnerRadius(canvasInnerRadiusNm)
+
     def value(self) -> Pulse:
         return self._presenter.model
 

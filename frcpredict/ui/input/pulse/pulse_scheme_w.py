@@ -113,6 +113,13 @@ class PulseSchemeWidget(BaseWidget):
             self.editProperties.setEnabled(False)
             self.btnRemovePulse.setEnabled(False)
 
+    def setCanvasInnerRadius(self, canvasInnerRadiusNm: float) -> None:
+        """
+        Sets the inner radius of the canvas, in nanometres, that the pattern fields will use to
+        generate pattern previews.
+        """
+        self.editProperties.setCanvasInnerRadius(canvasInnerRadiusNm)
+
     def highlightPulse(self, pulseKey: str) -> None:
         """ Highlights a specific pulse in the pulse scheme plot (and unhighlights all others). """
         self.clearPlotHighlighting()

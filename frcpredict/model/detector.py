@@ -20,9 +20,9 @@ class DetectorProperties:
     A description of a detector.
     """
 
-    readout_noise: Union[float, Multivalue[float]] = extended_field(  # rms
+    readout_noise: Union[float, Multivalue[float]] = extended_field(
         observable_property("_readout_noise", default=0.0, signal_name="basic_field_changed"),
-        description="readout noise [e⁻]", accept_multivalues=True
+        description="readout noise [rms]", accept_multivalues=True
     )
 
     quantum_efficiency: Union[float, Multivalue[float]] = extended_field(
@@ -33,16 +33,19 @@ class DetectorProperties:
     camera_pixel_size: Optional[Union[float, Multivalue[float]]] = extended_field(
         # nanometres (if point detector: None)
         observable_property("_camera_pixel_size", default=None, signal_name="basic_field_changed"),
-        description="camera pixel size", accept_multivalues=True
+        description="camera pixel size [nm]", accept_multivalues=True
     )
 
-    def get_total_readout_noise_var(self, pinhole_function: Pattern) -> float:
-        """ Returns the total readout noise of the detector. """
-
+    def get_total_readout_noise_var(self, canvas_inner_radius_nm: float,
+                                    pinhole_function: Pattern) -> float:
+        """ Returns the total readout noise of the detector as a variance. """
         if self.camera_pixel_size is not None:
-            pinhole_sum = (pinhole_function.get_numpy_array(self.camera_pixel_size) ** 2).sum()
+            pinhole_sum = (
+                    pinhole_function.get_numpy_array(
+                        canvas_inner_radius_nm, self.camera_pixel_size
+                    ) ** 2
+            ).sum()
+
             return pinhole_sum * self.readout_noise ** 2
-        elif self.readout_noise is not None:
-            return self.readout_noise ** 2
         else:
-            raise Exception("readout_noise or camera_pixel_size must not be None!")
+            return self.readout_noise ** 2

@@ -33,6 +33,7 @@ class PatternFieldWidget(BaseWidget):
     valueChanged = pyqtSignal(Pattern)
     loadFileClicked = pyqtSignal()
     generateClicked = pyqtSignal()
+    canvasInnerRadiusChanged = pyqtSignal(float)
 
     # Methods
     def __init__(self, *args, **kwargs) -> None:
@@ -41,6 +42,7 @@ class PatternFieldWidget(BaseWidget):
         self._allowEditGenerationAmplitude = True
         self._availableGenerationTypes = []
         self._fieldName = "Pattern"
+        self._canvasInnerRadius = 500.0
 
         # Prepare UI elements
         self.setFocusPolicy(Qt.TabFocus)
@@ -78,6 +80,21 @@ class PatternFieldWidget(BaseWidget):
         Sets which pattern types are available for the user to pick when generating a pattern.
         """
         self._availableGenerationTypes = patternTypes
+
+    def canvasInnerRadius(self) -> float:
+        """
+        Returns the inner radius of the canvas, in nanometres, that is used to generate pattern
+        previews.
+        """
+        return self._canvasInnerRadius
+
+    def setCanvasInnerRadius(self, canvasInnerRadiusNm: float) -> None:
+        """
+        Sets the inner radius of the canvas, in nanometres, that will be used to generate pattern
+        previews.
+        """
+        self._canvasInnerRadius = canvasInnerRadiusNm
+        self.canvasInnerRadiusChanged.emit(canvasInnerRadiusNm)
 
     def fieldName(self) -> str:
         """ Returns the displayed name of the field, e.g. "Optical PSF". """

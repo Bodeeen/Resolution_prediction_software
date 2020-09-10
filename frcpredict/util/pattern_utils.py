@@ -8,14 +8,14 @@ from .spin_average import spinavej
 
 
 # Functions
-def get_canvas_radius_nm(extend_sides_to_diagonal: bool = False) -> float:
+def get_canvas_radius_nm(inner_radius: float, extend_sides_to_diagonal: bool = False) -> float:
     """ Returns the radius of the canvas, in nanometres. """
-    return _canvas_inner_radius_nm if not extend_sides_to_diagonal else _canvas_outer_radius_nm
+    return inner_radius if not extend_sides_to_diagonal else inner_radius * np.sqrt(2)
 
 
 def get_canvas_dimensions_px(radius_nm: float, pixels_per_nm: float) -> Tuple[int, int]:
     """ Returns the radius and side length of the canvas respectively, in pixels. """
-    radius_px = np.int(radius_nm / pixels_per_nm)
+    radius_px = np.int(np.ceil(radius_nm / pixels_per_nm))
     side_length_px = radius_px * 2 - 1
     return radius_px, side_length_px
 
@@ -109,8 +109,3 @@ def _canvas_meshgrid(radius_nm: float, pixels_per_nm: float) -> np.ndarray:
 def _radial_to_2d(radius_nm: float, pixels_per_nm: float) -> np.ndarray:
     x, y = _canvas_meshgrid(radius_nm, pixels_per_nm)
     return np.sqrt(x ** 2 + y ** 2)
-
-
-# Constants
-_canvas_inner_radius_nm = 500.0
-_canvas_outer_radius_nm = _canvas_inner_radius_nm * np.sqrt(2)
