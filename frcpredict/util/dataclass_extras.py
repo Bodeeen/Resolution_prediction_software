@@ -14,7 +14,7 @@ T = TypeVar("T")
 
 class dataclass_property(property):
     def __init__(self, fget, fset, default) -> None:
-        _override_dataclasses_json_is_dataclass()
+        _override_dataclasses_json_decode_dataclass()
         self.default = default
         super().__init__(fget, fset)
 
@@ -256,27 +256,26 @@ def rebuild_dataclass(dataclass_instance: T) -> T:
     return type(dataclass_instance)(**kwargs)
 
 
-def _override_dataclasses_json_is_dataclass() -> None:
+def _override_dataclasses_json_decode_dataclass() -> None:
     """
     Overrides the is_dataclass and _is_dataclass_instance functions in dataclasses-json to be
     compatible with the way we use properties in dataclasses.
     """
 
-    global _has_overridden_dataclasses_json_is_dataclass
-    if _has_overridden_dataclasses_json_is_dataclass:
+    global _has_overridden_dataclasses_json_decode_dataclass
+    if _has_overridden_dataclasses_json_decode_dataclass:
         return
 
-    def is_dataclass(obj):
-        cls = obj if isinstance(obj, type) else type(obj)
-        return (hasattr(cls, "__dataclass_fields__") or
-                isinstance(obj, dataclass_property) and is_dataclass(obj.default))
+    old_decode_dataclass = dataclasses_json.core._decode_dataclass
 
-    def _is_dataclass_instance(obj):
-        return is_dataclass(type(obj))
+    def _decode_dataclass(cls, kvs, infer_missing):
+        if isinstance(kvs, dataclass_property):
+            return kvs
 
-    dataclasses_json.core.is_dataclass = is_dataclass
-    dataclasses_json.core._is_dataclass_instance = _is_dataclass_instance
-    _has_overridden_dataclasses_json_is_dataclass = True
+        return old_decode_dataclass(cls, kvs, infer_missing)
+
+    dataclasses_json.core._decode_dataclass = _decode_dataclass
+    _has_overridden_dataclasses_json_decode_dataclass = True
 
 
-_has_overridden_dataclasses_json_is_dataclass = False
+_has_overridden_dataclasses_json_decode_dataclass = False
