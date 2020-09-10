@@ -149,10 +149,10 @@ def simulate(run_instance: "mdl.RunInstance", *,
 
     # Input validation
     if len(run_instance.fluorophore_settings.responses) < 1:
-        raise Exception("Input didn't contain any fluorophore responses!")
+        raise ValueError("Input didn't contain any fluorophore responses!")
 
     if len(run_instance.pulse_scheme.pulses) < 1:
-        raise Exception("The pulse scheme is empty!")
+        raise ValueError("The pulse scheme is empty!")
 
     # Set up abort handling
     aborting = False
@@ -254,7 +254,7 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
             run_instance.imaging_system_settings.refractive_index
         )
     else:
-        raise Exception("Unsupported optical PSF type (only Airy from NA is currently supported)")
+        raise ValueError("Unsupported optical PSF type (only Airy from NA is currently supported)")
 
     # Calculate ON-state probabilities after illumination
     P_on = np.zeros(canvas_outer_rad_px)
@@ -295,4 +295,4 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
 
             return exp_kernel, var_kernel
 
-    raise Exception("Input didn't contain a readout pulse!")
+    raise ValueError("Input didn't contain any pulses!")
