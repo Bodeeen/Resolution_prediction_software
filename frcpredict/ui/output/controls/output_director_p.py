@@ -1,5 +1,6 @@
 import math
-from typing import Optional, Union
+from copy import copy
+from typing import Optional, Union, List
 
 import numpy as np
 from PyQt5.QtCore import pyqtSlot
@@ -52,10 +53,7 @@ class OutputDirectorPresenter(BasePresenter[SimulationResultsView]):
     def __init__(self, widget) -> None:
         self._currentRunInstance = None
         self._currentKernelResult = None
-
-        self._cachedInspectionCurveThreshold = None
-        self._cachedInspectionCurveX = None
-        self._cachedInspectionCurveY = None
+        self._clearCachedInspectionCurves()
 
         super().__init__(SimulationResultsView(), widget)
 
@@ -110,7 +108,8 @@ class OutputDirectorPresenter(BasePresenter[SimulationResultsView]):
             label = getLabelForMultivalue(self.model.results,
                                           self.model.results.multivalue_paths[inspectedIndex])
 
-            if self._cachedInspectionCurveThreshold == threshold:
+            if (self._cachedInspectionCurveX is not None and
+                    self._cachedInspectionCurveY is not None):
                 # Use cached curve
                 inspectedCurveX = self._cachedInspectionCurveX
                 inspectedCurveY = self._cachedInspectionCurveY
@@ -133,9 +132,10 @@ class OutputDirectorPresenter(BasePresenter[SimulationResultsView]):
                         self.model.threshold
                     )
 
-                self._cachedInspectionCurveThreshold = threshold
                 self._cachedInspectionCurveX = inspectedCurveX
                 self._cachedInspectionCurveY = inspectedCurveY
+
+            self._cachedInspectionMultivalueIndices = copy(self.model.multivalueValueIndices)
 
             self.widget.updateViewOptions(
                 ViewOptions(
@@ -152,6 +152,11 @@ class OutputDirectorPresenter(BasePresenter[SimulationResultsView]):
                 ViewOptions(threshold=threshold, valueAtThreshold=valueAtThreshold,
                             inspectedMultivalueIndex=inspectedIndex)
             )
+
+    def _clearCachedInspectionCurves(self) -> None:
+        self._cachedInspectionMultivalueIndices = []
+        self._cachedInspectionCurveX = None
+        self._cachedInspectionCurveY = None
 
     # Model event handling
     def _onResultsChange(self, results: Optional[SimulationResults]) -> None:
@@ -179,6 +184,8 @@ class OutputDirectorPresenter(BasePresenter[SimulationResultsView]):
 
         self.model._inspectedMultivalueIndex = -1
 
+        self._clearCachedInspectionCurves()
+
         # Update widget
         self._updateDataInWidget(initialDisplayOfData=True)
 
@@ -190,12 +197,34 @@ class OutputDirectorPresenter(BasePresenter[SimulationResultsView]):
         self._updateDataInWidget(initialDisplayOfData=True)
 
     def _onInspectedIndexChange(self, _) -> None:
+        self._clearCachedInspectionCurves()
         self._updateViewOptionsInWidget()
 
-    def _onMultivalueIndexChange(self, _) -> None:
+    def _onMultivalueIndexChange(self, multivalueIndices: List[int]) -> None:
+        # Clear cache if needed
+        if len(multivalueIndices) != len(self._cachedInspectionMultivalueIndices):
+            self._clearCachedInspectionCurves()
+        else:
+            oldIndicesExceptInspected = [
+                element
+                for i, element in enumerate(multivalueIndices)
+                if i != self.model.inspectedMultivalueIndex
+            ]
+
+            newIndicesExceptInspected = [
+                element
+                for i, element in enumerate(self._cachedInspectionMultivalueIndices)
+                if i != self.model.inspectedMultivalueIndex
+            ]
+
+            if oldIndicesExceptInspected != newIndicesExceptInspected:
+                self._clearCachedInspectionCurves()
+
+        # Update data
         self._updateDataInWidget()
 
     def _onThresholdChange(self, _) -> None:
+        self._clearCachedInspectionCurves()
         self._updateViewOptionsInWidget()
 
     # UI event handling
