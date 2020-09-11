@@ -241,16 +241,16 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
 
     G_2D = fftconvolve(pinhole_arr, psf_arr, mode="same")
     Gvar_2D = fftconvolve(pinhole_arr ** 2, psf_arr, mode="same")
-    G_rad = np.zeros(canvas_outer_rad_px)
-    Gvar_rad = np.zeros(canvas_outer_rad_px)
     if radial_psf_and_pinhole:
-        G_rad[0:canvas_outer_rad_px] = G_2D[canvas_outer_rad_px - 1, canvas_outer_rad_px - 1:]
-        Gvar_rad[0:canvas_outer_rad_px] = Gvar_2D[canvas_outer_rad_px - 1][canvas_outer_rad_px - 1:]
+        G_rad = G_2D[canvas_outer_rad_px - 1, canvas_outer_rad_px - 1:]
+        Gvar_rad = Gvar_2D[canvas_outer_rad_px - 1][canvas_outer_rad_px - 1:]
     else:
+        G_rad = np.zeros(canvas_outer_rad_px)
+        Gvar_rad = np.zeros(canvas_outer_rad_px)
         radial_profile_result = radial_profile(G_2D)
         radial_profile_result_var = radial_profile(Gvar_2D)
-        G_rad[0:len(radial_profile_result)] = radial_profile_result
-        Gvar_rad[0:len(radial_profile_result)] = radial_profile_result_var
+        G_rad[:len(radial_profile_result)] = radial_profile_result
+        Gvar_rad[:len(radial_profile_result)] = radial_profile_result_var
 
     # Calculate collection efficiency
     if isinstance(psf.pattern_data, mdl.AiryNAPatternData):

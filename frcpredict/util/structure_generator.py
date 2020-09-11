@@ -101,7 +101,7 @@ def positions2im(area_side_um: float, px_size_um: float,
                  f_array_x: np.ndarray, f_array_y: np.ndarray) -> np.ndarray:
     tot_fluorophores = len(f_array_x)
 
-    im_side_px = np.int(np.ceil(area_side_um / px_size_um))
+    im_side_px = np.int(np.round(area_side_um / px_size_um))
 
     im = np.zeros((im_side_px, im_side_px))
 

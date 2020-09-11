@@ -25,7 +25,16 @@ class PatternData(ABC):
 
     def get_radial_profile(self, canvas_inner_radius_nm: float, px_size_nm: float) -> np.ndarray:
         """ Returns a numpy array representation of the pattern data as a radial profile. """
-        return radial_profile(self.get_numpy_array(canvas_inner_radius_nm, px_size_nm))
+        outer_radius_nm = get_canvas_radius_nm(canvas_inner_radius_nm,
+                                               extend_sides_to_diagonal=True)
+        outer_radius_px, _ = get_canvas_dimensions_px(outer_radius_nm, px_size_nm)
+
+        return_value = np.zeros(outer_radius_px)
+        radial_profile_result = radial_profile(
+            self.get_numpy_array(canvas_inner_radius_nm, px_size_nm)
+        )
+        return_value[:len(radial_profile_result)] = radial_profile_result
+        return return_value
 
     @abstractmethod
     def get_numpy_array(self, canvas_inner_radius_nm: float, px_size_nm: float,

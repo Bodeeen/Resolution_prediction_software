@@ -15,7 +15,7 @@ def get_canvas_radius_nm(inner_radius: float, extend_sides_to_diagonal: bool = F
 
 def get_canvas_dimensions_px(radius_nm: float, px_size_nm: float) -> Tuple[int, int]:
     """ Returns the radius and side length of the canvas respectively, in pixels. """
-    radius_px = np.int(np.ceil(radius_nm / px_size_nm))
+    radius_px = np.int(np.round(radius_nm / px_size_nm))
     side_length_px = radius_px * 2 - 1
     return radius_px, side_length_px
 
