@@ -94,11 +94,11 @@ class FluorophoreSettingsPresenter(BasePresenter[FluorophoreSettings]):
         Removes the currently selected response. A dialog will open for the user to confirm first.
         """
 
-        confirmation_result = QMessageBox.question(
+        confirmationResult = QMessageBox.question(
             self.widget, "Remove Response",
             f"Remove the selected response \"{self._selectedResponse}\"?",
             defaultButton=QMessageBox.No
         )
 
-        if confirmation_result == QMessageBox.Yes:
+        if confirmationResult == QMessageBox.Yes:
             self.model.remove_response(self._selectedResponse.wavelength)

@@ -232,13 +232,13 @@ class MainWindow(QMainWindow, BaseWidget):
         self.actionExportBinary.setEnabled(kernelResult is not None)
 
     def closeEvent(self, event: QCloseEvent) -> None:
-        confirmation_result = QMessageBox.question(
+        confirmationResult = QMessageBox.question(
             self, "Exit?",
             f"Exit the program? Any unsaved input parameters and results will be lost.",
             defaultButton=QMessageBox.No
         )
 
-        if confirmation_result != QMessageBox.Yes:
+        if confirmationResult != QMessageBox.Yes:
             event.ignore()
             return
 

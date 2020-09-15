@@ -120,11 +120,11 @@ class PulseSchemePresenter(BasePresenter[PulseScheme]):
         Removes the currently selected pulse. A dialog will open for the user to confirm first.
         """
 
-        confirmation_result = QMessageBox.question(
+        confirmationResult = QMessageBox.question(
             self.widget, "Remove Pulse", "Remove the selected pulse?",
             defaultButton=QMessageBox.No)
 
-        if confirmation_result == QMessageBox.Yes:
+        if confirmationResult == QMessageBox.Yes:
             self.model.remove_pulse(self._selectedPulseKey)
 
     @pyqtSlot()

@@ -154,13 +154,13 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
         if self._currentWorker is None or self._currentWorker.hasFinished():
             return
 
-        confirmation_result = QMessageBox.question(
+        confirmationResult = QMessageBox.question(
             self.widget, "Abort Simulation", "Abort the current simulation?")
 
         if self._currentWorker is None or self._currentWorker.hasFinished():
             return
 
-        if confirmation_result == QMessageBox.Yes:
+        if confirmationResult == QMessageBox.Yes:
             self.widget.setAborting(True)
             self._currentWorker.abort()
 
@@ -178,19 +178,19 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
         if path:  # Check whether a file was picked
             if self.widget.isModified():
                 # Unsaved changes in input parameters, confirm before continuing
-                confirmation_result = QMessageBox.question(
+                confirmationResult = QMessageBox.question(
                     self.widget, "Confirm Load",
                     "You have unsaved changes in the Input Parameters section. Proceed loading" +
                     " the file?",
                     defaultButton=QMessageBox.No)
 
-                if confirmation_result != QMessageBox.Yes:
+                if confirmationResult != QMessageBox.Yes:
                     return
 
             try:
                 if path.endswith(".bin"):
                     # Open binary pickle file
-                    confirmation_result = QMessageBox.warning(
+                    confirmationResult = QMessageBox.warning(
                         self.widget, "Security Warning",
                         "You're about to open a simulation stored in binary format. Since" +
                         " data from this type of file can execute arbitrary code and thus is" +
@@ -200,7 +200,7 @@ class MainWindowPresenter(BasePresenter[RunInstance]):
                         "\n\nContinue loading the file?",
                         QMessageBox.Yes | QMessageBox.No, defaultButton=QMessageBox.No)
 
-                    if confirmation_result != QMessageBox.Yes:
+                    if confirmationResult != QMessageBox.Yes:
                         return
 
                     with open(path, "rb") as pickleFile:
