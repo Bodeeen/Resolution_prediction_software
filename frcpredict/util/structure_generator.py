@@ -106,11 +106,8 @@ def positions2im(area_side_um: float, px_size_um: float,
     im = np.zeros((im_side_px, im_side_px))
 
     for i in range(tot_fluorophores):
-        x_px = np.int(f_array_x[i] // px_size_um)
-        y_px = np.int(f_array_y[i] // px_size_um)
-        try:
-            im[y_px, x_px] += 1
-        except:
-            pass
+        x_px = np.int(f_array_x[i] / area_side_um * im.shape[1])
+        y_px = np.int(f_array_y[i] / area_side_um * im.shape[0])
+        im[y_px, x_px] += 1
 
     return im
