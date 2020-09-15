@@ -54,6 +54,12 @@
      </property>
      <item>
       <layout class="QFormLayout" name="formLayout">
+       <property name="fieldGrowthPolicy">
+        <enum>QFormLayout::ExpandingFieldsGrow</enum>
+       </property>
+       <property name="labelAlignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
        <property name="horizontalSpacing">
         <number>6</number>
        </property>
@@ -89,6 +95,12 @@
        </item>
        <item row="1" column="1">
         <widget class="QSpinBox" name="editNumPairs">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="maximum">
           <number>100000000</number>
          </property>
@@ -103,6 +115,12 @@
        </item>
        <item row="3" column="1">
         <widget class="QSpinBox" name="editFluorophores">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="maximum">
           <number>100000000</number>
          </property>

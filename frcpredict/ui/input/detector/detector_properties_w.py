@@ -26,6 +26,7 @@ class DetectorPropertiesWidget(BaseWidget):
 
     # Methods
     def __init__(self, *args, **kwargs) -> None:
+        self._hasSetMinimumHeight = False
         super().__init__(__file__, *args, **kwargs)
 
         # Prepare UI elements
@@ -55,6 +56,21 @@ class DetectorPropertiesWidget(BaseWidget):
 
         # Initialize presenter
         self._presenter = DetectorPropertiesPresenter(self)
+
+    def paintEvent(self, event) -> None:
+        ret = super().paintEvent(event)
+
+        # Set minimum size so that the widget doesn't become smaller when pixel size row is hidden
+        if not self._hasSetMinimumHeight:
+            minimumHeight = self.minimumSizeHint().height()
+            if self.editCameraPixelSize.isHidden():
+                minimumHeight += (self.editReadoutNoise.height()
+                                  + self.formLayout.verticalSpacing())
+
+            self.setMinimumHeight(minimumHeight)
+            self._hasSetMinimumHeight = True
+
+        return ret
 
     def value(self) -> DetectorProperties:
         return self._presenter.model

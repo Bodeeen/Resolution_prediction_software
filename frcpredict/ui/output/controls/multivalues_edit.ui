@@ -117,6 +117,9 @@
        </rect>
       </property>
       <layout class="QFormLayout" name="formLayout">
+       <property name="fieldGrowthPolicy">
+        <enum>QFormLayout::ExpandingFieldsGrow</enum>
+       </property>
        <property name="rowWrapPolicy">
         <enum>QFormLayout::WrapAllRows</enum>
        </property>

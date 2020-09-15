@@ -88,6 +88,12 @@
       <string>Data</string>
      </property>
      <layout class="QFormLayout" name="formLayout_4">
+      <property name="fieldGrowthPolicy">
+       <enum>QFormLayout::ExpandingFieldsGrow</enum>
+      </property>
+      <property name="labelAlignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      </property>
       <property name="verticalSpacing">
        <number>9</number>
       </property>

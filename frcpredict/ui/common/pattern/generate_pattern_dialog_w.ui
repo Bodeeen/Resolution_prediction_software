@@ -135,6 +135,12 @@
            </property>
            <item row="0" column="0">
             <layout class="QFormLayout" name="frmProperties">
+             <property name="fieldGrowthPolicy">
+              <enum>QFormLayout::ExpandingFieldsGrow</enum>
+             </property>
+             <property name="labelAlignment">
+              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+             </property>
              <item row="0" column="0">
               <widget class="QLabel" name="lblAmplitude">
                <property name="text">
