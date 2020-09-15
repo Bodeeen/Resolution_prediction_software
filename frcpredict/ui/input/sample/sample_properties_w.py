@@ -15,8 +15,8 @@ class SamplePropertiesWidget(BaseWidget):
     valueChanged = pyqtSignal(SampleProperties)
     modifiedFlagSet = pyqtSignal()
 
-    inputPowerChanged = pyqtSignal([float], [Multivalue])
-    DOriginChanged = pyqtSignal([float], [Multivalue])
+    inputPowerChangedByUser = pyqtSignal([float], [Multivalue])
+    DOriginChangedByUser = pyqtSignal([float], [Multivalue])
 
     loadSampleStructureClicked = pyqtSignal()
     unloadSampleStructureClicked = pyqtSignal()
@@ -41,10 +41,10 @@ class SamplePropertiesWidget(BaseWidget):
         self.modifiedFlagSet.connect(self._onModifiedFlagSet)
 
         # Connect forwarded signals
-        connectMulti(self.editInputPower.valueChanged, [float, Multivalue],
-                     self.inputPowerChanged)
-        connectMulti(self.editDOrigin.valueChanged, [float, Multivalue],
-                     self.DOriginChanged)
+        connectMulti(self.editInputPower.valueChangedByUser, [float, Multivalue],
+                     self.inputPowerChangedByUser)
+        connectMulti(self.editDOrigin.valueChangedByUser, [float, Multivalue],
+                     self.DOriginChangedByUser)
         self.configPanel.dataLoaded.connect(self.modifiedFlagSet)
 
         self.btnLoadSampleStructure.clicked.connect(self.loadSampleStructureClicked)

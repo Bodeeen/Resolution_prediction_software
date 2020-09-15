@@ -40,9 +40,9 @@ class SamplePropertiesPresenter(BasePresenter[SampleProperties]):
         super().__init__(SampleProperties(), widget)
 
         # Prepare UI events
-        connectMulti(widget.inputPowerChanged, [float, Multivalue],
+        connectMulti(widget.inputPowerChangedByUser, [float, Multivalue],
                      self._uiInputPowerChange)
-        connectMulti(widget.DOriginChanged, [float, Multivalue],
+        connectMulti(widget.DOriginChangedByUser, [float, Multivalue],
                      self._uiDOriginChange)
 
         widget.loadSampleStructureClicked.connect(self._uiClickLoadSampleStructure)
