@@ -81,7 +81,13 @@ def generate_digital_pinhole(*, fwhm: float,
 
     b_mat = np.array([b0_vec, b1_vec])
 
-    b_inv = np.linalg.pinv(b_mat)
+    for i in range(0, 5):
+        b_inv = np.linalg.pinv(b_mat)
+
+        # The NumPy build available on PyPI may create an all-nan array the first time we run pinv,
+        # at least on Windows with certain processors. Therefore, we retry if this happens.
+        if not np.isnan(b_inv).all():
+            break
 
     return b_inv[:, 0].reshape(g_base.shape)
 
