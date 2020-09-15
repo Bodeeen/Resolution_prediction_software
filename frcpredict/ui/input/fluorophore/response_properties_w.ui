@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>243</width>
+    <height>77</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QFormLayout" name="formLayout">
+   <property name="fieldGrowthPolicy">
+    <enum>QFormLayout::ExpandingFieldsGrow</enum>
+   </property>
+   <property name="labelAlignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
+   <property name="horizontalSpacing">
+    <number>9</number>
+   </property>
+   <property name="verticalSpacing">
+    <number>6</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item row="0" column="0">
+    <widget class="QLabel" name="lblWavelength">
+     <property name="text">
+      <string>Wavelength [nm]:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="FreeFloatBox" name="editWavelength"/>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="lblOffToOn">
+     <property name="text">
+      <string>ON cross section:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="lblOnToOff">
+     <property name="text">
+      <string>OFF cross section:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="lblEmission">
+     <property name="text">
+      <string>Emission cross section:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="ExtendedFreeFloatBox" name="editEmission" native="true">
+     <property name="infoText" stdset="0">
+      <string>The value set here determines the rate of emission induced per kW/cm² of light intensity. The rate of emission is calculated as the cross section times the illumination power given in kW/cm². The unit for the cross section is thus rate/(kW/cm²).</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="ExtendedFreeFloatBox" name="editOnToOff" native="true">
+     <property name="infoText" stdset="0">
+      <string>The value set here determines the rate of OFF-switching induced per kW/cm² of light intensity. The rate of OFF-switching is calculated as the cross section times the illumination power given in kW/cm². The unit for the cross section is thus rate/(kW/cm²).</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="ExtendedFreeFloatBox" name="editOffToOn" native="true">
+     <property name="infoText" stdset="0">
+      <string>The value set here determines the rate of ON-switching induced per kW/cm² of light intensity. The rate of ON-switching is calculated as the cross section times the illumination power given in kW/cm². The unit for the cross section is thus rate/(kW/cm²).</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ExtendedFreeFloatBox</class>
+   <extends>QWidget</extends>
+   <header>frcpredict.ui</header>
+  </customwidget>
+  <customwidget>
+   <class>FreeFloatBox</class>
+   <extends>QLineEdit</extends>
+   <header>frcpredict.ui</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
