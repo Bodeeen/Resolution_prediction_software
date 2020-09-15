@@ -1,9 +1,32 @@
 import os
 from abc import ABC
 
+
+def getUserDir() -> str:
+    """
+    Returns the user's documents folder if they are using a Windows system, or their home folder if
+    they are using another operating system.
+    """
+
+    if os.name == "nt":  # Windows system, try to return documents directory
+        try:
+            import ctypes.wintypes
+            CSIDL_PERSONAL = 5  # Documents
+            SHGFP_TYPE_CURRENT = 0  # Current value
+
+            buf = ctypes.create_unicode_buffer(ctypes.wintypes.MAX_PATH)
+            ctypes.windll.shell32.SHGetFolderPathW(0, CSIDL_PERSONAL, 0, SHGFP_TYPE_CURRENT, buf)
+
+            return buf.value
+        except ImportError:
+            pass
+
+    return os.path.expanduser("~")  # Non-Windows system, return home directory
+
+
 _basePresetFilesDir = os.path.join("data", "presets")
-_baseUserFilesDir = "user_files"
-_baseUserConfigFilesDir = os.path.join("user_files", "saved_configs")
+_baseUserFilesDir = os.path.join(getUserDir(), "frcpredict")
+_baseUserConfigFilesDir = os.path.join(_baseUserFilesDir, "saved_configs")
 
 
 def subOfPresetFilesDir(subdir: str) -> str:
