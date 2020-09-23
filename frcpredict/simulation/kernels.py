@@ -130,7 +130,8 @@ def make_kernels(*, num_fluorophore_simulations: int,
         T_exp=T_obs, P_on=P_pre)
         
     """Old calculation"""
-    h_var = (quantum_efficiency * collection_efficiency * rfl) * expected_ON + (quantum_efficiency * collection_efficiency * rfl)**2 *var_ON
+    alpha = quantum_efficiency * collection_efficiency * rfl
+    h_var = alpha * expected_ON + alpha**2 *var_ON
     h_var *= G**2
     """New calculation"""
 #    h_var1 = quantum_efficiency * collection_efficiency * np.multiply(G2, np.multiply(rfl, expected_ON))
