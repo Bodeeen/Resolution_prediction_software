@@ -235,11 +235,13 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
 
     psf_arr = psf.get_numpy_array(canvas_inner_rad_nm, px_size_nm,
                                   extend_sides_to_diagonal=radial_psf_and_pinhole)
+    #Create 2D array with 2D-sum = 1
     psf_arr = psf_arr / psf_arr.sum()
     pinhole_arr = pinhole.get_numpy_array(canvas_inner_rad_nm, px_size_nm,
                                           extend_sides_to_diagonal=radial_psf_and_pinhole)
 
     G_2D = fftconvolve(pinhole_arr, psf_arr, mode="same")
+    print('Sum of 2D G = ', G_2D.sum())
     Gvar_2D = fftconvolve(pinhole_arr ** 2, psf_arr, mode="same")
     if radial_psf_and_pinhole:
         G_rad = G_2D[canvas_outer_rad_px - 1, canvas_outer_rad_px - 1:]
@@ -290,9 +292,12 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
                 T_obs=pulse.duration
             )
 
+#            print('Sum of expected emission kernel = ', exp_kernel.sum())
+#            print('Radial of G = ', G_rad)
+#            print('Sum of radial of G = ', G_rad.sum())
             # As described in eq (17) and (18) in publication
             exp_kernel *= G_rad
-            var_kernel *= Gvar_rad  # According to the publication this should be abs(G_rad),
+            var_kernel *= G_rad**2  # According to the publication this should be abs(G_rad),
                                     # but that may be an error
 
             return exp_kernel, var_kernel

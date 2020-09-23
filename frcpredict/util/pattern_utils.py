@@ -74,6 +74,8 @@ def generate_digital_pinhole(*, fwhm: float,
 
     g_base = generate_gaussian(amplitude=1, fwhm=fwhm,
                                canvas_radius=canvas_radius, px_size_nm=px_size_nm)
+    
+    g_base /= g_base.sum()
     const_base = np.ones_like(g_base)
 
     b0_vec = g_base.reshape(g_base.size)
@@ -89,7 +91,8 @@ def generate_digital_pinhole(*, fwhm: float,
         if not np.isnan(b_inv).all():
             break
 
-    return b_inv[:, 0].reshape(g_base.shape)
+    p = b_inv[:, 0].reshape(g_base.shape)
+    return p
 
 
 def generate_physical_pinhole(*, radius: float,
