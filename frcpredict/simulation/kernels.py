@@ -80,7 +80,9 @@ def variance_ON_time(*, num_fluorophore_simulations: int, R_on: np.ndarray, R_of
     """
 
     assert R_on.shape == R_off.shape  == P_on.shape
-
+    
+    variances = np.zeros(R_on.shape)
+    
     for idx, val in np.ndenumerate(R_on):
         ON_times = make_random_telegraph_data(num_fluorophore_simulations,
                                               t_on=1 / R_off[idx],
@@ -88,9 +90,9 @@ def variance_ON_time(*, num_fluorophore_simulations: int, R_on: np.ndarray, R_of
                                               t_bleach=1e10,
                                               t_exp=T_exp,
                                               P_on=P_on[idx])
+        variances[idx] = ON_times.var()
 
-
-    return ON_times.var()
+    return variances
 
 
 def make_kernels(*, num_fluorophore_simulations: int,
@@ -130,13 +132,13 @@ def make_kernels(*, num_fluorophore_simulations: int,
         T_exp=T_obs, P_on=P_pre)
         
     """Old calculation"""
-    alpha = quantum_efficiency * collection_efficiency * rfl
-    h_var = alpha * expected_ON + alpha**2 *var_ON
-    h_var *= G**2
+#    alpha = quantum_efficiency * collection_efficiency * rfl
+#    h_var = alpha * expected_ON + alpha**2 * var_ON
+#    h_var *= G**2
     """New calculation"""
-#    h_var1 = quantum_efficiency * collection_efficiency * np.multiply(G2, np.multiply(rfl, expected_ON))
-#    h_var2 = quantum_efficiency**2 * collection_efficiency**2 * np.multiply(G**2, np.multiply(rfl**2, var_ON))
-#    h_var = h_var2 + h_var1
+    h_var1 = quantum_efficiency * collection_efficiency * np.multiply(G2, np.multiply(rfl, expected_ON))
+    h_var2 = quantum_efficiency**2 * collection_efficiency**2 * np.multiply(G**2, np.multiply(rfl**2, var_ON))
+    h_var = h_var2 + h_var1
 
     return hE, h_var
 
