@@ -65,8 +65,8 @@ def expected_P_on(*, P_pre: np.ndarray, R_on: np.ndarray, R_off: np.ndarray,
     return P_post
 
 
-def variance_detection(*, num_fluorophore_simulations: int, R_on: np.ndarray, R_off: np.ndarray,
-                       alpha: np.ndarray, T_exp: float, P_on: np.ndarray) -> np.ndarray:
+def variance_ON_time(*, num_fluorophore_simulations: int, R_on: np.ndarray, R_off: np.ndarray, 
+                     T_exp: float, P_on: np.ndarray) -> np.ndarray:
     """
     Estimates the variance of emitted photons for a single fluorophore observer for a certain
     observation time. R_on, R_off and alpha are given as arrays of "paired" values. Outputs are also
@@ -75,16 +75,14 @@ def variance_detection(*, num_fluorophore_simulations: int, R_on: np.ndarray, R_
     - num_fluorophore_simulations: Number of times to simulate fluorophore
     - R_on: Rate of ON-switching (events/ms)
     - R_off: Rate of OFF-switching (events/ms)
-    - alpha: Expected number of photons emitted/detected per ms that the
-        fluorophore is in the ON-state
     - T_exp: Observation time
     - P_on: Probability of fluorophore being ON at start
     """
 
-    assert R_on.shape == R_off.shape == alpha.shape == P_on.shape
-
+    assert R_on.shape == R_off.shape  == P_on.shape
+    
     variances = np.zeros(R_on.shape)
-
+    
     for idx, val in np.ndenumerate(R_on):
         ON_times = make_random_telegraph_data(num_fluorophore_simulations,
                                               t_on=1 / R_off[idx],
@@ -92,18 +90,17 @@ def variance_detection(*, num_fluorophore_simulations: int, R_on: np.ndarray, R_
                                               t_bleach=1e10,
                                               t_exp=T_exp,
                                               P_on=P_on[idx])
-
-        # Eq (2) in publication
-        variances[idx] = alpha[idx] * ON_times.mean() + alpha[idx] ** 2 * ON_times.var()
+        variances[idx] = ON_times.var()
 
     return variances
 
 
-def make_kernels_detection(*, num_fluorophore_simulations: int,
+def make_kernels(*, num_fluorophore_simulations: int,
                            quantum_efficiency: float, collection_efficiency: float,
                            max_intensity: float, relative_readout_intensity: np.ndarray,
                            P_pre: np.ndarray, CS_on_switch: float, CS_off_switch: float,
-                           CS_fluorescent: float, T_obs: float) -> Tuple[np.ndarray, np.ndarray]:
+                           CS_fluorescent: float, T_obs: float,
+                           G: np.ndarray, G2: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     """
     Creates the expected emission and variance of emission "kernels".
 
@@ -123,19 +120,27 @@ def make_kernels_detection(*, num_fluorophore_simulations: int,
     assert P_pre.shape == relative_readout_intensity.shape, "Not the same shapes"
 
     photon_illumination = max_intensity * relative_readout_intensity
-
-    alpha = quantum_efficiency * collection_efficiency * photon_illumination * CS_fluorescent
-    expected_on_at_obs = expected_on_time(P_on=P_pre, R_on=photon_illumination * CS_on_switch,
+    rfl = photon_illumination * CS_fluorescent
+    expected_ON = expected_on_time(P_on=P_pre, R_on=photon_illumination * CS_on_switch,
                                           R_off=photon_illumination * CS_off_switch, T_obs=T_obs)
 
-    exp_det = np.multiply(alpha, expected_on_at_obs)  # Comparable to eq (1) in publication
-    var_det = variance_detection(
+    hE = quantum_efficiency * collection_efficiency * np.multiply(G, np.multiply(rfl, expected_ON))  # Comparable to eq (1) in publication
+    
+    var_ON = variance_ON_time(
         num_fluorophore_simulations=num_fluorophore_simulations,
         R_on=photon_illumination * CS_on_switch, R_off=photon_illumination * CS_off_switch,
-        alpha=alpha, T_exp=T_obs, P_on=P_pre
-    )
+        T_exp=T_obs, P_on=P_pre)
+        
+    """Old calculation"""
+#    alpha = quantum_efficiency * collection_efficiency * rfl
+#    h_var = alpha * expected_ON + alpha**2 * var_ON
+#    h_var *= G**2
+    """New calculation"""
+    h_var1 = quantum_efficiency * collection_efficiency * np.multiply(G2, np.multiply(rfl, expected_ON))
+    h_var2 = quantum_efficiency**2 * collection_efficiency**2 * np.multiply(G**2, np.multiply(rfl**2, var_ON))
+    h_var = h_var2 + h_var1
 
-    return exp_det, var_det
+    return hE, h_var
 
 
 def simulate(run_instance: "mdl.RunInstance", *,
@@ -235,22 +240,24 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
 
     psf_arr = psf.get_numpy_array(canvas_inner_rad_nm, px_size_nm,
                                   extend_sides_to_diagonal=radial_psf_and_pinhole)
+    #Create 2D array with 2D-sum = 1
     psf_arr = psf_arr / psf_arr.sum()
     pinhole_arr = pinhole.get_numpy_array(canvas_inner_rad_nm, px_size_nm,
                                           extend_sides_to_diagonal=radial_psf_and_pinhole)
 
     G_2D = fftconvolve(pinhole_arr, psf_arr, mode="same")
-    Gvar_2D = fftconvolve(pinhole_arr ** 2, psf_arr, mode="same")
+    print('Sum of 2D G = ', G_2D.sum())
+    G2_2D = fftconvolve(pinhole_arr ** 2, psf_arr, mode="same")
     if radial_psf_and_pinhole:
         G_rad = G_2D[canvas_outer_rad_px - 1, canvas_outer_rad_px - 1:]
-        Gvar_rad = Gvar_2D[canvas_outer_rad_px - 1][canvas_outer_rad_px - 1:]
+        G2_rad = G2_2D[canvas_outer_rad_px - 1][canvas_outer_rad_px - 1:]
     else:
         G_rad = np.zeros(canvas_outer_rad_px)
-        Gvar_rad = np.zeros(canvas_outer_rad_px)
+        G2_rad = np.zeros(canvas_outer_rad_px)
         radial_profile_result = radial_profile(G_2D)
-        radial_profile_result_var = radial_profile(Gvar_2D)
+        radial_profile_result_2 = radial_profile(G2_2D)
         G_rad[:len(radial_profile_result)] = radial_profile_result
-        Gvar_rad[:len(radial_profile_result)] = radial_profile_result_var
+        G2_rad[:len(radial_profile_result)] = radial_profile_result_2
 
     # Calculate collection efficiency
     if isinstance(psf.pattern_data, mdl.AiryNAPatternData):
@@ -277,7 +284,7 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
                 T_exp=pulse.duration
             )
         else:  # Last pulse (readout pulse)
-            exp_kernel, var_kernel = make_kernels_detection(
+            exp_kernel, var_kernel = make_kernels(
                 num_fluorophore_simulations=run_instance.simulation_settings.num_kernel_detection_iterations,
                 quantum_efficiency=run_instance.detector_properties.quantum_efficiency,
                 collection_efficiency=collection_efficiency,
@@ -287,13 +294,18 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
                 CS_on_switch=response.cross_section_off_to_on,
                 CS_off_switch=response.cross_section_on_to_off,
                 CS_fluorescent=response.cross_section_emission,
-                T_obs=pulse.duration
+                T_obs=pulse.duration,
+                G = G_rad,
+                G2 = G2_rad
             )
 
+#            print('Sum of expected emission kernel = ', exp_kernel.sum())
+#            print('Radial of G = ', G_rad)
+#            print('Sum of radial of G = ', G_rad.sum())
             # As described in eq (17) and (18) in publication
-            exp_kernel *= G_rad
-            var_kernel *= Gvar_rad  # According to the publication this should be abs(G_rad),
-                                    # but that may be an error
+#            exp_kernel *= G_rad
+#            var_kernel *= G_rad**2  # According to the publication this should be abs(G_rad),
+#                                    # but that may be an error
 
             return exp_kernel, var_kernel
 
