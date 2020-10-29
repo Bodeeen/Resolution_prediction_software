@@ -1,5 +1,6 @@
 from typing import Optional
 
+from packaging import version
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt, QRect, QSettings
 from PyQt5.QtGui import QFontMetrics, QCloseEvent
 from PyQt5.QtWidgets import QMessageBox, QMainWindow
@@ -197,24 +198,32 @@ class MainWindow(QMainWindow, BaseWidget):
     # Internal methods
     def _loadWindowSettings(self) -> None:
         settings = self._getWindowSettingsObject()
-        geometry = settings.value(_geometrySettingName)
-        state = settings.value(_stateSettingName)
+        savedGeometry = settings.value(_geometrySettingName)
+        savedState = settings.value(_stateSettingName)
+        savedAppVersion = settings.value(_appVersionSettingName)
 
-        if geometry is not None:
-            self.restoreGeometry(geometry)
+        # Only load window settings if they were from the same program version (which means they
+        # will be reset when updating). This is done to prevent issues when the layout of the
+        # program changes.
+        if (savedAppVersion is not None and
+            version.parse(savedAppVersion) == version.parse(frcpredict.__version__)):
+            if savedGeometry is not None:
+                self.restoreGeometry(savedGeometry)
 
-        if state is not None:
-            self.restoreState(state)
+            if savedState is not None:
+                self.restoreState(savedState)
 
     def _saveWindowSettings(self) -> None:
         settings = self._getWindowSettingsObject()
         settings.setValue(_geometrySettingName, self.saveGeometry())
         settings.setValue(_stateSettingName, self.saveState())
+        settings.setValue(_appVersionSettingName, frcpredict.__version__)
 
     def _resetWindowSettings(self) -> None:
         settings = self._getWindowSettingsObject()
         settings.remove(_geometrySettingName)
         settings.remove(_stateSettingName)
+        settings.remove(_appVersionSettingName)
 
         self.restoreGeometry(self._defaultGeometry)
         self.restoreState(self._defaultState)
@@ -250,3 +259,4 @@ class MainWindow(QMainWindow, BaseWidget):
 
 _geometrySettingName: str = "geometry"
 _stateSettingName: str = "state"
+_appVersionSettingName: str = "appVersion"
