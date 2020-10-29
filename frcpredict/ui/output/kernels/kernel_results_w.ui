@@ -156,7 +156,7 @@
         </size>
        </property>
        <property name="text">
-        <string>Export kernel image…</string>
+        <string>Export raw kernel image…</string>
        </property>
       </widget>
      </item>
@@ -172,7 +172,7 @@
         </size>
        </property>
        <property name="text">
-        <string>Export current visualization…</string>
+        <string>Export visualization…</string>
        </property>
       </widget>
      </item>
