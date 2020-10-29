@@ -144,34 +144,31 @@ class FrcResultsPresenter(BasePresenter[FrcResultsModel]):
         """ Exports the current plot curve X and Y values to a CSV file picked by the user. """
 
         if self.model.currentPlot == Plot.frc:
+            caption = "Export FRC Plot Values"
             if self.model.frcCurve is None:
                 return
-
-            path, _ = QFileDialog.getSaveFileName(
-                self.widget,
-                caption="Export FRC Plot Values",
-                filter="CSV files (*.csv)",
-                directory=UserFileDirs.SimulatedData
-            )
-
-            if path:  # Check whether a file was picked
-                self._exportFrcPlotToCsv(path)
         elif self.model.currentPlot == Plot.inspection:
+            caption = "Export Inspection Plot Values"
             if (self.model.viewOptions.inspectedMultivalueIndex < 0
                     or self.model.viewOptions.inspectionDetails is None):
                 return
+        else:
+            raise ValueError(f"currentPlot is {self.model.currentPlot} which is an invalid value.")
 
-            path, _ = QFileDialog.getSaveFileName(
-                self.widget,
-                caption="Export Inspection Plot Values",
-                filter="CSV files (*.csv)",
-                directory=UserFileDirs.SimulatedData
-            )
+        path, _ = QFileDialog.getSaveFileName(
+            self.widget,
+            caption=caption,
+            filter="CSV files (*.csv)",
+            directory=UserFileDirs.SimulatedData
+        )
 
-            if path:  # Check whether a file was picked
+        if path:  # Check whether a file was picked
+            if self.model.currentPlot == Plot.frc:
+                self._exportFrcPlotToCsv(path)
+            elif self.model.currentPlot == Plot.inspection:
                 self._exportInspectionPlotToCsv(path)
 
     @pyqtSlot()
     def _uiClickExportGraph(self) -> None:
-        """ Exports the currently displayed expected image to a file picked by the user. """
+        """ Exports the currently displayed graph to an image file picked by the user. """
         self.widget.showExportGraphDialog(self.model.currentPlot)
