@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from enum import Enum
 from typing import Optional, Union, Tuple, List
 
 import numpy as np
@@ -11,6 +12,14 @@ from frcpredict.simulation import (
 from frcpredict.util import ndarray_field, expand_with_multivalues
 from .run_instance import RunInstance
 from .sample import DisplayableSample
+
+
+class KernelType(Enum):
+    """
+    Kernel types, corresponding to indices in the get_kernels2d function.
+    """
+    exp_kernel = 0  # Expected emission
+    var_kernel = 1  # Variance
 
 
 @dataclass_json
@@ -68,6 +77,26 @@ class KernelSimulationResult:
             # Probably raised because the entered threshold is outside the interpolation range
             return None
 
+    def get_kernels2d(self, run_instance: RunInstance, *, cache: bool = True) -> np.ndarray:
+        """
+        Expands the simulated kernels to 2D arrays and caches the result. Indices in the top level
+        array correspond to the KernelType enum. run_instance must be a RunInstance without any
+        multivalues.
+        """
+        if self._cached_kernels2d is not None:
+            return self._cached_kernels2d
+
+        kernels2d = expand_kernels_to_2d(
+            self.exp_kernel, self.var_kernel,
+            canvas_inner_radius_nm=run_instance.simulation_settings.canvas_inner_radius,
+            px_size_nm=run_instance.imaging_system_settings.scanning_step_size
+        )
+
+        if cache:
+            self._cached_kernels2d = kernels2d
+
+        return kernels2d
+
     def get_frc_curve(self, run_instance: RunInstance, *,
                       cache_kernels2d: bool = True) -> Tuple[np.ndarray, np.ndarray]:
         """
@@ -93,7 +122,7 @@ class KernelSimulationResult:
         RunInstance without any multivalues.
         """
         if self._cached_frc_curve_x is None or self._cached_frc_curve_y is None:
-            kernels2d = self._get_kernels2d(run_instance, cache=cache_kernels2d)
+            kernels2d = self.get_kernels2d(run_instance, cache=cache_kernels2d)
             self._cached_frc_curve_x, self._cached_frc_curve_y = get_frc_curve_from_kernels2d(
                 kernels2d, run_instance
             )
@@ -106,7 +135,7 @@ class KernelSimulationResult:
         """
         if (self._cached_expected_image is None
                 or displayable_sample.get_id() != self._cached_expected_image_sample_id):
-            kernels2d = self._get_kernels2d(run_instance, cache=cache_kernels2d)
+            kernels2d = self.get_kernels2d(run_instance, cache=cache_kernels2d)
             self._cached_expected_image = get_expected_image_from_kernels2d(
                 kernels2d, run_instance, displayable_sample
             )
@@ -114,7 +143,7 @@ class KernelSimulationResult:
 
     def clear_cache(self, *, clear_kernels2d: bool = False, clear_frc_curves: bool = False,
                     clear_expected_image: bool = False) -> None:
-        """ Clears the chosen caches. """
+        """ Clears the specified caches. """
 
         if clear_kernels2d:
             self._cached_kernels2d = None
@@ -126,26 +155,6 @@ class KernelSimulationResult:
         if clear_expected_image:
             self._cached_expected_image = None
             self._cached_expected_image_sample_id = None
-
-    # Internal methods
-    def _get_kernels2d(self, run_instance: RunInstance, *, cache: bool = True) -> np.ndarray:
-        """
-        Expands the simulated kernels to 2D arrays and caches the result. run_instance must be a
-        RunInstance without any multivalues.
-        """
-        if self._cached_kernels2d is not None:
-            return self._cached_kernels2d
-
-        kernels2d = expand_kernels_to_2d(
-            self.exp_kernel, self.var_kernel,
-            canvas_inner_radius_nm=run_instance.simulation_settings.canvas_inner_radius,
-            px_size_nm=run_instance.imaging_system_settings.scanning_step_size
-        )
-
-        if cache:
-            self._cached_kernels2d = kernels2d
-
-        return kernels2d
 
 
 @dataclass_json

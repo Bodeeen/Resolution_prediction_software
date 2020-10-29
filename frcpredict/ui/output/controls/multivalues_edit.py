@@ -78,7 +78,7 @@ class MultivaluesEditWidget(BaseWidget):
                     fieldLabelFont.setPointSize(fieldLabelFont.pointSize() - 1)
 
                 # Checkbox for enabling/disabling inspection of the multivalue
-                inspectionCheckBox = QCheckBox(toolTip="Inspect parameter")
+                inspectionCheckBox = QCheckBox(toolTip="Inspect parameter in FRC/Resolution Output")
                 inspectionCheckBoxes.append(inspectionCheckBox)
                 inspectionStateChangeSignals.append(inspectionCheckBox.stateChanged)
 

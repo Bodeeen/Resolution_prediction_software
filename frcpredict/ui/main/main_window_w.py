@@ -57,12 +57,15 @@ class MainWindow(QMainWindow, BaseWidget):
         self.setWindowTitle(frcpredict.__summary__)
 
         self.tabifyDockWidget(self.dckInput, self.dckVirtualImagingResults)
+        self.tabifyDockWidget(self.dckFrcResults, self.dckKernelResults)
         self.takeCentralWidget()
         self.dckInput.raise_()
+        self.dckFrcResults.raise_()
         self.resizeDocks([self.dckInput], [int(self.width() * 0.7)], Qt.Horizontal)
 
-        self.frcResults.setOutputDirector(self.outputDirector)
-        self.virtualImagingResults.setOutputDirector(self.outputDirector)
+        self.outFrcResults.setOutputDirector(self.outputDirector)
+        self.outKernelResults.setOutputDirector(self.outputDirector)
+        self.outVirtualImagingResults.setOutputDirector(self.outputDirector)
 
         self.configPanel.setFieldName("Full configuration")
         self.configPanel.setModelType(RunInstance)

@@ -19,7 +19,6 @@ class OutputDirectorWidget(BaseWidget):
     # Signals
     viewOptionsChanged = pyqtSignal(ViewOptions)
     kernelResultChanged = pyqtSignal(object, object, bool)
-    expectedImageChanged = pyqtSignal(object, object, bool)
 
     displayableSampleChanged = pyqtSignal(object)
     thresholdChanged = pyqtSignal(float)
@@ -92,7 +91,6 @@ class OutputDirectorWidget(BaseWidget):
 
         # Emit signals
         self.kernelResultChanged.emit(runInstance, kernelResult, initialDisplayOfData)
-        self.expectedImageChanged.emit(runInstance, kernelResult, initialDisplayOfData)
 
     def updateViewOptions(self, viewOptions: ViewOptions) -> None:
         """

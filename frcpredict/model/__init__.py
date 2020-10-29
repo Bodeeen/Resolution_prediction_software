@@ -21,5 +21,5 @@ from .detector import DetectorProperties
 from .simulation_setings import SimulationSettings
 
 from .run_instance import RunInstance
-from .results import KernelSimulationResult, KernelSimulationResult, SimulationResults
+from .results import KernelType, KernelSimulationResult, SimulationResults
 from .persistent_container import PersistentContainer

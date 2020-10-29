@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1160</width>
-    <height>720</height>
+    <height>967</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -84,7 +84,47 @@
       <number>18</number>
      </property>
      <item row="1" column="0">
-      <widget class="FrcResultsWidget" name="frcResults" native="true">
+      <widget class="FrcResultsWidget" name="outFrcResults" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>300</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dckKernelResults">
+   <property name="features">
+    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>Kernels Output</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dckKernelContents">
+    <layout class="QGridLayout" name="gridLayout_6">
+     <property name="leftMargin">
+      <number>18</number>
+     </property>
+     <property name="topMargin">
+      <number>18</number>
+     </property>
+     <property name="rightMargin">
+      <number>18</number>
+     </property>
+     <property name="bottomMargin">
+      <number>18</number>
+     </property>
+     <item row="0" column="0">
+      <widget class="KernelResultsWidget" name="outKernelResults" native="true">
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -113,9 +153,9 @@
     <string>Virtual Imaging Output</string>
    </property>
    <attribute name="dockWidgetArea">
-    <number>2</number>
+    <number>1</number>
    </attribute>
-   <widget class="QWidget" name="dockWidgetContents_3">
+   <widget class="QWidget" name="dckVirtualImagingContents">
     <layout class="QGridLayout" name="gridLayout_9">
      <property name="leftMargin">
       <number>18</number>
@@ -130,7 +170,7 @@
       <number>18</number>
      </property>
      <item row="1" column="0">
-      <widget class="VirtualImagingResultsWidget" name="virtualImagingResults" native="true">
+      <widget class="VirtualImagingResultsWidget" name="outVirtualImagingResults" native="true">
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -283,7 +323,7 @@
               <x>0</x>
               <y>0</y>
               <width>219</width>
-              <height>579</height>
+              <height>707</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout" stretch="2,3">
@@ -373,7 +413,7 @@
               <x>0</x>
               <y>0</y>
               <width>143</width>
-              <height>596</height>
+              <height>724</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -734,6 +774,12 @@
   </customwidget>
   <customwidget>
    <class>OutputDirectorWidget</class>
+   <extends>QWidget</extends>
+   <header>frcpredict.ui</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>KernelResultsWidget</class>
    <extends>QWidget</extends>
    <header>frcpredict.ui</header>
    <container>1</container>

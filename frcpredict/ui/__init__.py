@@ -50,4 +50,5 @@ from .output.controls.output_director_w import OutputDirectorWidget
 from .output.controls.multivalues_edit import MultivaluesEditWidget
 
 from .output.frc.frc_results_w import FrcResultsWidget
+from .output.kernels.kernel_results_w import KernelResultsWidget
 from .output.virtual_imaging.virtual_imaging_results_w import VirtualImagingResultsWidget

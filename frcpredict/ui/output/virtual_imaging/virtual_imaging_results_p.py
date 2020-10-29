@@ -36,7 +36,7 @@ class VirtualImagingResultsPresenter(BasePresenter[VirtualImagingResultsModel]):
         super().__init__(VirtualImagingResultsModel(), widget)
 
         # Prepare UI events
-        widget.expectedImageChanged.connect(self._uiExpectedImageChange)
+        widget.kernelResultChanged.connect(self._uiKernelResultChange)
 
         widget.loadImageClicked.connect(self._uiClickLoadImage)
         widget.unloadImageClicked.connect(self._uiClickUnloadImage)
@@ -52,9 +52,9 @@ class VirtualImagingResultsPresenter(BasePresenter[VirtualImagingResultsModel]):
 
     # UI event handling
     @pyqtSlot(object, object, bool)
-    def _uiExpectedImageChange(self, runInstance: RunInstance,
-                               kernelResult: Optional[KernelSimulationResult],
-                               initialDisplayOfData: bool) -> None:
+    def _uiKernelResultChange(self, runInstance: RunInstance,
+                              kernelResult: Optional[KernelSimulationResult],
+                              initialDisplayOfData: bool) -> None:
         """
         Retrieves the expected image for the given kernel simulation result and tells the widget to
         display it.
