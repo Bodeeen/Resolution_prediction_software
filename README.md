@@ -2,7 +2,7 @@
 
 ## Standalone downloads
 
-The program can be downloaded in standalone executable format from
+The program can be downloaded in standalone format from
 [the releases page](https://github.com/Bodeeen/Resolution_prediction_software/releases).
 Python and the required packages are included, so that you don't have to follow the "getting
 started" guide below. 
