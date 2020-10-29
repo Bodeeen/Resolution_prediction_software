@@ -46,12 +46,6 @@
    </property>
    <item>
     <layout class="QFormLayout" name="formLayout">
-     <property name="fieldGrowthPolicy">
-      <enum>QFormLayout::ExpandingFieldsGrow</enum>
-     </property>
-     <property name="labelAlignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
      <property name="verticalSpacing">
       <number>12</number>
      </property>
@@ -63,7 +57,7 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="lblPrecacheFrcCurves">
        <property name="text">
         <string>Results in slightly slower initial simulation, but a smoother experience when adjusting/inspecting parameter values in the output.</string>
        </property>
@@ -87,7 +81,7 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLabel" name="label_2">
+      <widget class="QLabel" name="lblPrecacheExpectedImages">
        <property name="text">
         <string>Results in slower loading of sample images, but a smoother experience when adjusting/inspecting parameter values in the output.</string>
        </property>
@@ -97,7 +91,7 @@
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QLabel" name="label_5">
+      <widget class="QLabel" name="lblCacheKernels2D">
        <property name="text">
         <string>Results in increased RAM usage, but faster generation of expected images.</string>
        </property>
