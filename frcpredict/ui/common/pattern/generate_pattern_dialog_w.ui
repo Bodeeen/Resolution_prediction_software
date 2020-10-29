@@ -115,9 +115,9 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>0</y>
+            <y>-55</y>
             <width>232</width>
-            <height>164</height>
+            <height>190</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout">
@@ -181,25 +181,35 @@
              <item row="3" column="1">
               <widget class="FreeFloatBox" name="editPeriodicity"/>
              </item>
-             <item row="4" column="0">
+             <item row="5" column="0">
               <widget class="QLabel" name="lblNa">
                <property name="text">
                 <string>NA:</string>
                </property>
               </widget>
              </item>
-             <item row="4" column="1">
+             <item row="5" column="1">
               <widget class="FreeFloatBox" name="editNa"/>
              </item>
-             <item row="5" column="0">
+             <item row="6" column="0">
               <widget class="QLabel" name="lblEmissionWavelength">
                <property name="text">
                 <string>Em. wavelength [nm]:</string>
                </property>
               </widget>
              </item>
-             <item row="5" column="1">
+             <item row="6" column="1">
               <widget class="FreeFloatBox" name="editEmissionWavelength"/>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="lblZeroIntensity">
+               <property name="text">
+                <string>Relative intensity in min. [%]:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="FreeFloatBox" name="editZeroIntensity"/>
              </item>
             </layout>
            </item>

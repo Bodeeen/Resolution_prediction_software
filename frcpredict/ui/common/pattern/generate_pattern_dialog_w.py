@@ -24,6 +24,7 @@ class GeneratePatternDialog(QDialog, BaseWidget):
     radiusChanged = pyqtSignal(float)
     fwhmChanged = pyqtSignal(float)
     periodicityChanged = pyqtSignal(float)
+    zeroIntensityChanged = pyqtSignal(float)
     naChanged = pyqtSignal(float)
     emissionWavelengthChanged = pyqtSignal(float)
 
@@ -43,8 +44,8 @@ class GeneratePatternDialog(QDialog, BaseWidget):
         self._updateOKButton()
 
         setTabOrderForChildren(self, [self.listType, self.editAmplitude, self.editRadius,
-                                      self.editFwhm, self.editPeriodicity, self.editNa,
-                                      self.editEmissionWavelength])
+                                      self.editFwhm, self.editPeriodicity, self.editZeroIntensity,
+                                      self.editNa, self.editEmissionWavelength])
 
         # Connect own signal slots
         self.listType.currentRowChanged.connect(self._onTypeListRowChange)
@@ -54,6 +55,7 @@ class GeneratePatternDialog(QDialog, BaseWidget):
         self.editRadius.valueChanged.connect(self.radiusChanged)
         self.editFwhm.valueChanged.connect(self.fwhmChanged)
         self.editPeriodicity.valueChanged.connect(self.periodicityChanged)
+        self.editZeroIntensity.valueChanged.connect(self.zeroIntensityChanged)
         self.editNa.valueChanged.connect(self.naChanged)
         self.editEmissionWavelength.valueChanged.connect(self.emissionWavelengthChanged)
 
@@ -70,7 +72,8 @@ class GeneratePatternDialog(QDialog, BaseWidget):
 
     def setAvailableProperties(self, amplitude: bool = False, radius: bool = False,
                                fwhm: bool = False, periodicity: bool = False,
-                               na: bool = False, emissionWavelength: bool = False) -> None:
+                               zeroIntensity: bool = False, na: bool = False,
+                               emissionWavelength: bool = False) -> None:
         """ Sets which pattern properties are available for the user to modify. """
 
         setFormLayoutRowVisibility(self.frmProperties, 0, self.lblAmplitude, self.editAmplitude,
@@ -85,10 +88,14 @@ class GeneratePatternDialog(QDialog, BaseWidget):
         setFormLayoutRowVisibility(self.frmProperties, 3, self.lblPeriodicity, self.editPeriodicity,
                                    visible=periodicity)
 
-        setFormLayoutRowVisibility(self.frmProperties, 4, self.lblNa, self.editNa,
+        setFormLayoutRowVisibility(self.frmProperties, 4,
+                                   self.lblZeroIntensity, self.editZeroIntensity,
+                                   visible=zeroIntensity)
+
+        setFormLayoutRowVisibility(self.frmProperties, 5, self.lblNa, self.editNa,
                                    visible=na)
 
-        setFormLayoutRowVisibility(self.frmProperties, 5,
+        setFormLayoutRowVisibility(self.frmProperties, 6,
                                    self.lblEmissionWavelength, self.editEmissionWavelength,
                                    visible=emissionWavelength)
 
@@ -127,7 +134,8 @@ class GeneratePatternDialog(QDialog, BaseWidget):
 
     def updatePropertyFields(self, amplitude: Optional[float] = None,
                              radius: Optional[float] = None, fwhm: Optional[float] = None,
-                             periodicity: Optional[float] = None, na: Optional[float] = None,
+                             periodicity: Optional[float] = None,
+                             zeroIntensity: Optional[float] = None, na: Optional[float] = None,
                              emissionWavelength: Optional[float] = None) -> None:
         """ Updates the values of the fields in the widget. """
 
@@ -142,6 +150,9 @@ class GeneratePatternDialog(QDialog, BaseWidget):
 
         if periodicity is not None:
             self.editPeriodicity.setValue(periodicity)
+
+        if zeroIntensity is not None:
+            self.editZeroIntensity.setValue(zeroIntensity)
 
         if na is not None:
             self.editNa.setValue(na)

@@ -150,19 +150,27 @@ class DoughnutPatternData(RadialPatternData):
     A description of the properties of a doughnut pattern.
     """
 
-    periodicity: Union[float, Multivalue[float]] = extended_field(480.0,
-                                                                  description="periodicity [nm]")
+    periodicity: Union[float, Multivalue[float]] = extended_field(
+        480.0, description="periodicity [nm]"
+    )
+
+    zero_intensity: Union[float, Multivalue[float]] = extended_field(
+        0.0, description="relative intensity in min. [%]"
+    )
 
     # Methods
     def get_numpy_array(self, canvas_inner_radius_nm: float, px_size_nm: float,
                         extend_sides_to_diagonal: bool = False) -> np.ndarray:
         return generate_doughnut(periodicity=self.periodicity,
+                                 zero_intensity=self.zero_intensity,
                                  canvas_radius=get_canvas_radius_nm(canvas_inner_radius_nm,
                                                                     extend_sides_to_diagonal),
                                  px_size_nm=px_size_nm)
 
     def __str__(self) -> str:
-        return f"Doughnut; periodicity = {self.periodicity} nm"
+        return f"Doughnut;" \
+               f" periodicity = {self.periodicity} nm," \
+               f" relative intensity in min. = {self.zero_intensity}%"
 
 
 @dataclass_json

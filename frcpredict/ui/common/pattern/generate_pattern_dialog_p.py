@@ -41,8 +41,16 @@ class GeneratePatternPresenter(BasePresenter[Pattern]):
         widget.radiusChanged.connect(self._uiRadiusChange)
         widget.fwhmChanged.connect(self._uiFwhmChange)
         widget.periodicityChanged.connect(self._uiPeriodicityChange)
+        widget.zeroIntensityChanged.connect(self._uiZeroIntensityChange)
         widget.naChanged.connect(self._uiNaChange)
         widget.emissionWavelengthChanged.connect(self._uiEmissionWavelengthChange)
+
+    # Internal methods
+    def _updatePatternDataInModel(self, field_name: str, field_value: float) -> None:
+        if (hasattr(self.model.pattern_data, field_name) and
+                getattr(self.model.pattern_data, field_name) != field_value):
+            setattr(self.model.pattern_data, field_name, field_value)
+            self._onPatternDataChange(self.model)
 
     # Model event handling
     def _onPatternDataChange(self, model: Pattern) -> None:
@@ -72,6 +80,8 @@ class GeneratePatternPresenter(BasePresenter[Pattern]):
 
         hasPeriodicityProperty = model.pattern_type == PatternType.doughnut
 
+        hasZeroIntensityProperty = model.pattern_type == PatternType.doughnut
+
         hasNAProperty = model.pattern_type == PatternType.airy_from_NA
 
         hasEmissionWavelengthProperty = model.pattern_type == PatternType.airy_from_NA
@@ -88,6 +98,9 @@ class GeneratePatternPresenter(BasePresenter[Pattern]):
         if hasPeriodicityProperty:
             self.widget.updatePropertyFields(periodicity=model.pattern_data.periodicity)
 
+        if hasZeroIntensityProperty:
+            self.widget.updatePropertyFields(zeroIntensity=model.pattern_data.zero_intensity * 100)
+
         if hasNAProperty:
             self.widget.updatePropertyFields(na=model.pattern_data.na)
 
@@ -101,6 +114,7 @@ class GeneratePatternPresenter(BasePresenter[Pattern]):
             radius=hasRadiusProperty,
             fwhm=hasFwhmProperty,
             periodicity=hasPeriodicityProperty,
+            zeroIntensity=hasZeroIntensityProperty,
             na=hasNAProperty,
             emissionWavelength=hasEmissionWavelengthProperty
         )
@@ -120,39 +134,28 @@ class GeneratePatternPresenter(BasePresenter[Pattern]):
 
     @pyqtSlot(float)
     def _uiAmplitudeChange(self, value: float) -> None:
-        if (hasattr(self.model.pattern_data, "amplitude") and
-                self.model.pattern_data.amplitude != value):
-            self.model.pattern_data.amplitude = value
-            self._onPatternDataChange(self.model)
+        self._updatePatternDataInModel("amplitude", value)
 
     @pyqtSlot(float)
     def _uiRadiusChange(self, value: float) -> None:
-        if hasattr(self.model.pattern_data, "radius") and self.model.pattern_data.radius != value:
-            self.model.pattern_data.radius = value
-            self._onPatternDataChange(self.model)
+        self._updatePatternDataInModel("radius", value)
 
     @pyqtSlot(float)
     def _uiFwhmChange(self, value: float) -> None:
-        if hasattr(self.model.pattern_data, "fwhm") and self.model.pattern_data.fwhm != value:
-            self.model.pattern_data.fwhm = value
-            self._onPatternDataChange(self.model)
+        self._updatePatternDataInModel("fwhm", value)
 
     @pyqtSlot(float)
     def _uiPeriodicityChange(self, value: float) -> None:
-        if (hasattr(self.model.pattern_data, "periodicity") and
-                self.model.pattern_data.periodicity != value):
-            self.model.pattern_data.periodicity = value
-            self._onPatternDataChange(self.model)
+        self._updatePatternDataInModel("periodicity", value)
+
+    @pyqtSlot(float)
+    def _uiZeroIntensityChange(self, value: float) -> None:
+        self._updatePatternDataInModel("zero_intensity", value / 100)
 
     @pyqtSlot(float)
     def _uiNaChange(self, value: float) -> None:
-        if hasattr(self.model.pattern_data, "na") and self.model.pattern_data.na != value:
-            self.model.pattern_data.na = value
-            self._onPatternDataChange(self.model)
+        self._updatePatternDataInModel("na", value)
 
     @pyqtSlot(float)
     def _uiEmissionWavelengthChange(self, value: float) -> None:
-        if (hasattr(self.model.pattern_data, "emission_wavelength") and
-                    self.model.pattern_data.emission_wavelength != value):
-            self.model.pattern_data.emission_wavelength = value
-            self._onPatternDataChange(self.model)
+        self._updatePatternDataInModel("emission_wavelength", value)

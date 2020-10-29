@@ -41,16 +41,18 @@ def generate_gaussian(*, amplitude: float, fwhm: float,
     return result
 
 
-def generate_doughnut(*, periodicity: float,
+def generate_doughnut(*, periodicity: float, zero_intensity: float,
                       canvas_radius: float, px_size_nm: float) -> np.ndarray:
     """ Generates a 2D doughnut pattern. """
 
     def Doughnut1D(radius: float) -> np.ndarray:
-        return np.where(
+        doughnut = np.where(
             radius < periodicity / (2 * px_size_nm),
             0.5 - 0.5 * np.cos(2 * np.pi * radius * px_size_nm / periodicity),
             1
         )
+        doughnut = zero_intensity + (1 - zero_intensity) * doughnut
+        return doughnut
 
     return Doughnut1D(_radial_to_2d(canvas_radius, px_size_nm))
 
@@ -90,6 +92,9 @@ def generate_digital_pinhole(*, fwhm: float,
         # at least on Windows with certain processors. Therefore, we retry if this happens.
         if not np.isnan(b_inv).all():
             break
+        elif i >= 4:
+            # Maximum retries reached
+            raise RuntimeError("Couldn't generate digital pinhole pattern, pinv returned nan array")
 
     p = b_inv[:, 0].reshape(g_base.shape)
     return p
