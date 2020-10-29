@@ -156,7 +156,23 @@
         </size>
        </property>
        <property name="text">
-        <string>Export as image…</string>
+        <string>Export kernel image…</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnExportVisualization">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Export current visualization…</string>
        </property>
       </widget>
      </item>

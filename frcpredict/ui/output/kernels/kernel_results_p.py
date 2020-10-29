@@ -45,6 +45,7 @@ class KernelResultsPresenter(BasePresenter[KernelResultsModel]):
         widget.expKernelToggled.connect(self._uiToggleExpKernel)
         widget.varKernelToggled.connect(self._uiToggleVarKernel)
         widget.exportImageClicked.connect(self._uiClickExportImage)
+        widget.exportVisualizationClicked.connect(self._uiClickExportVisualization)
 
     # Internal methods
     def _getCurrentKernelImage(self) -> Optional[np.ndarray]:
@@ -94,3 +95,8 @@ class KernelResultsPresenter(BasePresenter[KernelResultsModel]):
 
         if path:  # Check whether a file was picked
             imsave(path, self._getCurrentKernelImage().astype(np.float32))
+
+    @pyqtSlot()
+    def _uiClickExportVisualization(self) -> None:
+        """ Exports the currently displayed visualization to an image file picked by the user. """
+        self.widget.showExportVisualizationDialog()
