@@ -9,10 +9,10 @@ from PyQt5.QtWidgets import QFormLayout, QWidget
 def getArrayPixmap(arr: np.ndarray, normalize: bool = False) -> QPixmap:
     """
     Converts a numpy array to a QPixmap. The array is expected to be of the shape
-    (width, height).
+    (width, height) and contain floats.
     """
 
-    if normalize:
+    if normalize and ((arr < 0) | (arr > 1)).any():
         ptp = np.ptp(arr)
         arr = np.divide(arr - np.min(arr), ptp, out=np.zeros_like(arr), where=ptp != 0)
 
