@@ -33,6 +33,7 @@ class KernelResultsWidget(BaseOutputReceiverWidget):
         # Prepare UI elements
         self.imgKernel.ui.roiBtn.setVisible(False)
         self.imgKernel.ui.menuBtn.setVisible(False)
+        self.imgKernel.getImageItem().setBorder({"color": "FF0", "width": 1})
 
         # Connect forwarded events
         self.rdoExpKernel.clicked.connect(self.expKernelToggled)
@@ -60,7 +61,6 @@ class KernelResultsWidget(BaseOutputReceiverWidget):
 
         # Update image & border
         self.imgKernel.setImage(kernel if kernel is not None else np.zeros((0, 0)))
-        self.imgKernel.getImageItem().setBorder({"color": "FF0", "width": 1})
 
         # Update controls
         self.imgKernel.setEnabled(kernel is not None)
