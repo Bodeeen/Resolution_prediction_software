@@ -59,7 +59,7 @@ class DetectorPropertiesPresenter(BasePresenter[DetectorProperties]):
 
     @pyqtSlot(bool)
     def _uiCameraToggle(self, enabled: bool) -> None:
-        if enabled:
+        if enabled and self.model.camera_pixel_size is None:
             self.model.camera_pixel_size = 20.0
 
     @pyqtSlot(float)
