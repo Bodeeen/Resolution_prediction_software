@@ -121,13 +121,13 @@ class FrcResultsWidget(BaseOutputReceiverWidget):
                 # Update inspection plot curve
                 self.plotInspection.plot(inspectionCurveX, inspectionCurveY)
 
-                paddingX = (inspectionCurveX.max() - inspectionCurveX.min()) / 10
-                paddingY = (inspectionCurveY.max() - inspectionCurveY.min()) / 10
+                paddingX = (np.nanmax(inspectionCurveX) - np.nanmin(inspectionCurveX)) / 10
+                paddingY = (np.nanmax(inspectionCurveY) - np.nanmin(inspectionCurveY)) / 10
 
-                plotXMin = inspectionCurveX.min() - paddingX
-                plotXMax = inspectionCurveX.max() + paddingX
-                plotYMin = inspectionCurveY.min() - paddingY
-                plotYMax = inspectionCurveY.max() + paddingY
+                plotXMin = np.nanmin(inspectionCurveX) - paddingX
+                plotXMax = np.nanmax(inspectionCurveX) + paddingX
+                plotYMin = np.nanmin(inspectionCurveY) - paddingY
+                plotYMax = np.nanmax(inspectionCurveY) + paddingY
 
                 try:
                     self.plotInspection.setRange(xRange=[plotXMin, plotXMax],
