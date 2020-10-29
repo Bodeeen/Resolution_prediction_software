@@ -27,7 +27,8 @@ class SampleStructurePickerDialog(QDialog, BaseWidget):
     # Methods
     def __init__(self, parent: Optional[QWidget] = None,
                  inputSampleStructure: Optional[SampleStructure] = None,
-                 forOutput: bool = False, allowLoadFile: bool = False) -> None:
+                 forOutput: bool = False, allowLoadFile: bool = False,
+                 initialValue: Optional[SampleStructure] = None) -> None:
         super().__init__(__file__, parent, Qt.WindowSystemMenuHint | Qt.WindowTitleHint)
 
         # Prepare UI elements
@@ -53,6 +54,8 @@ class SampleStructurePickerDialog(QDialog, BaseWidget):
 
         # Initialize presenter
         self._presenter = SampleStructurePickerPresenter(self, inputSampleStructure)
+        if initialValue is not None:
+            self._presenter.model = deepcopy(initialValue)
 
         self._updateOKButton()
 
@@ -106,13 +109,14 @@ class SampleStructurePickerDialog(QDialog, BaseWidget):
         self.imgPreview.setPixmap(pixmap)
 
     @staticmethod
-    def getSampleStructure(parent: Optional[QWidget] = None) -> Tuple[Optional[SampleStructure], bool]:
+    def getSampleStructure(parent: Optional[QWidget] = None,
+                           initialValue: Optional[SampleStructure] = None) -> Tuple[Optional[SampleStructure], bool]:
         """
         Synchronously opens a dialog for picking a sample structure. The second value in the
         returned tuple refers to whether the "OK" button was pressed when the dialog closed. If
         it's true, the first value will contain the picked sample structure.
         """
-        dialog = SampleStructurePickerDialog(parent)
+        dialog = SampleStructurePickerDialog(parent, initialValue)
         sampleStructure, result = SampleStructurePickerDialog._execDialog(dialog)
         assert sampleStructure is None or isinstance(sampleStructure, SampleStructure)
         return sampleStructure, result

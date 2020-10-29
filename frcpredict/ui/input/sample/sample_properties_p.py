@@ -71,7 +71,9 @@ class SamplePropertiesPresenter(BasePresenter[SampleProperties]):
 
     @pyqtSlot()
     def _uiClickLoadSampleStructure(self) -> None:
-        sampleStructure, okClicked = SampleStructurePickerDialog.getSampleStructure(self.widget)
+        sampleStructure, okClicked = SampleStructurePickerDialog.getSampleStructure(
+            self.widget, self.model.structure
+        )
 
         if okClicked:
             self.model.load_structure(sampleStructure)

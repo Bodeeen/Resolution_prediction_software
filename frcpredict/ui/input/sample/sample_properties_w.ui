@@ -87,7 +87,7 @@ In these simulations, the spectral power curve is assumed to be constant at ever
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="btnLoadSampleStructure">
+      <widget class="QToolButton" name="btnLoadSampleStructure">
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -97,18 +97,8 @@ In these simulations, the spectral power curve is assumed to be constant at ever
        <property name="text">
         <string>Load sample structure…</string>
        </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="btnUnloadSampleStructure">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>24</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Unload sample structure</string>
+       <property name="popupMode">
+        <enum>QToolButton::MenuButtonPopup</enum>
        </property>
       </widget>
      </item>

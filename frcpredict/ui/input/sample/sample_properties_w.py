@@ -1,4 +1,5 @@
 from PyQt5.QtCore import pyqtSignal, pyqtSlot
+from PyQt5.QtWidgets import QMenu
 
 from frcpredict.model import Multivalue, SampleProperties, ExplicitSampleProperties
 from frcpredict.ui import BaseWidget
@@ -35,7 +36,7 @@ class SamplePropertiesWidget(BaseWidget):
         self.updateStructureLoaded(False)
 
         setTabOrderForChildren(self, [self.configPanel, self.editInputPower, self.editDOrigin,
-                                      self.btnLoadSampleStructure, self.btnUnloadSampleStructure])
+                                      self.btnLoadSampleStructure])
 
         # Connect own signal slots
         self.modifiedFlagSet.connect(self._onModifiedFlagSet)
@@ -48,7 +49,6 @@ class SamplePropertiesWidget(BaseWidget):
         self.configPanel.dataLoaded.connect(self.modifiedFlagSet)
 
         self.btnLoadSampleStructure.clicked.connect(self.loadSampleStructureClicked)
-        self.btnUnloadSampleStructure.clicked.connect(self.unloadSampleStructureClicked)
 
         # Initialize presenter
         self._presenter = SamplePropertiesPresenter(self)
@@ -68,14 +68,23 @@ class SamplePropertiesWidget(BaseWidget):
         self.editDOrigin.setValue(basicProperties.D_origin)
 
     def updateStructureLoaded(self, loaded: bool) -> None:
+        # Update input fields enabled state
         self.editInputPower.setEnabled(not loaded)
         self.editDOrigin.setEnabled(not loaded)
-
         self.editInputPower.setStaticText("Automatic" if loaded else None)
         self.editDOrigin.setStaticText("Automatic" if loaded else None)
 
-        self.btnLoadSampleStructure.setVisible(not loaded)
-        self.btnUnloadSampleStructure.setVisible(loaded)
+        # Update unload action enabled state
+        actionMenu = QMenu()
+        unloadAction = actionMenu.addAction("Unload sample structure",
+                                            self.unloadSampleStructureClicked)
+        unloadAction.setEnabled(loaded)
+        self.btnLoadSampleStructure.setMenu(actionMenu)
+
+    # Internal methods
+    def updateStructure(self) -> None:
+        """ Updates which multivalue-related actions are available to the user. """
+
 
     # Event handling
     @pyqtSlot()
