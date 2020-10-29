@@ -46,7 +46,7 @@ class observable_property(dataclass_property):
             try:
                 should_emit = not hasattr(self_, internal_name) or getter(self_) != value
                 if isinstance(should_emit, np.ndarray):
-                    should_emit = should_emit.all()
+                    should_emit = should_emit.any()
             except ValueError:
                 should_emit = True
 
