@@ -130,12 +130,7 @@ def make_kernels(*, num_fluorophore_simulations: int,
         num_fluorophore_simulations=num_fluorophore_simulations,
         R_on=photon_illumination * CS_on_switch, R_off=photon_illumination * CS_off_switch,
         T_exp=T_obs, P_on=P_pre)
-        
-    """Old calculation"""
-#    alpha = quantum_efficiency * collection_efficiency * rfl
-#    h_var = alpha * expected_ON + alpha**2 * var_ON
-#    h_var *= G**2
-    """New calculation"""
+
     h_var1 = quantum_efficiency * collection_efficiency * np.multiply(G2, np.multiply(rfl, expected_ON))
     h_var2 = quantum_efficiency**2 * collection_efficiency**2 * np.multiply(G**2, np.multiply(rfl**2, var_ON))
     h_var = h_var2 + h_var1
@@ -205,6 +200,7 @@ def simulate(run_instance: "mdl.RunInstance", *,
 
         return result
 
+    # Run dynamic_simulate_single on each element in expanded_run_instances
     kernel_results = np.frompyfunc(dynamic_simulate_single, 1, 1)(expanded_run_instances)
 
     # Return results, or None if aborted
@@ -246,7 +242,6 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
                                           extend_sides_to_diagonal=radial_psf_and_pinhole)
 
     G_2D = fftconvolve(pinhole_arr, psf_arr, mode="same")
-    print('Sum of 2D G = ', G_2D.sum())
     G2_2D = fftconvolve(pinhole_arr ** 2, psf_arr, mode="same")
     if radial_psf_and_pinhole:
         G_rad = G_2D[canvas_outer_rad_px - 1, canvas_outer_rad_px - 1:]
@@ -295,17 +290,9 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
                 CS_off_switch=response.cross_section_on_to_off,
                 CS_fluorescent=response.cross_section_emission,
                 T_obs=pulse.duration,
-                G = G_rad,
-                G2 = G2_rad
+                G=G_rad,
+                G2=G2_rad
             )
-
-#            print('Sum of expected emission kernel = ', exp_kernel.sum())
-#            print('Radial of G = ', G_rad)
-#            print('Sum of radial of G = ', G_rad.sum())
-            # As described in eq (17) and (18) in publication
-#            exp_kernel *= G_rad
-#            var_kernel *= G_rad**2  # According to the publication this should be abs(G_rad),
-#                                    # but that may be an error
 
             return exp_kernel, var_kernel
 
