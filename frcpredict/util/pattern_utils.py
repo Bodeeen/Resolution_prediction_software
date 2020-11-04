@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Union, Tuple
 
 import numpy as np
 from astropy.modeling.functional_models import AiryDisk2D, Gaussian2D
@@ -45,7 +45,7 @@ def generate_doughnut(*, periodicity: float, zero_intensity: float,
                       canvas_radius: float, px_size_nm: float) -> np.ndarray:
     """ Generates a 2D doughnut pattern. """
 
-    def Doughnut1D(radius: float) -> np.ndarray:
+    def Doughnut1D(radius: Union[float, np.ndarray]) -> np.ndarray:
         doughnut = np.where(
             radius < periodicity / (2 * px_size_nm),
             0.5 - 0.5 * np.cos(2 * np.pi * radius * px_size_nm / periodicity),
