@@ -5,7 +5,7 @@ import pyqtgraph as pg
 from pyqtgraph.GraphicsScene import exportDialog
 from PyQt5.QtCore import pyqtSignal, Qt
 
-from frcpredict.ui.util import centerWindow
+from frcpredict.ui.util import centerWindow, fixPyQtGraphNanBehaviour
 from ..controls.output_director_m import ViewOptions, InspectionDetails
 from ..base_output_receiver_widget import BaseOutputReceiverWidget
 from .frc_results_m import Plot
@@ -113,6 +113,8 @@ class FrcResultsWidget(BaseOutputReceiverWidget):
         self.plotInspection.clear()
 
         if inspectedIndex > -1 and inspectionDetails is not None:
+            fixPyQtGraphNanBehaviour()
+
             inspectionCurveX = inspectionDetails.curveX
             inspectionCurveY = inspectionDetails.curveY
             inspectionCurveIndex = inspectionDetails.curveIndex
