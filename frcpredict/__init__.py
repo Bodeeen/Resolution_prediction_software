@@ -2,5 +2,5 @@
 
 __title__: str = "frcpredict"
 __summary__: str = "Resolution Prediction Software"
-__version__: str = "1.0.0"
+__version__: str = "1.0.1"
 __author__: str = "TestaLab"
