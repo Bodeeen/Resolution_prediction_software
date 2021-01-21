@@ -38,6 +38,9 @@ class KernelSimulationResult:
 
     var_kernel: np.ndarray = ndarray_field(default_factory=lambda: np.zeros(()),
                                            encode_as_base64=True)
+    
+    switches_kernel: np.ndarray = ndarray_field(default_factory=lambda: np.zeros(()),
+                                           encode_as_base64=True)
 
     _cached_kernels2d: Optional[np.ndarray] = ndarray_field(default=None, encode_as_base64=True,
                                                             exclude=Exclude.ALWAYS)
@@ -85,9 +88,9 @@ class KernelSimulationResult:
         """
         if self._cached_kernels2d is not None:
             return self._cached_kernels2d
-
+        
         kernels2d = expand_kernels_to_2d(
-            self.exp_kernel, self.var_kernel,
+            self.exp_kernel, self.var_kernel, self.switches_kernel,
             canvas_inner_radius_nm=run_instance.simulation_settings.canvas_inner_radius,
             px_size_nm=run_instance.imaging_system_settings.scanning_step_size
         )

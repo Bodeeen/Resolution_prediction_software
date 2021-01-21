@@ -65,8 +65,36 @@ def expected_P_on(*, P_pre: np.ndarray, R_on: np.ndarray, R_off: np.ndarray,
     return P_post
 
 
+def expected_P_on_and_switches(*, P_pre: np.ndarray, R_on: np.ndarray, R_off: np.ndarray,
+                  T_exp: float, num_fluorophore_simulations: int) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Calculates the probability of a fluorophore being in the ON-state after some observation time.
+    (Eq (5) in publication.)
+
+    - P_pre: Probability of fluorophore being ON at start
+    - R_on: Rate of ON-switching (events/ms)
+    - R_off: Rate of OFF-switching (events/ms)
+    - T_exp: Observation time
+    - P_post: Probability of fluorophore being ON at end
+    """
+
+    k = R_on + R_off + np.finfo(float).eps
+
+    t1 = R_on / k
+    fac1 = P_pre - t1
+    fac2 = np.exp(-k * T_exp)
+
+    P_post = t1 + fac1 * fac2
+
+    var_ON, avg_switches = variance_ON_time(
+        num_fluorophore_simulations=num_fluorophore_simulations,
+        R_on=R_on, R_off=R_off,
+        T_exp=T_exp, P_on=P_pre)
+
+    return P_post, avg_switches
+
 def variance_ON_time(*, num_fluorophore_simulations: int, R_on: np.ndarray, R_off: np.ndarray, 
-                     T_exp: float, P_on: np.ndarray) -> np.ndarray:
+                     T_exp: float, P_on: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     """
     Estimates the variance of emitted photons for a single fluorophore observer for a certain
     observation time. R_on, R_off and alpha are given as arrays of "paired" values. Outputs are also
@@ -82,17 +110,19 @@ def variance_ON_time(*, num_fluorophore_simulations: int, R_on: np.ndarray, R_of
     assert R_on.shape == R_off.shape  == P_on.shape
     
     variances = np.zeros(R_on.shape)
+    avg_N = np.zeros(R_on.shape)
     
     for idx, val in np.ndenumerate(R_on):
-        ON_times = make_random_telegraph_data(num_fluorophore_simulations,
+        ON_times, N_switches = make_random_telegraph_data(num_fluorophore_simulations,
                                               t_on=1 / R_off[idx],
                                               t_off=1 / R_on[idx],
                                               t_bleach=1e10,
                                               t_exp=T_exp,
                                               P_on=P_on[idx])
         variances[idx] = ON_times.var()
-
-    return variances
+        avg_N[idx] = N_switches.mean()
+        
+    return variances, avg_N
 
 
 def make_kernels(*, num_fluorophore_simulations: int,
@@ -100,7 +130,7 @@ def make_kernels(*, num_fluorophore_simulations: int,
                            max_intensity: float, relative_readout_intensity: np.ndarray,
                            P_pre: np.ndarray, CS_on_switch: float, CS_off_switch: float,
                            CS_fluorescent: float, T_obs: float,
-                           G: np.ndarray, G2: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+                           G: np.ndarray, G2: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Creates the expected emission and variance of emission "kernels".
 
@@ -126,7 +156,7 @@ def make_kernels(*, num_fluorophore_simulations: int,
 
     hE = quantum_efficiency * collection_efficiency * np.multiply(G, np.multiply(rfl, expected_ON))  # Comparable to eq (1) in publication
     
-    var_ON = variance_ON_time(
+    var_ON, avg_switches = variance_ON_time(
         num_fluorophore_simulations=num_fluorophore_simulations,
         R_on=photon_illumination * CS_on_switch, R_off=photon_illumination * CS_off_switch,
         T_exp=T_obs, P_on=P_pre)
@@ -135,7 +165,8 @@ def make_kernels(*, num_fluorophore_simulations: int,
     h_var2 = quantum_efficiency**2 * collection_efficiency**2 * np.multiply(G**2, np.multiply(rfl**2, var_ON))
     h_var = h_var2 + h_var1
 
-    return hE, h_var
+
+    return hE, h_var, avg_switches
 
 
 def simulate(run_instance: "mdl.RunInstance", *,
@@ -181,12 +212,13 @@ def simulate(run_instance: "mdl.RunInstance", *,
             return None
 
         multivalue_values, run_instance_single = data
-        exp_kernel, var_kernel = _simulate_single(run_instance_single)
+        exp_kernel, var_kernel, switches_kernel = _simulate_single(run_instance_single)
 
         result = mdl.KernelSimulationResult(
             multivalue_values=multivalue_values,
             exp_kernel=exp_kernel,
-            var_kernel=var_kernel
+            var_kernel=var_kernel,
+            switches_kernel=switches_kernel
         )
 
         if precache_frc_curves:
@@ -214,7 +246,7 @@ def simulate(run_instance: "mdl.RunInstance", *,
         return None
 
 
-def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.ndarray]:
+def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Main function to run the simulations. run_instance must be a RunInstance without any
     multivalues.
@@ -270,16 +302,27 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
             canvas_inner_rad_nm, px_size_nm
         )
         response = run_instance.fluorophore_settings.get_response(pulse.wavelength)
-
+        switches_kernel = np.zeros(illumination_pattern_rad.shape)
         if pulse_index < len(run_instance.pulse_scheme.pulses) - 1:
+            #Without estimating number of switches
             P_on = expected_P_on(
                 P_pre=P_on,
                 R_on=pulse.max_intensity * response.cross_section_off_to_on * illumination_pattern_rad,
                 R_off=pulse.max_intensity * response.cross_section_on_to_off * illumination_pattern_rad,
                 T_exp=pulse.duration
             )
+            #Estimating number of switches
+            P_on, additional_switches = expected_P_on_and_switches(
+                P_pre=P_on,
+                R_on=pulse.max_intensity * response.cross_section_off_to_on * illumination_pattern_rad,
+                R_off=pulse.max_intensity * response.cross_section_on_to_off * illumination_pattern_rad,
+                T_exp=pulse.duration,
+                num_fluorophore_simulations=run_instance.simulation_settings.num_kernel_detection_iterations,
+            )    
+            switches_kernel += additional_switches
+            
         else:  # Last pulse (readout pulse)
-            exp_kernel, var_kernel = make_kernels(
+            exp_kernel, var_kernel, additional_switches = make_kernels(
                 num_fluorophore_simulations=run_instance.simulation_settings.num_kernel_detection_iterations,
                 quantum_efficiency=run_instance.detector_properties.quantum_efficiency,
                 collection_efficiency=collection_efficiency,
@@ -292,8 +335,9 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
                 T_obs=pulse.duration,
                 G=G_rad,
                 G2=G2_rad
-            )
+            )    
+            switches_kernel += additional_switches
 
-            return exp_kernel, var_kernel
+            return exp_kernel, var_kernel, switches_kernel
 
     raise ValueError("Input didn't contain any pulses!")

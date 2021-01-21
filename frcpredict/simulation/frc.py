@@ -18,6 +18,9 @@ def get_frc_curve_from_kernels2d(kernels2d: np.ndarray,
     from the given simulated kernels. run_instance must be a RunInstance without any multivalues.
     """
 
+    #print resulting total expected fluorophore switches
+    print(kernels2d[2].sum())
+
     # Pixel size in nanometres
     px_size_nm = run_instance.imaging_system_settings.scanning_step_size
 

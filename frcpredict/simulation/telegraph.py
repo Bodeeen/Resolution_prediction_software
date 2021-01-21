@@ -1,7 +1,7 @@
 import numpy as np
 
 from frcpredict.util.numba_compat import jit, prange
-
+from typing import Tuple
 # https://en.wikipedia.org/wiki/Telegraph_process
 # The mean and variance listed there don't map precisely on to what
 # we're dealing with but are probably useful for understanding
@@ -10,7 +10,7 @@ from frcpredict.util.numba_compat import jit, prange
 
 @jit(nopython=True, parallel=True)
 def make_random_telegraph_data(num_trials: int, t_on: float, t_off: float,
-                               t_bleach: float, t_exp: float, P_on: float) -> np.ndarray:
+                               t_bleach: float, t_exp: float, P_on: float) -> Tuple[np.ndarray, np.ndarray]:
     """
     Generates realization of on times from telegraph process with bleaching.
 
@@ -36,6 +36,10 @@ def make_random_telegraph_data(num_trials: int, t_on: float, t_off: float,
     """
 
     output_array = np.zeros(num_trials)
+    N_array = np.zeros(num_trials)
+    if t_exp <= 0:
+        return output_array, N_array
+    
     for i in prange(num_trials):
         on_time = 0.0
         t_elapsed = 0.0
@@ -49,6 +53,8 @@ def make_random_telegraph_data(num_trials: int, t_on: float, t_off: float,
             state = (state + 1) % 2
             t_elapsed += time_until_switch
         output_array[i] = on_time
-
+        N_array[i] = N_switches
+        
     lifetimes = np.random.exponential(t_bleach, size=num_trials)
-    return np.minimum(output_array, lifetimes)
+    
+    return np.minimum(output_array, lifetimes), N_array
