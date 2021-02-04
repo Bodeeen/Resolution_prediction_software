@@ -75,7 +75,8 @@ class Array2DPatternData(PatternData):
 
     # Methods
     def get_numpy_array(self, canvas_inner_radius_nm: Optional[float] = None,
-                        px_size_nm: Optional[float] = None, _: bool = False) -> np.ndarray:
+                        px_size_nm: Optional[float] = None, _: bool = False,
+                        allowNonOddSideLength: bool = False) -> np.ndarray:
         """
         Returns a numpy array representation of the 2D array. If canvas_inner_radius_nm and
         px_size_nm are set, the 2D array will be resized under the assumption that it has an
@@ -84,7 +85,7 @@ class Array2DPatternData(PatternData):
 
         if canvas_inner_radius_nm is not None and px_size_nm is not None:
             _, canvas_side_length_px = get_canvas_dimensions_px(
-                get_canvas_radius_nm(canvas_inner_radius_nm), px_size_nm
+                get_canvas_radius_nm(canvas_inner_radius_nm), px_size_nm, allowNonOddSideLength
             )
             canvas_size = (canvas_side_length_px, canvas_side_length_px)
 

@@ -153,7 +153,9 @@ class SampleImage(DisplayableSample):
 
     # Internal methods
     def _get_image_arr(self, px_size_nm: float) -> np.ndarray:
-        return self.image.get_numpy_array(self.area_side_um * 500, px_size_nm)
+        return self.image.get_numpy_array(
+            self.area_side_um * 500, px_size_nm, allowNonOddSideLength=True
+        )
 
 
 @dataclass_json

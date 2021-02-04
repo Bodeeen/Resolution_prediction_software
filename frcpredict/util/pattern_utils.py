@@ -13,10 +13,14 @@ def get_canvas_radius_nm(inner_radius: float, extend_sides_to_diagonal: bool = F
     return inner_radius if not extend_sides_to_diagonal else inner_radius * np.sqrt(2)
 
 
-def get_canvas_dimensions_px(radius_nm: float, px_size_nm: float) -> Tuple[int, int]:
+def get_canvas_dimensions_px(radius_nm: float, px_size_nm: float,
+                             allowNonOddSideLength: bool = False) -> Tuple[int, int]:
     """ Returns the radius and side length of the canvas respectively, in pixels. """
     radius_px = np.int(np.round(radius_nm / px_size_nm))
-    side_length_px = radius_px * 2 - 1
+    if not allowNonOddSideLength:
+        side_length_px = radius_px * 2 - 1
+    else:
+        side_length_px = np.int(np.round(radius_nm * 2 / px_size_nm))
     return radius_px, side_length_px
 
 
