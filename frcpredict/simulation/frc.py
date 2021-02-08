@@ -19,7 +19,8 @@ def get_frc_curve_from_kernels2d(kernels2d: np.ndarray,
     """
 
     #print resulting total expected fluorophore switches
-    print(kernels2d[2].sum())
+    print('Sum of switches kernel: ', kernels2d[2].sum())
+    print('Average of switches kernel: ', kernels2d[2].mean())
 
     # Pixel size in nanometres
     px_size_nm = run_instance.imaging_system_settings.scanning_step_size

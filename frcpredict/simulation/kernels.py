@@ -114,8 +114,8 @@ def variance_ON_time(*, num_fluorophore_simulations: int, R_on: np.ndarray, R_of
     
     for idx, val in np.ndenumerate(R_on):
         ON_times, N_switches = make_random_telegraph_data(num_fluorophore_simulations,
-                                              t_on=1 / R_off[idx],
-                                              t_off=1 / R_on[idx],
+                                              t_on=1 / (R_off[idx] + 1e-12),
+                                              t_off=1 / (R_on[idx] + 1e-12),
                                               t_bleach=1e10,
                                               t_exp=T_exp,
                                               P_on=P_on[idx])
@@ -297,20 +297,20 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
 
     # Calculate ON-state probabilities after illumination
     P_on = np.zeros(canvas_outer_rad_px)
+    switches_kernel = np.zeros(canvas_outer_rad_px)
     for pulse_index, pulse in enumerate(run_instance.pulse_scheme.pulses):
         illumination_pattern_rad = pulse.illumination_pattern.get_radial_profile(
             canvas_inner_rad_nm, px_size_nm
         )
         response = run_instance.fluorophore_settings.get_response(pulse.wavelength)
-        switches_kernel = np.zeros(illumination_pattern_rad.shape)
         if pulse_index < len(run_instance.pulse_scheme.pulses) - 1:
             #Without estimating number of switches
-            P_on = expected_P_on(
-                P_pre=P_on,
-                R_on=pulse.max_intensity * response.cross_section_off_to_on * illumination_pattern_rad,
-                R_off=pulse.max_intensity * response.cross_section_on_to_off * illumination_pattern_rad,
-                T_exp=pulse.duration
-            )
+            # P_on = expected_P_on(
+            #     P_pre=P_on,
+            #     R_on=pulse.max_intensity * response.cross_section_off_to_on * illumination_pattern_rad,
+            #     R_off=pulse.max_intensity * response.cross_section_on_to_off * illumination_pattern_rad,
+            #     T_exp=pulse.duration
+            # )
             #Estimating number of switches
             P_on, additional_switches = expected_P_on_and_switches(
                 P_pre=P_on,
@@ -318,7 +318,8 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
                 R_off=pulse.max_intensity * response.cross_section_on_to_off * illumination_pattern_rad,
                 T_exp=pulse.duration,
                 num_fluorophore_simulations=run_instance.simulation_settings.num_kernel_detection_iterations,
-            )    
+            )
+            print('Additinal switches pulse ', pulse_index, additional_switches)
             switches_kernel += additional_switches
             
         else:  # Last pulse (readout pulse)
@@ -336,6 +337,7 @@ def _simulate_single(run_instance: "mdl.RunInstance") -> Tuple[np.ndarray, np.nd
                 G=G_rad,
                 G2=G2_rad
             )    
+            print('Additinal switches pulse ', pulse_index, additional_switches)
             switches_kernel += additional_switches
 
             return exp_kernel, var_kernel, switches_kernel
