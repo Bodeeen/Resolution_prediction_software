@@ -63,7 +63,8 @@ class KernelResultsPresenter(BasePresenter[KernelResultsModel]):
     def _onKernels2DChange(self, _) -> None:
         self.widget.updateKernelImage(self._getCurrentKernelImage())
 
-        if self.model.kernels2D is not None:
+        if (self.model.kernels2D is not None
+                and self.model.kernels2D.shape[0] > KernelType.switches_kernel.value):
             switchesKernel = self.model.kernels2D[KernelType.switches_kernel.value]
             self.widget.updateNumberOfSwitches(switchesKernel.sum(), switchesKernel.mean())
         else:

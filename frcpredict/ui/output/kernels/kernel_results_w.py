@@ -81,4 +81,7 @@ class KernelResultsWidget(BaseOutputReceiverWidget):
             if average is not None:
                 text += f", avg.: {round(average, 2):.2f}"
             text += ")"
+            self.rdoSwitchesKernel.setEnabled(True)
+        else:
+            self.rdoSwitchesKernel.setEnabled(False)
         self.rdoSwitchesKernel.setText(text)
