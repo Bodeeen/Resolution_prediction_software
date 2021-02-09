@@ -44,6 +44,7 @@ class KernelResultsPresenter(BasePresenter[KernelResultsModel]):
         widget.kernelResultChanged.connect(self._uiKernelResultChange)
         widget.expKernelToggled.connect(self._uiToggleExpKernel)
         widget.varKernelToggled.connect(self._uiToggleVarKernel)
+        widget.switchesKernelToggled.connect(self._uiToggleSwitchesKernel)
         widget.exportImageClicked.connect(self._uiClickExportImage)
         widget.exportVisualizationClicked.connect(self._uiClickExportVisualization)
 
@@ -62,6 +63,12 @@ class KernelResultsPresenter(BasePresenter[KernelResultsModel]):
     def _onKernels2DChange(self, _) -> None:
         self.widget.updateKernelImage(self._getCurrentKernelImage())
 
+        if self.model.kernels2D is not None:
+            switchesKernel = self.model.kernels2D[KernelType.switches_kernel.value]
+            self.widget.updateNumberOfSwitches(switchesKernel.sum(), switchesKernel.mean())
+        else:
+            self.widget.updateNumberOfSwitches(None, None)
+
     # UI event handling
     @pyqtSlot(object, object, bool)
     def _uiKernelResultChange(self, runInstance: RunInstance,
@@ -79,12 +86,23 @@ class KernelResultsPresenter(BasePresenter[KernelResultsModel]):
         if enabled:
             self.model.kernelType = KernelType.var_kernel
 
+    @pyqtSlot(bool)
+    def _uiToggleSwitchesKernel(self, enabled: bool) -> None:
+        if enabled:
+            self.model.kernelType = KernelType.switches_kernel
+
     @pyqtSlot()
     def _uiClickExportImage(self) -> None:
         """ Exports the currently displayed kernel image to a file picked by the user. """
 
-        caption = ("Export Emission Kernel Image" if self.model.kernelType == KernelType.exp_kernel
-                   else "Export Variance Kernel Image")
+        if self.model.kernelType == KernelType.exp_kernel:
+            caption = "Export Emission Kernel Image"
+        elif self.model.kernelType == KernelType.exp_kernel:
+            caption = "Export Variance Kernel Image"
+        elif self.model.kernelType == KernelType.switches_kernel:
+            caption = "Export Switches Kernel Image"
+        else:
+            caption = "Export Image"
 
         path, _ = QFileDialog.getSaveFileName(
             self.widget,

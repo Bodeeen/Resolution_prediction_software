@@ -25,7 +25,7 @@ def expand_kernels_to_2d(*kernels,
             np.linspace(0, canvas_outer_rad_px - 1, canvas_outer_rad_px),
             kernels[i], half_side
         )
-        for i in range(len(kernels))
+        for i in range(len(kernels)) if (kernels[i] is not None and len(kernels[i].shape) > 0)
     ])
 
     return kernels2d

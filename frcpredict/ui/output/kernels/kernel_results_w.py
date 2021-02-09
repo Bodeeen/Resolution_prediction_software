@@ -19,6 +19,7 @@ class KernelResultsWidget(BaseOutputReceiverWidget):
     kernelResultChanged = pyqtSignal(object, object, bool)
     expKernelToggled = pyqtSignal(bool)
     varKernelToggled = pyqtSignal(bool)
+    switchesKernelToggled = pyqtSignal(bool)
     exportImageClicked = pyqtSignal()
     exportVisualizationClicked = pyqtSignal()
 
@@ -38,6 +39,7 @@ class KernelResultsWidget(BaseOutputReceiverWidget):
         # Connect forwarded events
         self.rdoExpKernel.clicked.connect(self.expKernelToggled)
         self.rdoVarKernel.clicked.connect(self.varKernelToggled)
+        self.rdoSwitchesKernel.clicked.connect(self.switchesKernelToggled)
         self.btnExportImage.clicked.connect(self.exportImageClicked)
         self.btnExportVisualization.clicked.connect(self.exportVisualizationClicked)
 
@@ -55,6 +57,8 @@ class KernelResultsWidget(BaseOutputReceiverWidget):
             self.rdoExpKernel.setChecked(True)
         elif kernelType == KernelType.var_kernel:
             self.rdoVarKernel.setChecked(True)
+        elif kernelType == KernelType.switches_kernel:
+            self.rdoSwitchesKernel.setChecked(True)
 
     def updateKernelImage(self, kernel: Optional[np.ndarray]) -> None:
         """ Updates the kernel image in the widget. """
@@ -67,3 +71,14 @@ class KernelResultsWidget(BaseOutputReceiverWidget):
         self.grpViewOptions.setEnabled(kernel is not None)
         self.btnExportImage.setEnabled(kernel is not None)
         self.btnExportVisualization.setEnabled(kernel is not None)
+
+    def updateNumberOfSwitches(self, numSwitches: Optional[float],
+                               average: Optional[float] = None) -> None:
+        """ Updates the label that displays the total number of switches. """
+        text = "Fluorophore switches"
+        if numSwitches is not None:
+            text += f" (sum: {round(numSwitches)}"
+            if average is not None:
+                text += f", avg.: {round(average, 2):.2f}"
+            text += ")"
+        self.rdoSwitchesKernel.setText(text)

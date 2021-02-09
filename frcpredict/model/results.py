@@ -20,6 +20,7 @@ class KernelType(Enum):
     """
     exp_kernel = 0  # Expected emission
     var_kernel = 1  # Variance
+    switches_kernel = 2  # Fluorophore switches
 
 
 @dataclass_json
